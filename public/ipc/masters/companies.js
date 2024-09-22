@@ -1,5 +1,5 @@
 const { ipcMain } = require('electron');
-const { loadCompanies, getCompanyById, saveCompany, deleteCompanyById, editCompany } = require('../../database/masters/companies');
+const { loadCompanies, getCompanyById, saveCompany, deleteCompanyById, editCompany, searchCompanies } = require('../../database/masters/companies');
 
 ipcMain.on('load-companies', (event) => {
     loadCompanies((err, rows) => {
@@ -58,6 +58,17 @@ ipcMain.on('edit-company', (event, id) => {
             console.error(err.message);
         } else {
             event.sender.send('edit-company', row);
+        }
+    });
+});
+
+ipcMain.on('search-companies', (event, query) => {
+    searchCompanies(query, (err, query) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            console.log(query);
+            event.sender.send('search-companies-result', query);
         }
     });
 });

@@ -42,10 +42,32 @@ function deletePaymentMethodById(id, callback) {
     db.run('DELETE FROM payment_methods WHERE id = ?', [id], callback);
 }
 
+function searchPaymentMethods(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM payment_methods 
+        WHERE name LIKE ? 
+        `;
+        params = [`%${query}%`];
+    } else {
+        // クエリが空の場合はすべてのデータを返す
+        sql = `SELECT * FROM payment_methods`;
+    }
+
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
+
 module.exports = {
     initializeDatabase,
     loadPaymentMethods,
     getPaymentMethodById,
     savePaymentMethod,
-    deletePaymentMethodById
+    deletePaymentMethodById,
+    searchPaymentMethods
 };

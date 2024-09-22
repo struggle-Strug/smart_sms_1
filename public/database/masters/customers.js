@@ -35,9 +35,36 @@ function deleteCustomerById(id, callback) {
     db.run('DELETE FROM customers WHERE id = ?', [id], callback);
 }
 
+function searchCustomers(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM customers 
+        WHERE name_primary LIKE ? 
+        OR name_secondary LIKE ? 
+        OR name_kana LIKE ? 
+        OR id LIKE ? 
+        `;
+        params = [
+            `%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`, 
+        ];
+    } else {
+        // クエリが空の場合はすべてのデータを返す
+        sql = `SELECT * FROM customers`;
+    }
+
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
+
 module.exports = {
     loadCustomers,
     getCustomerById,
     saveCustomer,
     deleteCustomerById,
+    searchCustomers
 };

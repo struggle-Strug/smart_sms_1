@@ -1,5 +1,5 @@
 const { ipcMain } = require('electron');
-const { loadStorageFacilities, getStorageFacilityById, saveStorageFacility, deleteStorageFacilityById } = require('../../database/masters/storageFacilities');
+const { loadStorageFacilities, getStorageFacilityById, saveStorageFacility, deleteStorageFacilityById, searchStorageFacilities } = require('../../database/masters/storageFacilities');
 
 ipcMain.on('load-storage-facilities', (event) => {
     loadStorageFacilities((err, rows) => {
@@ -53,6 +53,16 @@ ipcMain.on('delete-storage-facility', (event, id) => {
             console.error(err.message);
         } else {
             event.sender.send('storage-facility-deleted', id);
+        }
+    });
+});
+
+ipcMain.on('search-storage-facilities', (event, query) => {
+    searchStorageFacilities(query, (err, query) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('search-storage-facilities-result', query);
         }
     });
 });

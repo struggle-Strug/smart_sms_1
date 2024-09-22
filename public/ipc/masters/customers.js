@@ -1,5 +1,5 @@
 const { ipcMain } = require('electron');
-const { loadCustomers, getCustomerById, saveCustomer, deleteCustomerById } = require('../../database/masters/customers');
+const { loadCustomers, getCustomerById, saveCustomer, deleteCustomerById, searchCustomers } = require('../../database/masters/customers');
 
 ipcMain.on('load-customers', (event) => {
     loadCustomers((err, rows) => {
@@ -63,6 +63,17 @@ ipcMain.on('get-customer-detail', (event, id) => {
             console.error(err.message);
         } else {
             event.sender.send('customer-detail-data', row);
+        }
+    });
+});
+
+ipcMain.on('search-customers', (event, query) => {
+    searchCustomers(query, (err, query) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            console.log(query);
+            event.sender.send('search-customers-result', query);
         }
     });
 });

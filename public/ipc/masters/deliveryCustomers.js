@@ -1,5 +1,5 @@
 const { ipcMain } = require('electron');
-const { loadDeliveryCustomers, getDeliveryCustomerById, saveDeliveryCustomer, deleteDeliveryCustomerById } = require('../../database/masters/deliveryCustomers');
+const { loadDeliveryCustomers, getDeliveryCustomerById, saveDeliveryCustomer, deleteDeliveryCustomerById, searchDeliveryCustomers } = require('../../database/masters/deliveryCustomers');
 
 ipcMain.on('load-delivery-customers', (event) => {
     loadDeliveryCustomers((err, rows) => {
@@ -53,6 +53,15 @@ ipcMain.on('get-delivery-customer-detail', (event, id) => {
             console.error(err.message);
         } else {
             event.sender.send('delivery-customer-detail-data', row);
+        }
+    });
+});
+ipcMain.on('search-delivery-customers', (event, query) => {
+    searchDeliveryCustomers(query, (err, query) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('search-delivery-customers-result', query);
         }
     });
 });

@@ -59,10 +59,37 @@ function deleteVendorById(id, callback) {
     db.run('DELETE FROM vendors WHERE id = ?', [id], callback);
 }
 
+function searchVendors(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM vendors 
+        WHERE name_primary LIKE ? 
+        OR name_secondary LIKE ? 
+        OR name_kana LIKE ? 
+        OR id LIKE ? 
+        `;
+        params = [
+            `%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`
+        ];
+    } else {
+        // クエリが空の場合はすべてのデータを返す
+        sql = `SELECT * FROM vendors`;
+    }
+
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
+
 module.exports = {
     initializeDatabase,
     loadVendors,
     getVendorById,
     saveVendor,
-    deleteVendorById
+    deleteVendorById,
+    searchVendors
 };

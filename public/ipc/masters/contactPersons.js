@@ -1,5 +1,5 @@
 const { ipcMain } = require('electron');
-const { loadContactPersons, getContactPersonById, saveContactPerson, deleteContactPersonById, editContactPerson } = require('../../database/masters/contactPersons');
+const { loadContactPersons, getContactPersonById, saveContactPerson, deleteContactPersonById, editContactPerson, searchContactPersons } = require('../../database/masters/contactPersons');
 
 ipcMain.on('load-contact-persons', (event) => {
     loadContactPersons((err, rows) => {
@@ -53,6 +53,16 @@ ipcMain.on('edit-contact-person', (event, id) => {
             console.error(err.message);
         } else {
             event.sender.send('edit-contact-person', row);
+        }
+    });
+});
+
+ipcMain.on('search-contact-persons', (event, query) => {
+    searchContactPersons(query, (err, query) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('search-contact-persons-result', query);
         }
     });
 });

@@ -1,5 +1,5 @@
 const { ipcMain } = require('electron');
-const { loadPrimarySections, getPrimarySectionById, savePrimarySection, deletePrimarySectionById, editPrimarySection } = require('../../database/masters/primarySections');
+const { loadPrimarySections, getPrimarySectionById, savePrimarySection, deletePrimarySectionById, editPrimarySection, searchPrimarySections } = require('../../database/masters/primarySections');
 
 // Primary Sectionsをロードする
 ipcMain.on('load-primary-sections', (event) => {
@@ -58,6 +58,16 @@ ipcMain.on('edit-primary-section', (event, id) => {
             console.error(err.message);
         } else {
             event.sender.send('edit-primary-section', row);
+        }
+    });
+});
+
+ipcMain.on('search-primary-sections', (event, query) => {
+    searchPrimarySections(query, (err, query) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('search-primary-sections-result', query);
         }
     });
 });

@@ -32,6 +32,8 @@ function saveCompany(companyData, callback) {
         bank_account_number,
         bank_branch_name,
         bank_branch_code,
+        zip_code,
+        account_holder_name,
         account_type,
         remarks
     } = companyData;
@@ -50,6 +52,8 @@ function saveCompany(companyData, callback) {
                 bank_branch_name = ?, 
                 bank_branch_code = ?, 
                 account_type = ?, 
+                zip_code = ?,
+                account_holder_name = ?,
                 remarks = ?, 
                 updated = datetime('now') 
             WHERE id = ?`,
@@ -65,6 +69,8 @@ function saveCompany(companyData, callback) {
                 bank_branch_name,
                 bank_branch_code,
                 account_type,
+                account_holder_name,
+                zip_code,
                 remarks,
                 id
             ],
@@ -73,7 +79,7 @@ function saveCompany(companyData, callback) {
     } else {
         db.run(
             `INSERT INTO companies 
-            (name, address, phone_number, fax_number, email, representive_name, bank_name, bank_account_number, bank_branch_name, bank_branch_code, account_type, remarks, created, updated) 
+            (name, address, phone_number, fax_number, email, representive_name, bank_name, bank_account_number, bank_branch_name, bank_branch_code, account_type, zip_code,account_holder_name, remarks, created, updated) 
             VALUES 
             (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
             [
@@ -87,7 +93,9 @@ function saveCompany(companyData, callback) {
                 bank_account_number,
                 bank_branch_name,
                 bank_branch_code,
+                zip_code,
                 account_type,
+                account_holder_name,
                 remarks
             ],
             callback
@@ -133,11 +141,50 @@ function initializeDatabase() {
     db.run(sql);
 }
 
+function addZipCodeColumn() {
+    const sql = `
+    ALTER TABLE companies 
+    ADD COLUMN zip_code VARCHAR(10)
+    `;
+    db.run(sql);
+}
+
+function addAccountHolderColumn() {
+    const sql = `
+    ALTER TABLE companies 
+    ADD COLUMN account_holder_name VARCHAR(255)
+    `;
+    db.run(sql);
+}
+
+function searchCompanies(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM companies 
+        WHERE name LIKE ? OR address LIKE ? OR phone_number LIKE ? OR email LIKE ? OR representive_name LIKE ?
+        `;
+        params = [`%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`];
+    } else {
+        sql = `SELECT * FROM companies`;
+    }
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
+
+
 module.exports = {
     loadCompanies,
     getCompanyById,
     saveCompany,
     deleteCompanyById,
     editCompany,
-    initializeDatabase
+    initializeDatabase,
+    addZipCodeColumn,
+    addAccountHolderColumn,
+    searchCompanies
 };

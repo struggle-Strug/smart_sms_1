@@ -58,10 +58,36 @@ function deleteDeliveryCustomerById(id, callback) {
     db.run('DELETE FROM delivery_customers WHERE id = ?', [id], callback);
 }
 
+function searchDeliveryCustomers(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM delivery_customers 
+        WHERE name_primary LIKE ? 
+        OR name_secondary LIKE ? 
+        OR id LIKE ? 
+        `;
+        params = [
+            `%${query}%`, `%${query}%`, `%${query}%`
+        ];
+    } else {
+        // クエリが空の場合はすべてのデータを返す
+        sql = `SELECT * FROM delivery_customers`;
+    }
+
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
+
 module.exports = {
     initializeDatabase,
     loadDeliveryCustomers,
     getDeliveryCustomerById,
     saveDeliveryCustomer,
     deleteDeliveryCustomerById,
+    searchDeliveryCustomers,
 };

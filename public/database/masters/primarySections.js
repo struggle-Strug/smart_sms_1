@@ -50,6 +50,7 @@ function savePrimarySection(primarySectionData, callback) {
     }
 }
 
+
 function deletePrimarySectionById(id, callback) {
     db.run('DELETE FROM primary_sections WHERE id = ?', [id], callback);
 }
@@ -58,4 +59,26 @@ function editPrimarySection(id, callback) {
     getPrimarySectionById(id, callback);
 }
 
-module.exports = { loadPrimarySections, getPrimarySectionById, savePrimarySection, deletePrimarySectionById, editPrimarySection, initializeDatabase };
+function searchPrimarySections(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM primary_sections 
+        WHERE name LIKE ?
+        `;
+        params = [
+            `%${query}%`
+        ];
+    } else {
+        // クエリが空の場合はすべてのデータを返す
+        sql = `SELECT * FROM primary_sections`;
+    }
+
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
+module.exports = { loadPrimarySections, getPrimarySectionById, savePrimarySection, deletePrimarySectionById, editPrimarySection, initializeDatabase, searchPrimarySections };

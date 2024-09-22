@@ -1,5 +1,5 @@
 const { ipcMain } = require('electron');
-const { loadVendors, getVendorById, saveVendor, deleteVendorById } = require('../../database/masters/vendors');
+const { loadVendors, getVendorById, saveVendor, deleteVendorById, searchVendors } = require('../../database/masters/vendors');
 
 ipcMain.on('load-vendors', (event) => {
     loadVendors((err, rows) => {
@@ -53,6 +53,16 @@ ipcMain.on('delete-vendor', (event, id) => {
             console.error(err.message);
         } else {
             event.sender.send('vendor-deleted', id);
+        }
+    });
+});
+
+ipcMain.on('search-vendors', (event, query) => {
+    searchVendors(query, (err, query) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('search-vendors-result', query);
         }
     });
 });

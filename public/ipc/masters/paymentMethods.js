@@ -1,5 +1,5 @@
 const { ipcMain } = require('electron');
-const { loadPaymentMethods, getPaymentMethodById, savePaymentMethod, deletePaymentMethodById } = require('../../database/masters/paymentMethods');
+const { loadPaymentMethods, getPaymentMethodById, savePaymentMethod, deletePaymentMethodById, searchPaymentMethods } = require('../../database/masters/paymentMethods');
 
 ipcMain.on('load-payment-methods', (event) => {
     loadPaymentMethods((err, rows) => {
@@ -53,6 +53,16 @@ ipcMain.on('delete-payment-method', (event, id) => {
             console.error(err.message);
         } else {
             event.sender.send('payment-method-deleted', id);
+        }
+    });
+});
+
+ipcMain.on('search-payment-methods', (event, query) => {
+    searchPaymentMethods(query, (err, query) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('search-payment-methods-result', query);
         }
     });
 });

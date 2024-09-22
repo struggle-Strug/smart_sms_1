@@ -69,11 +69,33 @@ function editShippingMethod(id, callback) {
     });
 }
 
+function searchShippingMethods(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM shipping_methods 
+        WHERE name LIKE ? 
+        `;
+        params = [`%${query}%`];
+    } else {
+        // クエリが空の場合はすべてのデータを返す
+        sql = `SELECT * FROM shipping_methods`;
+    }
+
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
+
 module.exports = {
     initializeDatabase,
     loadShippingMethods,
     getShippingMethodById,
     saveShippingMethod,
     deleteShippingMethodById,
-    editShippingMethod
+    editShippingMethod,
+    searchShippingMethods
 };

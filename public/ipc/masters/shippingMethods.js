@@ -4,7 +4,8 @@ const {
     getShippingMethodById,
     saveShippingMethod,
     deleteShippingMethodById,
-    editShippingMethod
+    editShippingMethod,
+    searchShippingMethods
 } = require('../../database/masters/shippingMethods');
 
 ipcMain.on('load-shipping-methods', (event) => {
@@ -59,6 +60,16 @@ ipcMain.on('edit-shipping-method', (event, id) => {
             console.error(err.message);
         } else {
             event.sender.send('edit-shipping-method', row);
+        }
+    });
+});
+
+ipcMain.on('search-shipping-methods', (event, query) => {
+    searchShippingMethods(query, (err, query) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('search-shipping-methods-result', query);
         }
     });
 });

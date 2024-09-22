@@ -53,10 +53,34 @@ function deleteStorageFacilityById(id, callback) {
     db.run('DELETE FROM storage_facilities WHERE id = ?', [id], callback);
 }
 
+function searchStorageFacilities(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM storage_facilities 
+        WHERE name LIKE ? 
+        `;
+        params = [
+            `%${query}%`
+        ];
+    } else {
+        // クエリが空の場合はすべてのデータを返す
+        sql = `SELECT * FROM storage_facilities`;
+    }
+
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
+
 module.exports = {
     initializeDatabase,
     loadStorageFacilities,
     getStorageFacilityById,
     saveStorageFacility,
     deleteStorageFacilityById,
+    searchStorageFacilities
 };

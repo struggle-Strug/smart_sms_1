@@ -35,13 +35,21 @@ function StorageFacilityDetail() {
                 </div>
                 <div className="flex bg-white">
                     <div className="w-1/5">
-                        <div className='p-4'>所在地</div>
+                        <div className='p-4'>倉庫コード</div>
+                    </div>
+                    <div className="w-4/5 py-1.5">
+                        <div className='px-4 py-2.5'>{facility.id || ''}</div>
+                    </div>
+                </div>
+                <div className="flex bg-gray-100">
+                    <div className="w-1/5">
+                        <div className='p-4'>倉庫所在地</div>
                     </div>
                     <div className="w-4/5 py-1.5">
                         <div className='px-4 py-2.5'>{facility.address || ''}</div>
                     </div>
                 </div>
-                <div className="flex bg-gray-100">
+                <div className="flex bg-white">
                     <div className="w-1/5">
                         <div className='p-4'>電話番号</div>
                     </div>
@@ -49,7 +57,7 @@ function StorageFacilityDetail() {
                         <div className='px-4 py-2.5'>{facility.phone_number || ''}</div>
                     </div>
                 </div>
-                <div className="flex bg-white">
+                <div className="flex bg-gray-100">
                     <div className="w-1/5">
                         <div className='p-4'>FAX番号</div>
                     </div>
@@ -57,7 +65,7 @@ function StorageFacilityDetail() {
                         <div className='px-4 py-2.5'>{facility.fax_number || ''}</div>
                     </div>
                 </div>
-                <div className="flex bg-gray-100">
+                <div className="flex bg-white">
                     <div className="w-1/5">
                         <div className='p-4'>担当者名</div>
                     </div>
@@ -65,7 +73,7 @@ function StorageFacilityDetail() {
                         <div className='px-4 py-2.5'>{facility.contact_person || ''}</div>
                     </div>
                 </div>
-                <div className="flex bg-white">
+                <div className="flex bg-gray-100">
                     <div className="w-1/5">
                         <div className='p-4'>メールアドレス</div>
                     </div>
@@ -73,7 +81,7 @@ function StorageFacilityDetail() {
                         <div className='px-4 py-2.5'>{facility.email || ''}</div>
                     </div>
                 </div>
-                <div className="flex bg-gray-100">
+                <div className="flex bg-white">
                     <div className="w-1/5">
                         <div className='p-4'>保管方法</div>
                     </div>
@@ -81,7 +89,7 @@ function StorageFacilityDetail() {
                         <div className='px-4 py-2.5'>{facility.storage_method || ''}</div>
                     </div>
                 </div>
-                <div className="flex bg-white">
+                <div className="flex bg-gray-100">
                     <div className="w-1/5">
                         <div className='p-4'>備考</div>
                     </div>

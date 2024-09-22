@@ -6,7 +6,7 @@ function Home() {
             <div className='text-3xl font-bold my-2'>
                 通知
             </div>
-            <div className='bg-gray-100 p-6 rounded-xl'>
+            <div className='bg-gray-100 p-6 rounded-xl flex items-center justify-center'>
                 <div className='grid grid-col-12 mb-4'>
                     <div className='col-start-1 col-end-2 text-gray-600'>2024年10月10日</div>
                     <div className='col-start-2 col-end-12 pl-4'>タイトルが入ります。タイトルが入ります。タイトルが入ります。タイトルが入ります。</div>
@@ -63,9 +63,7 @@ function Home() {
                         <div className='font-bold'>消費税設定</div>
                         <div><img src='/Icon.png' width={24} /></div>
                     </div>
-                </div>
-                <div className='flex items-center mt-6'>
-                    <div className='flex items-center py-3 px-4 border rounded'>
+                    <div className='flex items-center py-3 px-4 border rounded ml-14'>
                         <div className='font-bold'>使用者設定</div>
                         <div><img src='/Icon.png' width={24} /></div>
                     </div>
@@ -73,6 +71,9 @@ function Home() {
                         <div className='font-bold'>銀行API連携</div>
                         <div><img src='/Icon.png' width={24} /></div>
                     </div>
+                </div>
+                <div className='flex items-center mt-6'>
+                    
                 </div>
             </div>
         </div>

@@ -4,7 +4,8 @@ const {
     getSecondarySectionById,
     saveSecondarySection,
     deleteSecondarySectionById,
-    editSecondarySection
+    editSecondarySection,
+    searchSecondarySections
 } = require('../../database/masters/secondarySections');
 
 ipcMain.on('load-secondary-sections', (event) => {
@@ -65,6 +66,16 @@ ipcMain.on('edit-secondary-section', (event, id) => {
             console.error(err.message);
         } else {
             event.sender.send('edit-secondary-section', row);
+        }
+    });
+});
+
+ipcMain.on('search-secondary-sections', (event, query) => {
+    searchSecondarySections(query, (err, query) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('search-secondary-sections-result', query);
         }
     });
 });

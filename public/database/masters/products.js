@@ -60,11 +60,40 @@ function deleteProductById(id, callback) {
     db.run('DELETE FROM products WHERE id = ?', [id], callback);
 }
 
+function searchProducts(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM products 
+        WHERE name LIKE ? 
+        OR classification_primary LIKE ? 
+        OR classification_secondary LIKE ? 
+        OR jan_code LIKE ? 
+        OR manufacturer_name LIKE ? 
+        `;
+        params = [
+            `%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`, 
+            `%${query}%`
+        ];
+    } else {
+        // クエリが空の場合はすべてのデータを返す
+        sql = `SELECT * FROM products`;
+    }
+
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
+
 module.exports = {
     initializeDatabase,
     loadProducts,
     getProductById,
     saveProduct,
     deleteProductById,
+    searchProducts
 };
 

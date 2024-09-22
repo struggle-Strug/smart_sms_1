@@ -13,6 +13,7 @@ require('./ipc/masters/shippingMethods');
 require('./ipc/masters/companies');
 require('./ipc/masters/primarySections');
 require('./ipc/masters/secondarySections');
+require('./ipc/masters/shops');
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -52,10 +53,14 @@ function createWindow() {
   shippingMethodsDB.initializeDatabase();
   const companiesDB = require('./database/masters/companies');
   companiesDB.initializeDatabase();
+  // companiesDB.addZipCodeColumn();
+  // companiesDB.addAccountHolderColumn();
   const primarySectionsDB = require('./database/masters/primarySections');
   primarySectionsDB.initializeDatabase();
   const secondarySectionsDB = require('./database/masters/secondarySections');
   secondarySectionsDB.initializeDatabase();
+  const shopsSectionsDB = require('./database/masters/shops');
+  shopsSectionsDB.initializeDatabase();
 }
 
 const dbPath = path.join(app.getPath('userData'), 'database.db');

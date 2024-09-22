@@ -97,6 +97,29 @@ function editContactPerson(id, callback) {
     getContactPersonById(id, callback);
 }
 
+function searchContactPersons(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM contact_persons 
+        WHERE name LIKE ? 
+        `;
+        params = [
+            `%${query}%`
+        ];
+    } else {
+        // クエリが空の場合はすべてのデータを返す
+        sql = `SELECT * FROM contact_persons`;
+    }
+
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
+
 // モジュールエクスポート
 module.exports = {
     initializeDatabase,
@@ -105,4 +128,5 @@ module.exports = {
     saveContactPerson,
     deleteContactPersonById,
     editContactPerson,
+    searchContactPersons,
 };

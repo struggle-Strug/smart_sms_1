@@ -1,5 +1,5 @@
 const { ipcMain } = require('electron');
-const { loadProducts, getProductById, saveProduct, deleteProductById } = require('../../database/masters/products');
+const { loadProducts, getProductById, saveProduct, deleteProductById, searchProducts } = require('../../database/masters/products');
 
 ipcMain.on('load-products', (event) => {
     loadProducts((err, rows) => {
@@ -53,6 +53,16 @@ ipcMain.on('get-product-detail', (event, id) => {
             console.error(err.message);
         } else {
             event.sender.send('product-detail-data', row);
+        }
+    });
+});
+
+ipcMain.on('search-products', (event, query) => {
+    searchProducts(query, (err, query) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('search-products-result', query);
         }
     });
 });

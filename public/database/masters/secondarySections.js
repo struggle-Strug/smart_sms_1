@@ -55,6 +55,27 @@ function initializeDatabase() {
     `);
 }
 
+function searchSecondarySections(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM secondary_sections 
+        WHERE name LIKE ?
+        `;
+        params = [
+            `%${query}%`
+        ];
+    } else {
+        sql = `SELECT * FROM secondary_sections`;
+    }
+
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
 
 module.exports = {
     loadSecondarySections,
@@ -62,5 +83,6 @@ module.exports = {
     saveSecondarySection,
     deleteSecondarySectionById,
     editSecondarySection,
-    initializeDatabase
+    initializeDatabase,
+    searchSecondarySections
 };
