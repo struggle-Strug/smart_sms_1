@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import VoucherEntries from './Procurements/VoucherEntries';
+import Statements from './Procurements/Statements';
 
 function Procurement() {
   const [isOpen, setIsOpen] = useState(false);
@@ -47,7 +48,7 @@ function Procurement() {
               <div className='font-bold'>伝票入力</div>
               <div><img src='/Icon.png' width={24} /></div>
             </Link>
-            <Link to={"/procurement/voucher-entries"} className='flex items-center py-3 px-4 border rounded  ml-5'>
+            <Link to={"/procurement/statements"} className='flex items-center py-3 px-4 border rounded  ml-5'>
               <div className='font-bold'>明細表</div>
               <div><img src='/Icon.png' width={24} /></div>
             </Link>
@@ -61,6 +62,7 @@ function Procurement() {
       }
       <Routes>
         <Route path="voucher-entries/*" element={<VoucherEntries />} />
+        <Route path="statements/*" element={<Statements />} />
       </Routes>
     </div>)
 }

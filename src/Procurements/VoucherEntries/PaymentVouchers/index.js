@@ -1,6 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
+import PaymentVouchersAdd from './add';
+import PaymentVouchersDetail from './detail';
+import PaymentVouchersEdit from './edit';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -145,7 +148,9 @@ function PaymentVouchersIndex() {
     return (
         <Routes>
             <Route path="" element={<Index />} />
-            {/* <Route path="add" element={<CustomersAdd />} /> */}
+            <Route path="add" element={<PaymentVouchersAdd />} />
+            <Route path="detail/:id" element={<PaymentVouchersDetail />} />
+            <Route path="edit/:id" element={<PaymentVouchersEdit />} />
         </Routes>
     )
 }

@@ -5,171 +5,183 @@ import { Tooltip } from 'react-tooltip'
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 const { ipcRenderer } = window.require('electron');
 
-function CustomersDetail() {
-    const [isOpen, setIsOpen] = useState(false);
-    const dropdownRef = useRef(null);
-    const { id } = useParams();
-    const [customer, setCustomer] = useState(null);
-
-    const location = useLocation();
-
-    useEffect(() => {
-        ipcRenderer.send('get-customer-detail', id);
-        ipcRenderer.on('customer-detail-data', (event, data) => {
-            setCustomer(data);
-        });
-
-        return () => {
-            ipcRenderer.removeAllListeners('customer-detail-data');
-        };
-    }, [id]);
-
-    const toggleDropdown = () => {
-        setIsOpen(!isOpen);
-    };
-
-    const handleClickOutside = (event) => {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-            setIsOpen(false);
-        }
-    };
-
-    useEffect(() => {
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
-
-    if (!customer) {
-        return <div>Loading...</div>;
-    }
-
+function PaymentVouchersDetail() {
     return (
         <div className='w-full'>
-            <div className='p-8'>
-                <div className=' mb-8 flex'>
-                    <div className='text-2xl font-bold'>{customer.name_primary || '株式会社テスト'}</div>
-                    <Link to={`/master/customers/edit/${customer.id}`} className='ml-auto py-3 px-4 border rounded-lg text-base font-bold'>編集する</Link>
-                </div>
-                <div className="flex bg-gray-100">
-                    <div className="w-1/5">
-                        <div className='p-4'>得意先名1</div>
-                    </div>
-                    <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{customer.name_primary || ''}</div>
-                    </div>
-                </div>
-                <div className="flex bg-white">
-                    <div className="w-1/5">
-                        <div className='p-4'>顧客名1(カタカナ)</div>
-                    </div>
-                    <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{customer.name_kana || ''}</div>
-                    </div>
-                </div>
-                <div className="flex bg-gray-100">
-                    <div className="w-1/5">
-                        <div className='p-4 flex items-center'>
-                            得意先名2
-                            <a data-tooltip-id="my-tooltip" data-tooltip-content="得意先名の続き、支店名、部署名等" className='flex ml-3'>
-                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M8.47315 4.57084H10.1398V6.23751H8.47315V4.57084ZM8.47315 7.90418H10.1398V12.9042H8.47315V7.90418ZM9.30648 0.404175C4.70648 0.404175 0.973145 4.13751 0.973145 8.73751C0.973145 13.3375 4.70648 17.0708 9.30648 17.0708C13.9065 17.0708 17.6398 13.3375 17.6398 8.73751C17.6398 4.13751 13.9065 0.404175 9.30648 0.404175ZM9.30648 15.4042C5.63148 15.4042 2.63981 12.4125 2.63981 8.73751C2.63981 5.06251 5.63148 2.07084 9.30648 2.07084C12.9815 2.07084 15.9731 5.06251 15.9731 8.73751C15.9731 12.4125 12.9815 15.4042 9.30648 15.4042Z" fill="#1F2937" />
+            <div className=''>
+                <div className='pt-8 pb-6 flex border-b px-8 items-center'>
+                    <div className='text-2xl font-bold'>{'株式会社テスト'}</div>
+                    <div className='flex ml-auto'>
+                        <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
+                            <div className='pr-1.5 pl-1 flex items-center'>
+                                <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg" className=''>
+                                    <path d="M0.391357 18.7308H4.14136L15.2014 7.67077L11.4514 3.92077L0.391357 14.9808V18.7308ZM2.39136 15.8108L11.4514 6.75077L12.3714 7.67077L3.31136 16.7308H2.39136V15.8108Z" fill="#1F2937" />
+                                    <path d="M15.7614 1.02077C15.3714 0.630771 14.7414 0.630771 14.3514 1.02077L12.5214 2.85077L16.2714 6.60077L18.1014 4.77077C18.4914 4.38077 18.4914 3.75077 18.1014 3.36077L15.7614 1.02077Z" fill="#1F2937" />
                                 </svg>
-                            </a>
-                            <Tooltip id="my-tooltip" />
+                            </div>
+                            編集
+                        </Link>
+                        <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
+                            <div className='pr-1.5 pl-1 flex items-center'>
+                                <svg width="21" height="19" viewBox="0 0 21 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.3926 5.72949H16.3926V0.729492H4.39258V5.72949H3.39258C1.73258 5.72949 0.392578 7.06949 0.392578 8.72949V14.7295H4.39258V18.7295H16.3926V14.7295H20.3926V8.72949C20.3926 7.06949 19.0526 5.72949 17.3926 5.72949ZM6.39258 2.72949H14.3926V5.72949H6.39258V2.72949ZM14.3926 16.7295H6.39258V12.7295H14.3926V16.7295ZM16.3926 12.7295V10.7295H4.39258V12.7295H2.39258V8.72949C2.39258 8.17949 2.84258 7.72949 3.39258 7.72949H17.3926C17.9426 7.72949 18.3926 8.17949 18.3926 8.72949V12.7295H16.3926Z" fill="#1F2937" />
+                                    <path d="M16.3926 10.2295C16.9449 10.2295 17.3926 9.78178 17.3926 9.22949C17.3926 8.67721 16.9449 8.22949 16.3926 8.22949C15.8403 8.22949 15.3926 8.67721 15.3926 9.22949C15.3926 9.78178 15.8403 10.2295 16.3926 10.2295Z" fill="#1F2937" />
+                                </svg>
+                            </div>
+                            印刷
+                        </Link>
+                        <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold flex'>
+                            <div className='pr-1.5 pl-1 flex items-center'>
+                                <svg width="15" height="19" viewBox="0 0 15 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M11.3926 6.72949V16.7295H3.39258V6.72949H11.3926ZM9.89258 0.729492H4.89258L3.89258 1.72949H0.392578V3.72949H14.3926V1.72949H10.8926L9.89258 0.729492ZM13.3926 4.72949H1.39258V16.7295C1.39258 17.8295 2.29258 18.7295 3.39258 18.7295H11.3926C12.4926 18.7295 13.3926 17.8295 13.3926 16.7295V4.72949Z" fill="#1F2937" />
+                                </svg>
+                            </div>
+                            削除
+                        </Link>
+                    </div>
+                </div>
+                <div className='px-8 py-6'>
+                    <div className='py-2.5 font-bold text-xl'>伝票番号</div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>伝票番号</div>
+                        <div>PO-0000000001</div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>発注日付</div>
+                        <div>202-08-27</div>
+                    </div>
+                    <div className='py-3'>
+                        <hr className='' />
+                    </div>
+                    <div className='py-2.5 font-bold text-xl'>取引先情報</div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>宛名</div>
+                        <div>株式会社御中</div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>仕入先コード</div>
+                        <div></div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>郵便番号</div>
+                        <div>1040031</div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>市区町村・番地</div>
+                        <div>東京都中央区銀座6丁目10-1建物名・部屋番号などGINZA SIX 13階</div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>担当者</div>
+                        <div></div>
+                    </div>
+                    <div className='py-3'>
+                        <hr className='' />
+                    </div>
+                    <div className='py-2.5 font-bold text-xl'>自社情報</div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>自社名</div>
+                        <div></div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>担当者名</div>
+                        <div></div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>電話番号</div>
+                        <div>088040760246</div>
+                    </div>
+                    <div className='py-3'>
+                        <hr className='' />
+                    </div>
+                    <div className='py-2.5 font-bold text-xl'>明細</div>
+                    <table className="w-full mt-8 table-auto">
+                        <thead className=''>
+                            <tr className='border-b'>
+                                <th className='text-left py-2'>商品コード</th>
+                                <th className='text-left py-2 w-72'>商品名</th>
+                                <th className='text-left py-2'>数量</th>
+                                <th className='text-left py-2'>単位</th>
+                                <th className='text-left py-2'>発注残数</th>
+                                <th className='text-left py-2'>単価</th>
+                                <th className='text-left py-2'>税率</th>
+                                <th className='text-left py-2'>倉庫</th>
+                                <th className='text-left py-2'>金額</th>
+                                <th className='text-left py-2'>税額</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr className='border-b'>
+                                <td className='py-2'>1234</td>
+                                <td className='py-2'>商品名が入ります。商品名が入ります。商品名が入ります。商品名が入ります。入ります</td>
+                                <td className='py-2'>200</td>
+                                <td className='py-2'>200</td>
+                                <td className='py-2'>20</td>
+                                <td className='py-2'>200</td>
+                                <td className='py-2'>10個</td>
+                                <td className='py-2'>倉庫</td>
+                                <td className='py-2'>0円</td>
+                                <td className='py-2'>0円</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div className='py-6 flex'>
+                        <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>税抜合計</div>
+                                <div>5,000円</div>
+                            </div>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>消費税(8%)</div>
+                                <div>5,000円</div>
+                            </div>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>消費税(10%)</div>
+                                <div>5,000円</div>
+                            </div>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>消費税合計</div>
+                                <div>5,000円</div>
+                            </div>
+                            <div className='flex'>
+                                <div className='w-40'>税込合計</div>
+                                <div>5,000円</div>
+                            </div>
                         </div>
                     </div>
-                    <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{customer.name_secondary || ''}</div>
+                    <div className='py-3'>
+                        <hr className='' />
                     </div>
-                </div>
-                <div className="flex bg-white">
-                    <div className="w-1/5">
-                        <div className='p-4'>得意先コード</div>
+                    <div className='py-2.5 font-bold text-xl'>備考</div>
+                    <div className='flex items-center pb-2'>
+                    恐れいりますが、振込手数料は貴社にてご負担ください。
                     </div>
-                    <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{customer.billing_code || ''}</div>
+                    <div className='py-3'>
+                        <hr className='' />
                     </div>
-                </div>
-                <div className="flex bg-gray-100">
-                    <div className="w-1/5">
-                        <div className='p-4'>電話番号</div>
+                    <div className='py-2.5 font-bold text-xl'>支払情報</div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>締日</div>
+                        <div></div>
                     </div>
-                    <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{customer.phone_number || ''}</div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>支払期日</div>
+                        <div></div>
                     </div>
-                </div>
-                <div className="flex bg-white">
-                    <div className="w-1/5">
-                        <div className='p-4'>FAX</div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>支払方法</div>
+                        <div></div>
                     </div>
-                    <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{customer.fax_number || ''}</div>
+                    <div className='py-3'>
+                        <hr className='' />
                     </div>
-                </div>
-                <div className="flex bg-gray-100">
-                    <div className="w-1/5">
-                        <div className='p-4'>メールアドレス</div>
+                    <div className='py-2.5 font-bold text-xl'>納品情報</div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>入荷予定日</div>
+                        <div></div>
                     </div>
-                    <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{customer.email || ''}</div>
-                    </div>
-                </div>
-                <div className="flex bg-white">
-                    <div className="w-1/5">
-                        <div className='p-4'>郵便番号</div>
-                    </div>
-                    <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{customer.zip_code || ''}</div>
-                    </div>
-                </div>
-                <div className="flex bg-gray-100">
-                    <div className="w-1/5">
-                        <div className='p-4'>住</div>
-                    </div>
-                    <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{customer.address || ''}</div>
-                    </div>
-                </div>
-                <div className="flex bg-white">
-                    <div className="w-1/5">
-                        <div className='p-4'>敬称</div>
-                    </div>
-                    <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{customer.honorific || ''}</div>
-                    </div>
-                </div>
-                <div className="flex bg-gray-100">
-                    <div className="w-1/5">
-                        <div className='p-4'>請求先コード</div>
-                    </div>
-                    <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{customer.billing_code || ''}</div>
-                    </div>
-                </div>
-                <div className="flex bg-white">
-                    <div className="w-1/5">
-                        <div className='p-4'>請求情報</div>
-                    </div>
-                    <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{customer.billing_information || ''}</div>
-                    </div>
-                </div>
-                <div className="flex bg-gray-100">
-                    <div className="w-1/5">
-                        <div className='p-4'>月次売上目標</div>
-                    </div>
-                    <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{customer.monthly_sales_target ? `${customer.monthly_sales_target}万円` : ''}</div>
-                    </div>
-                </div>
-                <div className="flex bg-white">
-                    <div className="w-1/5">
-                        <div className='p-4'>備考</div>
-                    </div>
-                    <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{customer.remarks || ''}</div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>ステータス</div>
+                        <div></div>
                     </div>
                 </div>
             </div>
@@ -177,4 +189,4 @@ function CustomersDetail() {
     );
 }
 
-export default CustomersDetail;
+export default PaymentVouchersDetail;

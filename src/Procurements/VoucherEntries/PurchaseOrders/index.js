@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import PurchaseOrdersAdd from './add';
-// import CustomersEdit from './edit';
+import PurchaseOrdersEdit from './edit';
 import PurchaseOrdersDetail from './detail';
 
 const { ipcRenderer } = window.require('electron');
@@ -149,7 +149,7 @@ function PurchaseOrdersIndex() {
         <Routes>
             <Route path="" element={<Index />} />
             <Route path="add" element={<PurchaseOrdersAdd />} />
-            {/* <Route path="edit/:id" element={<CustomersEdit />} /> */}
+            <Route path="edit/:id" element={<PurchaseOrdersEdit />} />
             <Route path="detail/:id" element={<PurchaseOrdersDetail />} />
         </Routes>
     )

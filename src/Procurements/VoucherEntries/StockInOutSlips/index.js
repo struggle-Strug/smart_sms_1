@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import StockInOutSlipsAdd from './add';
-// import CustomersEdit from './edit';
+import StockInOutSlipsEdit from './edit';
 import StockInOutSlipsDetail from './detail';
 
 const { ipcRenderer } = window.require('electron');
@@ -149,7 +149,7 @@ function StockInOutSlipsIndex() {
         <Routes>
             <Route path="" element={<Index />} />
             <Route path="add" element={<StockInOutSlipsAdd />} />
-            {/* <Route path="edit/:id" element={<CustomersEdit />} /> */}
+            <Route path="edit/:id" element={<StockInOutSlipsEdit />} />
             <Route path="detail/:id" element={<StockInOutSlipsDetail />} />
         </Routes>
     )
