@@ -80,51 +80,90 @@ function Index() {
     return (
         <div className='w-full'>
             <div className='p-8'>
-                <div className='pb-6 text-2xl font-bold'>発注明細表</div>
+                <div className='pb-6 flex items-center'>
+                <div className='text-2xl font-bold'>発注明細表</div>
+                    <div className='flex ml-auto'>
+                        <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold flex'>
+                            <div className='flex items-center'>
+                            </div>
+                            明細表設定
+                        </Link>
+                        </div>
+                    </div>
                 <div className='bg-gray-100 rounded p-6'>
                     <div className='pb-3 text-lg font-bold'>
                         表示条件指定
                     </div>
-                    <div className='grid grid-cols-3 gap-8'>
+                    <div className='grid grid-cols-3 gap-6'>
                         <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                        <div className='flex items-center'>
+                            <div>
+                            <div className='text-sm pb-1.5'>期間指定 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
+                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            </div>
+                            <div>
+                            <div className='w-1'>&nbsp;</div>
+                            <div className='flex items-center px-2'>〜</div>
+                            </div>
+                            
+                            <div>
+                            <div className='text-sm pb-1.5 text-gray-100'>期間指定</div>
+                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            </div>
+                        </div>
+                        </div>
+                        <div>
+                            <div className='text-sm pb-1.5'>カテゴリー</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                         </div>
                         <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                            <div className='text-sm pb-1.5'>サブカテゴリー</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                         </div>
                         <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                            <div className='text-sm pb-1.5'>仕入先</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                         </div>
                         <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                            <div className='text-sm pb-1.5'>商品名</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                         </div>
                         <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                            <div className='text-sm pb-1.5'>担当者</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                         </div>
                         <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                            <div className='text-sm pb-1.5'>倉庫</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                         </div>
                         <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                            <div className='text-sm pb-1.5'>ステータス</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                         </div>
                         <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                            <div className='text-sm pb-1.5'>ロット番号</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                         </div>
                         <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                            <div className='text-sm pb-1.5'>区分１</div>
+                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                        </div>
+                        <div>
+                            <div className='text-sm pb-1.5'>区分２</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                         </div>
                     </div>
-                    <div className='flex mt-4'>
-                        <div className='border rounded-lg py-3 px-7 mb-8 text-base font-bold bg-blue-600 text-white'>適用して表示</div>
+                    <div className='flex mt-6'>
+                        <div className='border rounded-lg py-3 px-7 text-base font-bold bg-blue-600 text-white'>適用して表示</div>
+                    </div>
+                </div>
+                <div className='flex justify-end'>
+                    <div className='flex ml-auto pt-6'>
+                        <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold flex'>
+                    <div className='flex items-center'>
+                        </div>
+                            エクスポート
+                        </Link>
                     </div>
                 </div>
                 <table className="w-full mt-8 table-auto">

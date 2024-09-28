@@ -80,7 +80,16 @@ function Index() {
     return (
         <div className='w-full'>
             <div className='p-8'>
-                <div className='pb-6 text-2xl font-bold'>入出庫明細表</div>
+            <div className='pb-6 flex items-center'>
+                <div className='text-2xl font-bold'>入出庫明細表</div>
+                    <div className='flex ml-auto'>
+                        <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold flex'>
+                            <div className='flex items-center'>
+                            </div>
+                            明細表設定
+                        </Link>
+                        </div>
+                    </div>
                 <div className='bg-gray-100 rounded p-6'>
                     <div className='pb-3 text-lg font-bold'>
                         表示条件指定
