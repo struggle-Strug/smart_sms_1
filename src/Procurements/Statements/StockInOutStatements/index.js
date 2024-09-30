@@ -91,10 +91,10 @@ function Index() {
                         </div>
                     </div>
                 <div className='bg-gray-100 rounded p-6'>
-                    <div className='pb-3 text-lg font-bold'>
+                    <div className='pb-6 text-lg font-bold'>
                         表示条件指定
                     </div>
-                    <div className='grid grid-cols-3 gap-8'>
+                    <div className='grid grid-cols-3 gap-6'>
                     <div>
                         <div className='flex items-center'>
                             <div>
@@ -120,44 +120,59 @@ function Index() {
                             <div className='text-sm pb-1.5'>入庫先倉庫</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                         </div>
-                        
+                        <div className='flex-col'>
+                        <div className='text-sm pb-1.5'>処理種別 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
+                        <div className='my-2.5 flex'>
+                        <label className='text-base'>
+                            <input type="radio" name="processType" value="type1" className='mr-2' />出庫
+                        </label>
+                        <label className='text-base ml-10'>
+                            <input type="radio" name="processType" value="type2" className='mr-2' />入庫
+                        </label>
+                        <label className='text-base ml-10'>
+                            <input type="radio" name="processType" value="type3" className='mr-2' />振替
+                        </label>
+                    </div>
+                        </div>
                         <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                            <div className='text-sm pb-1.5'>商品</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                         </div>
                         <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
-                        </div>
-                        <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
-                        </div>
-                        <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
-                        </div>
-                        <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
-                        </div>
-                        <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
-                        </div>
-                        <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                            <div className='text-sm pb-1.5'>担当者</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                         </div>
                     </div>
-                    <div className='flex mt-4'>
-                        <div className='border rounded-lg py-3 px-7 mb-8 text-base font-bold bg-blue-600 text-white'>適用して表示</div>
+                    <div className='grid grid-cols-4 gap-6 py-6'>
+                        <div>
+                        <div className='text-sm pb-1.5'>ステータス</div>
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                        </div>
+                        <div>
+                        <div className='text-sm pb-1.5'>ロット番号</div>
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                        </div>
+                        <div>
+                        <div className='text-sm pb-1.5'>区分１</div>
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                        </div>
+                        <div>
+                        <div className='text-sm pb-1.5'>区分２</div>
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                        </div>
+                    </div>
+                    <div className='flex'>
+                        <div className='border rounded-lg py-3 px-7 text-base font-bold bg-blue-600 text-white'>適用して表示</div>
                     </div>
                 </div>
-            </div>
-            <div className='flex px-8 justify-end'>
-                <div className='border rounded-lg py-3 px-7 text-base font-bold text-black'>
-                    エクスポート
+            <div className='flex justify-end'>
+                    <div className='flex ml-auto pt-6'>
+                        <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold flex'>
+                    <div className='flex items-center'>
+                        </div>
+                            エクスポート
+                        </Link>
+                    </div>
                 </div>
             </div>
             <div className='px-8 pb-8'>

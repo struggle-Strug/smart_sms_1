@@ -91,10 +91,10 @@ function Index() {
                         </div>
                     </div>
                 <div className='bg-gray-100 rounded-lg p-6'>
-                    <div className='pb-3 text-lg font-bold'>
+                    <div className='pb-6 text-lg font-bold'>
                         表示条件指定
                     </div>
-                        <div className='flex items-center space-x-2 pb-6'>
+                        <div className='grid grid-cols-2 gap-6 pb-6'>
                         <div className='pl-0'>
                         <div className='text-sm pb-1.5'>期間指定 <span className='text-xs ml-1 font-bold text-red-600'>必須</span>
                         </div> {/* ボックスと波線の間隔を調整 */}
@@ -104,12 +104,10 @@ function Index() {
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/2' placeholder='' name="" value={""} />
                         </div>
                         </div>
-                            <div className='pl-8'>
-                            <div className='text-sm pb-1.5'>
-                            支払方法
-                        </div>
+                        <div>
+                            <div className='text-sm pb-1.5'>仕入先</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
-                        </div>
+                            </div>
                         </div>
                         
                     <div className='grid grid-cols-3 gap-6'>

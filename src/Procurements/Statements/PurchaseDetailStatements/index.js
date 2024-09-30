@@ -1,11 +1,33 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
+import CustomSelect from '../../../Components/CustomSelect';
 
 const { ipcRenderer } = window.require('electron');
 
 
 function Index() {
+    const options = [
+        { value: '御中', label: '御中' },
+        { value: '貴社', label: '貴社' },
+    ];
+
+    const [customer, setCustomer] = useState({
+        id: '',
+        name_primary: '',
+        name_secondary: '',
+        name_kana: '',
+        honorific: '',
+        phone_number: '',
+        fax_number: '',
+        zip_code: '',
+        address: '',
+        email: '',
+        remarks: '',
+        billing_code: '',
+        billing_information: '',
+        monthly_sales_target: ''
+    });
     const [customers, setCustomers] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
@@ -91,7 +113,7 @@ function Index() {
                         </div>
                     </div>
                 <div className='bg-gray-100 rounded p-6'>
-                    <div className='pb-3 text-lg font-bold'>
+                    <div className='pb-6 text-lg font-bold'>
                         表示条件指定
                     </div>
                     <div className='grid grid-cols-3 gap-6'>
@@ -138,7 +160,7 @@ function Index() {
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>ステータス</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <CustomSelect options={options} name={"honorific"} data={customer} setData={setCustomer} />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>ロット番号</div>
