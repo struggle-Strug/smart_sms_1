@@ -95,14 +95,32 @@ function Index() {
                         表示条件指定
                     </div>
                     <div className='grid grid-cols-3 gap-8'>
+                    <div>
+                        <div className='flex items-center'>
+                            <div>
+                            <div className='text-sm pb-1.5'>期間指定 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
+                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            </div>
+                            <div>
+                            <div className='w-1'>&nbsp;</div>
+                            <div className='flex items-center px-2'>〜</div>
+                            </div>
+                            
+                            <div>
+                            <div className='text-sm pb-1.5 text-gray-100'>期間指定</div>
+                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            </div>
+                        </div>
+                        </div>
                         <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                            <div className='text-sm pb-1.5'>出庫元倉庫</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                         </div>
                         <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                            <div className='text-sm pb-1.5'>入庫先倉庫</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                         </div>
+                        
                         <div>
                             <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
