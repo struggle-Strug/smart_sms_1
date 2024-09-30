@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
-import VoucherEntries from './Procurements/VoucherEntries';
-import Statements from './Procurements/Statements';
-import SummaryAndManagementSheets from './Procurements/SummaryAndManagementSheets';
+// import VoucherEntries from './Procurements/VoucherEntries';
+// import Statements from './Procurements/Statements';
+// import SummaryAndManagementSheets from './Procurements/SummaryAndManagementSheets';
 
 function SalesMagement() {
   const [isOpen, setIsOpen] = useState(false);
