@@ -6,7 +6,7 @@ import CustomSelect from '../../../Components/CustomSelect';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 const { ipcRenderer } = window.require('electron');
 
-function StockInOutSlipsEdit() {
+function SalesSlipsAdd() {
     const options = [
         { value: '御中', label: '御中' },
         { value: '貴社', label: '貴社' },
@@ -76,7 +76,7 @@ function StockInOutSlipsEdit() {
                         </div>
                     </div>
                     <div className='pb-2'>
-                        <div className='w-40 text-sm pb-1.5'>先方担当者</div>
+                        <div className='w-40 text-sm pb-1.5'>アップデート</div>
                         <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
                     </div>
                     <div className='py-3'>
@@ -198,5 +198,5 @@ function StockInOutSlipsEdit() {
     );
 }
 
-export default StockInOutSlipsEdit;
+export default SalesSlipsAdd;
 

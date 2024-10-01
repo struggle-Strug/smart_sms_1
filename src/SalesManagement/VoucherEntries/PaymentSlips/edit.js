@@ -6,7 +6,7 @@ import CustomSelect from '../../../Components/CustomSelect';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 const { ipcRenderer } = window.require('electron');
 
-function PurchaseInvoicesEdit() {
+function PaymentSlipsEdit() {
     const options = [
         { value: '御中', label: '御中' },
         { value: '貴社', label: '貴社' },
@@ -32,7 +32,7 @@ function PurchaseInvoicesEdit() {
         <div className='w-full'>
             <div className=''>
                 <div className='pt-8 pb-6 flex border-b px-8 items-center'>
-                    <div className='text-2xl font-bold'>{'株式会社テスト'}</div>
+                    <div className='text-2xl font-bold'>支払伝票</div>
                     <div className='flex ml-auto'>
                         <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
                             <div className='pr-1.5 pl-1 flex items-center'>
@@ -87,7 +87,7 @@ function PurchaseInvoicesEdit() {
                         <div className='text-sm pb-1.5'>担当者</div>
                         <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
                     </div>
-                    <div className='py-2.5 font-bold text-xl'>仕入伝票</div>
+                    <div className='py-2.5 font-bold text-xl'>支払伝票</div>
                     <div className='rounded-lg bg-gray-100 p-6 flex'>
                         <div className=''>
                             <div className='text-sm pb-1.5'>仕入日付</div>
@@ -109,6 +109,22 @@ function PurchaseInvoicesEdit() {
                     <div className='py-3'>
                         <hr className='' />
                     </div>
+                    <table className="w-full mt-8 table-auto">
+                        <thead className=''>
+                            <tr className='border-b'>
+                                <th className='text-left py-2'>選択</th>
+                                <th className='text-left py-2 w-72'>仕入日付</th>
+                                <th className='text-left py-2'>仕入伝票番号</th>
+                                <th className='text-left py-2'>仕入先名</th>
+                                <th className='text-left py-2'>金額</th>
+                                <th className='text-left py-2'>ステータス</th>
+                            </tr>
+                        </thead>
+                    </table>
+                    <div className='flex my-6'>
+                    <div className='border rounded-lg py-3 px-4 text-base font-bold bg-blue-600 text-white'><Link to="add" className={``}>紐付ける</Link></div>
+                    </div>
+                        <hr className='' />
                     <div className='py-2.5 font-bold text-xl'>明細</div>
                     <div className='flex items-end'>
                         <div className=''>
@@ -117,15 +133,15 @@ function PurchaseInvoicesEdit() {
                                     <div className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>＋</div>
                                 </div>
                                 <div className=''>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'>支払方法 <span className='text-sm font-bold text-red-600'>必須</span></div>
                                     <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "120px" }} />
                                 </div>
                                 <div className='ml-4'>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'>支払金額 <span className='text-sm font-bold text-red-600'>必須</span></div>
                                     <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "440px" }} />
                                 </div>
                                 <div className='ml-4'>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'>手数料等</div>
                                     <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "180px" }} />
                                 </div>
                                 <div className='ml-4'>
@@ -133,6 +149,16 @@ function PurchaseInvoicesEdit() {
                                         <svg width="15" height="19" viewBox="0 0 15 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M11.3926 6.72949V16.7295H3.39258V6.72949H11.3926ZM9.89258 0.729492H4.89258L3.89258 1.72949H0.392578V3.72949H14.3926V1.72949H10.8926L9.89258 0.729492ZM13.3926 4.72949H1.39258V16.7295C1.39258 17.8295 2.29258 18.7295 3.39258 18.7295H11.3926C12.4926 18.7295 13.3926 17.8295 13.3926 16.7295V4.72949Z" fill="#1F2937" />
                                         </svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className='flex items-end justify-end py-2'>
+                                <div className=''>
+                                    <div className='flex items-center'>
+                                        <div className='mr-4'>消費税額</div>
+                                        <div className='mr-12'>0円</div>
+                                        <div className='mr-4'>金額</div>
+                                        <div className='font-bold text-lg'>0円</div>
                                     </div>
                                 </div>
                             </div>
@@ -175,5 +201,6 @@ function PurchaseInvoicesEdit() {
     );
 }
 
-export default PurchaseInvoicesEdit;
+export default PaymentSlipsEdit;
+
 

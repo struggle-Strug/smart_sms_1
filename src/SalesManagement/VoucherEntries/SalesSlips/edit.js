@@ -6,7 +6,7 @@ import CustomSelect from '../../../Components/CustomSelect';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 const { ipcRenderer } = window.require('electron');
 
-function PurchaseOrdersEdit() {
+function SalesSlipsEdit() {
     const options = [
         { value: '御中', label: '御中' },
         { value: '貴社', label: '貴社' },
@@ -198,5 +198,5 @@ function PurchaseOrdersEdit() {
     );
 }
 
-export default PurchaseOrdersEdit;
+export default SalesSlipsEdit;
 

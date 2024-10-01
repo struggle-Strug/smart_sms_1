@@ -41,7 +41,7 @@ function SalesManagement() {
       {
         location.pathname === '/sales-management' && 
         <div className='px-40 py-10'>
-        <div className='pb-6 text-2xl font-bold'>仕入管理</div>
+        <div className='pb-6 text-2xl font-bold'>売上管理</div>
         <div className=''>
           <div className='flex items-center mb-4'>
             <Link to={"/sales-management/voucher-entries"} className='flex items-center py-3 px-4 border rounded'>

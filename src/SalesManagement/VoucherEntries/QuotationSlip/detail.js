@@ -5,7 +5,7 @@ import { Tooltip } from 'react-tooltip'
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 const { ipcRenderer } = window.require('electron');
 
-function StockInOutSlipsDetail() {
+function QuotationSlipDetail() {
     return (
         <div className='w-full'>
             <div className=''>
@@ -50,21 +50,45 @@ function StockInOutSlipsDetail() {
                         <div className='w-40'>発注日付</div>
                         <div>202-08-27</div>
                     </div>
+                    <div className='py-3'>
+                        <hr className='' />
+                    </div>
+                    <div className='py-2.5 font-bold text-xl'>取引先情報</div>
                     <div className='flex items-center pb-2'>
-                        <div className='w-40'>処理種別</div>
+                        <div className='w-40'>宛名</div>
+                        <div>株式会社御中</div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>仕入先コード</div>
                         <div></div>
                     </div>
                     <div className='flex items-center pb-2'>
-                        <div className='w-40'>出庫元倉庫</div>
-                        <div></div>
+                        <div className='w-40'>郵便番号</div>
+                        <div>1040031</div>
                     </div>
                     <div className='flex items-center pb-2'>
-                        <div className='w-40'>入庫先倉庫</div>
-                        <div></div>
+                        <div className='w-40'>市区町村・番地</div>
+                        <div>東京都中央区銀座6丁目10-1建物名・部屋番号などGINZA SIX 13階</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>担当者</div>
                         <div></div>
+                    </div>
+                    <div className='py-3'>
+                        <hr className='' />
+                    </div>
+                    <div className='py-2.5 font-bold text-xl'>自社情報</div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>自社名</div>
+                        <div></div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>担当者名</div>
+                        <div></div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>電話番号</div>
+                        <div>088040760246</div>
                     </div>
                     <div className='py-3'>
                         <hr className='' />
@@ -77,9 +101,12 @@ function StockInOutSlipsDetail() {
                                 <th className='text-left py-2 w-72'>商品名</th>
                                 <th className='text-left py-2'>数量</th>
                                 <th className='text-left py-2'>単位</th>
-                                <th className='text-left py-2'>ロット番号</th>
+                                <th className='text-left py-2'>発注残数</th>
                                 <th className='text-left py-2'>単価</th>
+                                <th className='text-left py-2'>税率</th>
+                                <th className='text-left py-2'>倉庫</th>
                                 <th className='text-left py-2'>金額</th>
+                                <th className='text-left py-2'>税額</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -87,19 +114,74 @@ function StockInOutSlipsDetail() {
                                 <td className='py-2'>1234</td>
                                 <td className='py-2'>商品名が入ります。商品名が入ります。商品名が入ります。商品名が入ります。入ります</td>
                                 <td className='py-2'>200</td>
-                                <td className='py-2'>個</td>
-                                <td className='py-2'>122</td>
+                                <td className='py-2'>200</td>
+                                <td className='py-2'>20</td>
+                                <td className='py-2'>200</td>
                                 <td className='py-2'>10個</td>
+                                <td className='py-2'>倉庫</td>
+                                <td className='py-2'>0円</td>
                                 <td className='py-2'>0円</td>
                             </tr>
                         </tbody>
                     </table>
+                    <div className='py-6 flex'>
+                        <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>税抜合計</div>
+                                <div>5,000円</div>
+                            </div>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>消費税(8%)</div>
+                                <div>5,000円</div>
+                            </div>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>消費税(10%)</div>
+                                <div>5,000円</div>
+                            </div>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>消費税合計</div>
+                                <div>5,000円</div>
+                            </div>
+                            <div className='flex'>
+                                <div className='w-40'>税込合計</div>
+                                <div>5,000円</div>
+                            </div>
+                        </div>
+                    </div>
                     <div className='py-3'>
                         <hr className='' />
                     </div>
                     <div className='py-2.5 font-bold text-xl'>備考</div>
                     <div className='flex items-center pb-2'>
-                        恐れいりますが、振込手数料は貴社にてご負担ください。
+                    恐れいりますが、振込手数料は貴社にてご負担ください。
+                    </div>
+                    <div className='py-3'>
+                        <hr className='' />
+                    </div>
+                    <div className='py-2.5 font-bold text-xl'>支払情報</div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>締日</div>
+                        <div></div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>支払期日</div>
+                        <div></div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>支払方法</div>
+                        <div></div>
+                    </div>
+                    <div className='py-3'>
+                        <hr className='' />
+                    </div>
+                    <div className='py-2.5 font-bold text-xl'>納品情報</div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>入荷予定日</div>
+                        <div></div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>ステータス</div>
+                        <div></div>
                     </div>
                 </div>
             </div>
@@ -107,4 +189,4 @@ function StockInOutSlipsDetail() {
     );
 }
 
-export default StockInOutSlipsDetail;
+export default QuotationSlipDetail;

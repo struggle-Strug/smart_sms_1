@@ -5,7 +5,7 @@ import { Tooltip } from 'react-tooltip'
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 const { ipcRenderer } = window.require('electron');
 
-function PaymentVouchersDetail() {
+function PaymentSlipsDetail() {
     return (
         <div className='w-full'>
             <div className=''>
@@ -189,4 +189,4 @@ function PaymentVouchersDetail() {
     );
 }
 
-export default PaymentVouchersDetail;
+export default PaymentSlipsDetail;

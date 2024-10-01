@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
-import PaymentVouchersAdd from './add';
-import PaymentVouchersDetail from './detail';
-import PaymentVouchersEdit from './edit';
+import PaymentSlipsAdd from './add';
+import PaymentSlipsDetail from './detail';
+import PaymentSlipsEdit from './edit';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -83,7 +83,7 @@ function Index() {
     return (
         <div className='w-full'>
             <div className='p-8'>
-                <div className='pb-6 text-2xl font-bold'>支払伝票</div>
+                <div className='pb-6 text-2xl font-bold'>入金伝票</div>
                 <div className='flex'>
                     <div className='border rounded-lg py-3 px-7 mb-8 text-base font-bold bg-blue-600 text-white'><Link to="add" className={``}>新規登録</Link></div>
                 </div>
@@ -144,15 +144,15 @@ function Index() {
     )
 }
 
-function PaymentVouchersIndex() {
+function PaymentSlipsIndex() {
     return (
         <Routes>
             <Route path="" element={<Index />} />
-            <Route path="add" element={<PaymentVouchersAdd />} />
-            <Route path="detail/:id" element={<PaymentVouchersDetail />} />
-            <Route path="edit/:id" element={<PaymentVouchersEdit />} />
+            <Route path="add" element={<PaymentSlipsAdd />} />
+            <Route path="detail/:id" element={<PaymentSlipsDetail />} />
+            <Route path="edit/:id" element={<PaymentSlipsEdit />} />
         </Routes>
     )
 }
 
-export default PaymentVouchersIndex;
+export default PaymentSlipsIndex;

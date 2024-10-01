@@ -44,10 +44,10 @@ function VoucherEntries() {
       <div className='border-r w-48 h-[100vh]'>
         <div className='text-center py-2 pt-4'></div>
         <div className='text-center py-2 pt-4 text-lg'></div>
-        <div className={`text-center py-2 text-lg ${location.pathname.includes("/procurement/statements/purchase-order-statement") && "font-bold border-l-4 border-blue-600"}`}><Link to="purchase-order-statement" className={``}>発注明細表</Link></div>
-        <div className={`text-center py-2 text-lg ${location.pathname.includes("/procurement/statements/purchase-detail-statement") && "font-bold border-l-4 border-blue-600"}`}><Link to="purchase-detail-statement" className={``}>仕入明細表</Link></div>
-        <div className={`text-center py-2 text-lg ${location.pathname.includes("/procurement/statements/stock-in-out-statement") && "font-bold border-l-4 border-blue-600"}`}><Link to="stock-in-out-statement" className={``}>入出庫明細表</Link></div>
-        <div className={`text-center py-2 text-lg ${location.pathname.includes("/procurement/statements/payment-statement") && "font-bold border-l-4 border-blue-600"}`}><Link to="payment-statement" className={``}>支払明細表</Link></div>
+        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/statements/purchase-order-statement") && "font-bold border-l-4 border-blue-600"}`}><Link to="purchase-order-statement" className={``}>発注明細表</Link></div>
+        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/statements/purchase-detail-statement") && "font-bold border-l-4 border-blue-600"}`}><Link to="purchase-detail-statement" className={``}>仕入明細表</Link></div>
+        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/statements/stock-in-out-statement") && "font-bold border-l-4 border-blue-600"}`}><Link to="stock-in-out-statement" className={``}>入出庫明細表</Link></div>
+        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/statements/payment-statement") && "font-bold border-l-4 border-blue-600"}`}><Link to="payment-statement" className={``}>支払明細表</Link></div>
       </div>
       <Routes>
         <Route path="" element={<PaymentStatementsIndex />}/>

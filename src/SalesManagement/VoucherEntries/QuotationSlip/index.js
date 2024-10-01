@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
-import PurchaseOrdersAdd from './add';
-import PurchaseOrdersEdit from './edit';
-import PurchaseOrdersDetail from './detail';
+import QuotationSlipAdd from './add';
+import QuotationSlipEdit from './edit';
+import QuotationSlipDetail from './detail';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -83,7 +83,7 @@ function Index() {
     return (
         <div className='w-full'>
             <div className='p-8'>
-                <div className='pb-6 text-2xl font-bold'>発注伝票</div>
+                <div className='pb-6 text-2xl font-bold'>見積伝票</div>
                 <div className='flex'>
                 <div className='border rounded-lg py-3 px-7 mb-8 text-base font-bold bg-blue-600 text-white'><Link to="add" className={``}>新規登録</Link></div>
                 </div>
@@ -111,10 +111,10 @@ function Index() {
                 <table className="w-full mt-8 table-auto">
                     <thead className=''>
                         <tr className='border-b'>
-                            <th className='text-left pb-2.5'>発注日付</th>
+                            <th className='text-left pb-2.5'>見積日付</th>
                             <th className='text-left pb-2.5'>伝票番号</th>
-                            <th className='text-left pb-2.5'>仕入先名</th>
-                            <th className='text-left pb-2.5'>仕入先コード</th>
+                            <th className='text-left pb-2.5'>得意先名</th>
+                            <th className='text-left pb-2.5'>得意先コード</th>
                             <th className='text-left pb-2.5'>備考</th>
                             <th className='text-right'></th>
                         </tr>
@@ -144,15 +144,15 @@ function Index() {
     )
 }
 
-function PurchaseOrdersIndex() {
+function QuotationSlipIndex() {
     return (
         <Routes>
             <Route path="" element={<Index />} />
-            <Route path="add" element={<PurchaseOrdersAdd />} />
-            <Route path="edit/:id" element={<PurchaseOrdersEdit />} />
-            <Route path="detail/:id" element={<PurchaseOrdersDetail />} />
+            <Route path="add" element={<QuotationSlipAdd />} />
+            <Route path="edit/:id" element={<QuotationSlipEdit />} />
+            <Route path="detail/:id" element={<QuotationSlipDetail />} />
         </Routes>
     )
 }
 
-export default PurchaseOrdersIndex;
+export default QuotationSlipIndex;

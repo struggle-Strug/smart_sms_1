@@ -6,7 +6,7 @@ import CustomSelect from '../../../Components/CustomSelect';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 const { ipcRenderer } = window.require('electron');
 
-function StockInOutSlipsAdd() {
+function QuotationSlipAdd() {
     const options = [
         { value: '御中', label: '御中' },
         { value: '貴社', label: '貴社' },
@@ -32,7 +32,7 @@ function StockInOutSlipsAdd() {
         <div className='w-full'>
             <div className=''>
                 <div className='pt-8 pb-6 flex border-b px-8 items-center'>
-                    <div className='text-2xl font-bold'>{'株式会社テスト'}</div>
+                    <div className='text-2xl font-bold'>{'見積伝票の新規作成'}</div>
                     <div className='flex ml-auto'>
                         <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
                             <div className='pr-1.5 pl-1 flex items-center'>
@@ -46,14 +46,28 @@ function StockInOutSlipsAdd() {
                     </div>
                 </div>
                 <div className='px-8 py-6'>
-                    <div className='py-2.5 font-bold text-xl'>伝票番号</div>
+                    <div className='py-2.5 font-bold text-xl'>伝票情報</div>
                     <div className='pb-2'>
-                        <div className='w-40 text-sm pb-1.5'>伝票番号 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                        <div className='w-40 text-sm pb-1.5'>伝票番号 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
                         <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
                     </div>
                     <div className='pb-2'>
-                        <div className='w-40 text-sm pb-1.5'>発注日付 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                        <div className='w-40 text-sm pb-1.5'>見積日 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
                         <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
+                    </div>
+                    <div className='pb-2'>
+                        <div className='w-40 text-sm pb-1.5'>見積期限 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
+                    </div>
+                    <div className='pb-2'>
+                    <div className='flex items-center text-sm pb-1.5'>出庫元倉庫
+                    <a href="#" className="my-tooltip ml-2.5">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8.47315 4.57084H10.1398V6.23751H8.47315V4.57084ZM8.47315 7.90418H10.1398V12.9042H8.47315V7.90418ZM9.30648 0.404175C4.70648 0.404175 0.973145 4.13751 0.973145 8.73751C0.973145 13.3375 4.70648 17.0708 9.30648 17.0708C13.9065 17.0708 17.6398 13.3375 17.6398 8.73751C17.6398 4.13751 13.9065 0.404175 9.30648 0.404175ZM9.30648 15.4042C5.63148 15.4042 2.63981 12.4125 2.63981 8.73751C2.63981 5.06251 5.63148 2.07084 9.30648 2.07084C12.9815 2.07084 15.9731 5.06251 15.9731 8.73751C15.9731 12.4125 12.9815 15.4042 9.30648 15.4042Z" fill="#1F2937" />
+                            </svg>
+                        </a>
+                    </div>
+                    <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
                     </div>
                     <div className='py-3'>
                         <hr className='' />
@@ -62,11 +76,11 @@ function StockInOutSlipsAdd() {
                     <div className='pb-2'>
                         <div className='flex'>
                             <div>
-                                <div className='w-40 text-sm pb-1.5'>仕入先コード</div>
+                                <div className='text-sm pb-1.5'>得意先コード <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
                                 <input type='text' className='border rounded px-4 py-2.5 bg-white w-28' placeholder='' name="" value={""} />
                             </div>
-                            <div>
-                                <div className='w-40 text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                            <div>s
+                                <div className='w-40 text-sm pb-1.5'>得意先名 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
                                 <input type='text' className='border rounded px-4 py-2.5 bg-white w-80' placeholder='' name="" value={""} />
                             </div>
                             <div className='ml-12'>
@@ -76,7 +90,7 @@ function StockInOutSlipsAdd() {
                         </div>
                     </div>
                     <div className='pb-2'>
-                        <div className='w-40 text-sm pb-1.5'>アップデート</div>
+                        <div className='w-40 text-sm pb-1.5'>先方担当者</div>
                         <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
                     </div>
                     <div className='py-3'>
@@ -198,5 +212,5 @@ function StockInOutSlipsAdd() {
     );
 }
 
-export default StockInOutSlipsAdd;
+export default QuotationSlipAdd;
 
