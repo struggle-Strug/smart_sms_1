@@ -32,7 +32,7 @@ function SalesSlipsAdd() {
         <div className='w-full'>
             <div className=''>
                 <div className='pt-8 pb-6 flex border-b px-8 items-center'>
-                    <div className='text-2xl font-bold'>{'株式会社テスト'}</div>
+                    <div className='text-2xl font-bold'>{'売上伝票の新規作成'}</div>
                     <div className='flex ml-auto'>
                         <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
                             <div className='pr-1.5 pl-1 flex items-center'>
@@ -46,13 +46,17 @@ function SalesSlipsAdd() {
                     </div>
                 </div>
                 <div className='px-8 py-6'>
-                    <div className='py-2.5 font-bold text-xl'>伝票番号</div>
+                    <div className='pb-2.5 font-bold text-xl'>伝票情報</div>
                     <div className='pb-2'>
-                        <div className='w-40 text-sm pb-1.5'>伝票番号 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                        <div className='w-40 text-sm pb-1.5'>伝票番号 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
                         <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
                     </div>
                     <div className='pb-2'>
-                        <div className='w-40 text-sm pb-1.5'>発注日付 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                        <div className='w-40 text-sm pb-1.5'>売上日付 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
+                    </div>
+                    <div className='pb-2'>
+                        <div className='w-40 text-sm pb-1.5'>納品期限</div>
                         <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
                     </div>
                     <div className='py-3'>
@@ -62,25 +66,41 @@ function SalesSlipsAdd() {
                     <div className='pb-2'>
                         <div className='flex'>
                             <div>
-                                <div className='w-40 text-sm pb-1.5'>仕入先コード</div>
+                                <div className='text-sm pb-1.5'>得意先コード <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
                                 <input type='text' className='border rounded px-4 py-2.5 bg-white w-28' placeholder='' name="" value={""} />
                             </div>
-                            <div>
-                                <div className='w-40 text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                            <div className='ml-4'>
+                                <div className='text-sm pb-1.5'>得意先名 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
                                 <input type='text' className='border rounded px-4 py-2.5 bg-white w-80' placeholder='' name="" value={""} />
                             </div>
-                            <div className='ml-12'>
-                                <div className='w-40 text-sm pb-1.5'></div>
+                            <div className='ml-4'>
+                                <div className='text-sm pb-1.5 w-40 text-transparent'>宛名</div>
                                 <CustomSelect options={options} name={"honorific"} data={customer} setData={setCustomer} placeholder='御中' />
                             </div>
                         </div>
                     </div>
                     <div className='pb-2'>
-                        <div className='w-40 text-sm pb-1.5'>アップデート</div>
+                        <div className='text-sm pb-1.5'>先方担当者</div>
                         <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
                     </div>
                     <div className='py-3'>
                         <hr className='' />
+                    </div>
+                    <div className='py-2.5 font-bold text-xl'>受注伝票</div>
+                    <div className='pb-2'>
+                        <div className='text-sm pb-1.5'>受注伝票番号</div>
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
+                    </div>
+                    <div className='py-2.5 font-bold text-xl'>受注番号</div>
+                    <div className='pb-2'>
+                    <div className='flex items-center text-sm pb-1.5'>受注番号
+                    <a href="#" className="my-tooltip ml-2.5">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8.47315 4.57084H10.1398V6.23751H8.47315V4.57084ZM8.47315 7.90418H10.1398V12.9042H8.47315V7.90418ZM9.30648 0.404175C4.70648 0.404175 0.973145 4.13751 0.973145 8.73751C0.973145 13.3375 4.70648 17.0708 9.30648 17.0708C13.9065 17.0708 17.6398 13.3375 17.6398 8.73751C17.6398 4.13751 13.9065 0.404175 9.30648 0.404175ZM9.30648 15.4042C5.63148 15.4042 2.63981 12.4125 2.63981 8.73751C2.63981 5.06251 5.63148 2.07084 9.30648 2.07084C12.9815 2.07084 15.9731 5.06251 15.9731 8.73751C15.9731 12.4125 12.9815 15.4042 9.30648 15.4042Z" fill="#1F2937" />
+                            </svg>
+                        </a>
+                    </div>
+                    <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
                     </div>
                     <div className='py-2.5 font-bold text-xl'>明細</div>
                     <div className='flex items-center'>
@@ -90,37 +110,53 @@ function SalesSlipsAdd() {
                         <div className=''>
                             <div className='flex items-center'>
                                 <div className=''>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'>商品コード <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
                                     <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "120px" }} />
                                 </div>
                                 <div className='ml-4'>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                    <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "440px" }} />
+                                    <div className='text-sm pb-1.5'>商品名 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
+                                    <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "220px" }} />
                                 </div>
                                 <div className='ml-4'>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'>数量 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
                                     <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "180px" }} />
                                 </div>
                                 <div className='ml-4'>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'>単位 </div>
                                     <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "120px" }} />
                                 </div>
                                 <div className='ml-4'>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'>単価 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
+                                    <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "180px" }} />
+                                </div>
+                                <div className='ml-4'>
+                                    <div className='text-sm pb-1.5'>金額 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
                                     <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "180px" }} />
                                 </div>
                             </div>
                             <div className='flex items-center mt-4'>
                                 <div className=''>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'>税率 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
+                                    <CustomSelect options={options} name={"honorific"} data={customer} setData={setCustomer} placeholder='' />
+                                </div>
+                                <div className='ml-4'>
+                                    <div className='text-sm pb-1.5'>ロット番号 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
                                     <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "120px" }} />
                                 </div>
                                 <div className='ml-4'>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'>倉庫 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
+                                    <CustomSelect options={options} name={"honorific"} data={customer} setData={setCustomer} placeholder='' />
+                                </div>
+                                <div className='ml-4'>
+                                    <div className='text-sm pb-1.5'>在庫数 </div>
                                     <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "180px" }} />
                                 </div>
                                 <div className='ml-4'>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'>粗利益 </div>
+                                    <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "180px" }} />
+                                </div>
+                                <div className='ml-4'>
+                                    <div className='text-sm pb-1.5'>粗利率 </div>
                                     <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "180px" }} />
                                 </div>
                             </div>
@@ -133,11 +169,14 @@ function SalesSlipsAdd() {
                             </div>
                         </div>
                     </div>
-                    <div className='py-3'>
-                        <hr className='' />
-                    </div>
-                    {/* <div className='py-2.5 font-bold text-xl'>明細</div> */}
-                    <div className='py-6 flex'>
+                    <div className='pb-6 flex flex-col mr-14'>
+                        <div className='flex items-center mr-10 pt-3'>
+                            <div className='ml-auto flex'>消費税額</div>
+                            <div className='ml-4'>0円</div>
+                            <div className='ml-10 flex'>金額</div>
+                            <div className='ml-4 text-lg font-semibold'>0円</div>
+                        </div>
+                        <div className='py-6 flex'>
                         <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
                             <div className='flex pb-2'>
                                 <div className='w-40'>税抜合計</div>
@@ -161,6 +200,7 @@ function SalesSlipsAdd() {
                             </div>
                         </div>
                     </div>
+                    </div>
                     <div className='py-3'>
                         <hr className='' />
                     </div>
@@ -171,28 +211,24 @@ function SalesSlipsAdd() {
                     <div className='py-3'>
                         <hr className='' />
                     </div>
-                    <div className='py-2.5 font-bold text-xl'>支払情報</div>
+                    <div className='py-2.5 font-bold text-xl'>請求情報</div>
                     <div className='pb-2'>
                         <div className='w-40 text-sm pb-1.5'>締日</div>
                         <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
                     </div>
                     <div className='pb-2'>
-                        <div className='w-40 text-sm pb-1.5'>支払期日</div>
+                        <div className='w-40 text-sm pb-1.5'>入金期日</div>
                         <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
                     </div>
                     <div className='pb-2'>
-                        <div className='w-40 text-sm pb-1.5'>支払方法</div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
-                    </div>
-                    <div className='py-3'>
-                        <hr className='' />
-                    </div>
-                    <div className='py-2.5 font-bold text-xl'>納品情報</div>
-                    <div className='pb-2'>
-                        <div className='w-40 text-sm pb-1.5'>入荷予定日</div>
+                        <div className='w-40 text-sm pb-1.5'>入金方法</div>
                         <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
                     </div>
                 </div>
+            </div>
+            <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
+                <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' >新規登録</div>
+                <Link to={`/master/payment-methods`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
             </div>
         </div>
     );
