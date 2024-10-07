@@ -56,6 +56,7 @@ function Master() {
         <div className={`text-center py-2 text-lg ${location.pathname.includes("/master/customers") && "font-bold border-l-4 border-blue-600"}`}><Link to="customers" className={``}>得意先</Link></div>
         <div className={`text-center py-2 text-lg ${location.pathname.includes("/master/delivery-customers") && "font-bold border-l-4 border-blue-600"}`}><Link to="delivery-customers">納品先</Link></div>
         <div className={`text-center py-2 text-lg ${location.pathname.includes("/master/products") && "font-bold border-l-4 border-blue-600"}`}><Link to="products">商品</Link></div>
+        <div className={`text-center py-2 text-lg ${location.pathname.includes("/master/set-products") && "font-bold border-l-4 border-blue-600"}`}><Link to="set-products">セット商品</Link></div>
         <div className={`text-center py-2 text-lg ${location.pathname.includes("/master/vendors") && "font-bold border-l-4 border-blue-600"}`}><Link to="vendors">仕入先</Link></div>
         <div className={`text-center py-2 text-lg ${location.pathname.includes("/master/storage-facilities") && "font-bold border-l-4 border-blue-600"}`}><Link to="storage-facilities">倉庫</Link></div>
         <div className={`text-center py-2 text-lg ${location.pathname.includes("/master/payment-methods") && "font-bold border-l-4 border-blue-600"}`}><Link to="payment-methods">支払方法</Link></div>
@@ -72,6 +73,7 @@ function Master() {
         <Route path="customers/*" element={<CustomersIndex />} />
         <Route path="delivery-customers/*" element={<DeliveryCustomersIndex />} />
         <Route path="products/*" element={<ProductsIndex />} />
+        <Route path="set-products/*" element={<ProductsIndex />} />
         <Route path="vendors/*" element={<VendorsIndex />} />
         <Route path="storage-facilities/*" element={<StorageFacilitiesIndex />} />
         <Route path="payment-methods/*" element={<PaymentMethodsIndex />} />
