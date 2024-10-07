@@ -46,38 +46,53 @@ function StockInOutSlipsAdd() {
                     </div>
                 </div>
                 <div className='px-8 py-6'>
-                    <div className='py-2.5 font-bold text-xl'>伝票番号</div>
+                    <div className='py-2.5 font-bold text-xl'>伝票情報</div>
                     <div className='pb-2'>
                         <div className='w-40 text-sm pb-1.5'>伝票番号 <span className='text-sm font-bold text-red-600'>必須</span></div>
                         <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
                     </div>
                     <div className='pb-2'>
-                        <div className='w-40 text-sm pb-1.5'>発注日付 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                        <div className='w-40 text-sm pb-1.5'>入出庫日付 <span className='text-sm font-bold text-red-600'>必須</span></div>
                         <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
                     </div>
-                    <div className='py-3'>
-                        <hr className='' />
-                    </div>
-                    <div className='py-2.5 font-bold text-xl'>取引先情報</div>
                     <div className='pb-2'>
-                        <div className='flex'>
-                            <div>
-                                <div className='w-40 text-sm pb-1.5'>仕入先コード</div>
-                                <input type='text' className='border rounded px-4 py-2.5 bg-white w-28' placeholder='' name="" value={""} />
-                            </div>
-                            <div>
-                                <div className='w-40 text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                <input type='text' className='border rounded px-4 py-2.5 bg-white w-80' placeholder='' name="" value={""} />
-                            </div>
-                            <div className='ml-12'>
-                                <div className='w-40 text-sm pb-1.5'></div>
-                                <CustomSelect options={options} name={"honorific"} data={customer} setData={setCustomer} placeholder='御中' />
-                            </div>
+                        <div className='w-40 text-sm pb-1.5'>処理種別 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                    </div>
+                    <div className='pb-2'>
+                        <div className='w-40 text-sm pb-1.5'>
+                            出庫元倉庫
+                            <a data-tooltip-id="my-tooltip" data-tooltip-content="データを設定" className='flex ml-3'>
+                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M8.47315 4.57084H10.1398V6.23751H8.47315V4.57084ZM8.47315 7.90418H10.1398V12.9042H8.47315V7.90418ZM9.30648 0.404175C4.70648 0.404175 0.973145 4.13751 0.973145 8.73751C0.973145 13.3375 4.70648 17.0708 9.30648 17.0708C13.9065 17.0708 17.6398 13.3375 17.6398 8.73751C17.6398 4.13751 13.9065 0.404175 9.30648 0.404175ZM9.30648 15.4042C5.63148 15.4042 2.63981 12.4125 2.63981 8.73751C2.63981 5.06251 5.63148 2.07084 9.30648 2.07084C12.9815 2.07084 15.9731 5.06251 15.9731 8.73751C15.9731 12.4125 12.9815 15.4042 9.30648 15.4042Z" fill="#1F2937" />
+                                </svg>
+                            </a>
+                            <Tooltip id="my-tooltip" />
                         </div>
+                        <CustomSelect  />
                     </div>
                     <div className='pb-2'>
-                        <div className='w-40 text-sm pb-1.5'>アップデート</div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
+                        <div className='w-40 text-sm pb-1.5'>
+                            入庫先倉庫
+                            <a data-tooltip-id="my-tooltip" data-tooltip-content="データを設定" className='flex ml-3'>
+                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M8.47315 4.57084H10.1398V6.23751H8.47315V4.57084ZM8.47315 7.90418H10.1398V12.9042H8.47315V7.90418ZM9.30648 0.404175C4.70648 0.404175 0.973145 4.13751 0.973145 8.73751C0.973145 13.3375 4.70648 17.0708 9.30648 17.0708C13.9065 17.0708 17.6398 13.3375 17.6398 8.73751C17.6398 4.13751 13.9065 0.404175 9.30648 0.404175ZM9.30648 15.4042C5.63148 15.4042 2.63981 12.4125 2.63981 8.73751C2.63981 5.06251 5.63148 2.07084 9.30648 2.07084C12.9815 2.07084 15.9731 5.06251 15.9731 8.73751C15.9731 12.4125 12.9815 15.4042 9.30648 15.4042Z" fill="#1F2937" />
+                                </svg>
+                            </a>
+                            <Tooltip id="my-tooltip" />
+                        </div>
+                        <CustomSelect  />
+                    </div>
+                    <div className='pb-2'>
+                        <div className='w-40 text-sm pb-1.5'>
+                            担当者
+                            <a data-tooltip-id="my-tooltip" data-tooltip-content="データを設定" className='flex ml-3'>
+                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M8.47315 4.57084H10.1398V6.23751H8.47315V4.57084ZM8.47315 7.90418H10.1398V12.9042H8.47315V7.90418ZM9.30648 0.404175C4.70648 0.404175 0.973145 4.13751 0.973145 8.73751C0.973145 13.3375 4.70648 17.0708 9.30648 17.0708C13.9065 17.0708 17.6398 13.3375 17.6398 8.73751C17.6398 4.13751 13.9065 0.404175 9.30648 0.404175ZM9.30648 15.4042C5.63148 15.4042 2.63981 12.4125 2.63981 8.73751C2.63981 5.06251 5.63148 2.07084 9.30648 2.07084C12.9815 2.07084 15.9731 5.06251 15.9731 8.73751C15.9731 12.4125 12.9815 15.4042 9.30648 15.4042Z" fill="#1F2937" />
+                                </svg>
+                            </a>
+                            <Tooltip id="my-tooltip" />
+                        </div>
+                        <CustomSelect  />
                     </div>
                     <div className='py-3'>
                         <hr className='' />
@@ -90,38 +105,30 @@ function StockInOutSlipsAdd() {
                         <div className=''>
                             <div className='flex items-center'>
                                 <div className=''>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'>商品コード <span className='text-sm font-bold text-red-600'>必須</span></div>
                                     <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "120px" }} />
                                 </div>
                                 <div className='ml-4'>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'>商品名 <span className='text-sm font-bold text-red-600'>必須</span></div>
                                     <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "440px" }} />
                                 </div>
                                 <div className='ml-4'>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'>数量 <span className='text-sm font-bold text-red-600'>必須</span></div>
                                     <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "180px" }} />
                                 </div>
                                 <div className='ml-4'>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'>単位</div>
                                     <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "120px" }} />
                                 </div>
                                 <div className='ml-4'>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'>単価 <span className='text-sm font-bold text-red-600'>必須</span></div>
                                     <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "180px" }} />
                                 </div>
                             </div>
                             <div className='flex items-center mt-4'>
                                 <div className=''>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'>ロット番号</div>
                                     <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "120px" }} />
-                                </div>
-                                <div className='ml-4'>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                    <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "180px" }} />
-                                </div>
-                                <div className='ml-4'>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                    <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "180px" }} />
                                 </div>
                             </div>
                         </div>
