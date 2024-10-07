@@ -46,74 +46,88 @@ function StockInOutSlipsAdd() {
                     </div>
                 </div>
                 <div className='px-8 py-6'>
-                    <div className='py-2.5 font-bold text-xl'>伝票情報</div>
-                    <div className='pb-2'>
-                        <div className='w-40 text-sm pb-1.5'>伝票番号 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                    <div className='pt-2.5 pb-4 font-bold text-xl'>伝票情報</div>
+                    <div className='pb-4'>
+                        <div className='w-40 text-sm pb-1.5'>伝票番号 <span className='ml-2 text-xs font-bold text-red-600'>必須</span></div>
                         <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
                     </div>
-                    <div className='pb-2'>
-                        <div className='w-40 text-sm pb-1.5'>入出庫日付 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                    <div className='pb-4'>
+                        <div className='w-40 text-sm pb-1.5'>入出庫日付 <span className='ml-2 text-xs font-bold text-red-600'>必須</span></div>
                         <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
                     </div>
-                    <div className='pb-2'>
-                        <div className='w-40 text-sm pb-1.5'>処理種別 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                    <div className='w-40 text-sm pb-1.5 flex items-center'>
+                            処理種別 
+                        <a href="#" className="my-tooltip ml-2.5">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8.47315 4.57084H10.1398V6.23751H8.47315V4.57084ZM8.47315 7.90418H10.1398V12.9042H8.47315V7.90418ZM9.30648 0.404175C4.70648 0.404175 0.973145 4.13751 0.973145 8.73751C0.973145 13.3375 4.70648 17.0708 9.30648 17.0708C13.9065 17.0708 17.6398 13.3375 17.6398 8.73751C17.6398 4.13751 13.9065 0.404175 9.30648 0.404175ZM9.30648 15.4042C5.63148 15.4042 2.63981 12.4125 2.63981 8.73751C2.63981 5.06251 5.63148 2.07084 9.30648 2.07084C12.9815 2.07084 15.9731 5.06251 15.9731 8.73751C15.9731 12.4125 12.9815 15.4042 9.30648 15.4042Z" fill="#1F2937" />
+                            </svg>
+                        </a>
+                        <span className='ml-2.5 text-xs font-bold text-red-600'>必須</span>
+                    </div>
+                    <div className='pb-4 flex'>
+                        <label className='text-base'>
+                            <input type="radio" name="processType" value="type1" className='mr-2' />出庫
+                        </label>
+                        <label className='text-base ml-10'>
+                            <input type="radio" name="processType" value="type2" className='mr-2' />入庫
+                        </label>
+                        <label className='text-base ml-10'>
+                            <input type="radio" name="processType" value="type3" className='mr-2' />振替
+                        </label>
                     </div>
                     <div className='pb-2'>
-                        <div className='w-40 text-sm pb-1.5'>
-                            出庫元倉庫
-                            <a data-tooltip-id="my-tooltip" data-tooltip-content="データを設定" className='flex ml-3'>
-                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M8.47315 4.57084H10.1398V6.23751H8.47315V4.57084ZM8.47315 7.90418H10.1398V12.9042H8.47315V7.90418ZM9.30648 0.404175C4.70648 0.404175 0.973145 4.13751 0.973145 8.73751C0.973145 13.3375 4.70648 17.0708 9.30648 17.0708C13.9065 17.0708 17.6398 13.3375 17.6398 8.73751C17.6398 4.13751 13.9065 0.404175 9.30648 0.404175ZM9.30648 15.4042C5.63148 15.4042 2.63981 12.4125 2.63981 8.73751C2.63981 5.06251 5.63148 2.07084 9.30648 2.07084C12.9815 2.07084 15.9731 5.06251 15.9731 8.73751C15.9731 12.4125 12.9815 15.4042 9.30648 15.4042Z" fill="#1F2937" />
-                                </svg>
-                            </a>
-                            <Tooltip id="my-tooltip" />
+                        <div className='flex items-center text-sm pb-1.5'>出庫元倉庫
+                        <a href="#" className="my-tooltip ml-2.5">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8.47315 4.57084H10.1398V6.23751H8.47315V4.57084ZM8.47315 7.90418H10.1398V12.9042H8.47315V7.90418ZM9.30648 0.404175C4.70648 0.404175 0.973145 4.13751 0.973145 8.73751C0.973145 13.3375 4.70648 17.0708 9.30648 17.0708C13.9065 17.0708 17.6398 13.3375 17.6398 8.73751C17.6398 4.13751 13.9065 0.404175 9.30648 0.404175ZM9.30648 15.4042C5.63148 15.4042 2.63981 12.4125 2.63981 8.73751C2.63981 5.06251 5.63148 2.07084 9.30648 2.07084C12.9815 2.07084 15.9731 5.06251 15.9731 8.73751C15.9731 12.4125 12.9815 15.4042 9.30648 15.4042Z" fill="#1F2937" />
+                            </svg>
+                        </a>
+                        </div>
+                        <div className="w-1/2 pb-1.5">
+                           <CustomSelect placeholder={""} options={options} name={"honorific"} data={customer} setData={setCustomer} />
                         </div>
                         <CustomSelect  />
                     </div>
                     <div className='pb-2'>
-                        <div className='w-40 text-sm pb-1.5'>
-                            入庫先倉庫
-                            <a data-tooltip-id="my-tooltip" data-tooltip-content="データを設定" className='flex ml-3'>
-                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M8.47315 4.57084H10.1398V6.23751H8.47315V4.57084ZM8.47315 7.90418H10.1398V12.9042H8.47315V7.90418ZM9.30648 0.404175C4.70648 0.404175 0.973145 4.13751 0.973145 8.73751C0.973145 13.3375 4.70648 17.0708 9.30648 17.0708C13.9065 17.0708 17.6398 13.3375 17.6398 8.73751C17.6398 4.13751 13.9065 0.404175 9.30648 0.404175ZM9.30648 15.4042C5.63148 15.4042 2.63981 12.4125 2.63981 8.73751C2.63981 5.06251 5.63148 2.07084 9.30648 2.07084C12.9815 2.07084 15.9731 5.06251 15.9731 8.73751C15.9731 12.4125 12.9815 15.4042 9.30648 15.4042Z" fill="#1F2937" />
-                                </svg>
-                            </a>
-                            <Tooltip id="my-tooltip" />
+                        <div className='flex items-center text-sm pb-1.5'>入庫先倉庫
+                        <a href="#" className="my-tooltip ml-2.5">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8.47315 4.57084H10.1398V6.23751H8.47315V4.57084ZM8.47315 7.90418H10.1398V12.9042H8.47315V7.90418ZM9.30648 0.404175C4.70648 0.404175 0.973145 4.13751 0.973145 8.73751C0.973145 13.3375 4.70648 17.0708 9.30648 17.0708C13.9065 17.0708 17.6398 13.3375 17.6398 8.73751C17.6398 4.13751 13.9065 0.404175 9.30648 0.404175ZM9.30648 15.4042C5.63148 15.4042 2.63981 12.4125 2.63981 8.73751C2.63981 5.06251 5.63148 2.07084 9.30648 2.07084C12.9815 2.07084 15.9731 5.06251 15.9731 8.73751C15.9731 12.4125 12.9815 15.4042 9.30648 15.4042Z" fill="#1F2937" />
+                            </svg>
+                        </a>
                         </div>
-                        <CustomSelect  />
+                        <div className="w-1/2 pb-1.5">
+                           <CustomSelect placeholder={""} options={options} name={"honorific"} data={customer} setData={setCustomer} />
+                        </div>
                     </div>
                     <div className='pb-2'>
-                        <div className='w-40 text-sm pb-1.5'>
-                            担当者
-                            <a data-tooltip-id="my-tooltip" data-tooltip-content="データを設定" className='flex ml-3'>
-                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M8.47315 4.57084H10.1398V6.23751H8.47315V4.57084ZM8.47315 7.90418H10.1398V12.9042H8.47315V7.90418ZM9.30648 0.404175C4.70648 0.404175 0.973145 4.13751 0.973145 8.73751C0.973145 13.3375 4.70648 17.0708 9.30648 17.0708C13.9065 17.0708 17.6398 13.3375 17.6398 8.73751C17.6398 4.13751 13.9065 0.404175 9.30648 0.404175ZM9.30648 15.4042C5.63148 15.4042 2.63981 12.4125 2.63981 8.73751C2.63981 5.06251 5.63148 2.07084 9.30648 2.07084C12.9815 2.07084 15.9731 5.06251 15.9731 8.73751C15.9731 12.4125 12.9815 15.4042 9.30648 15.4042Z" fill="#1F2937" />
-                                </svg>
-                            </a>
-                            <Tooltip id="my-tooltip" />
+                        <div className='flex items-center text-sm pb-1.5'>担当者
                         </div>
-                        <CustomSelect  />
+                        <div className="w-1/2 pb-1.5">
+                           <CustomSelect placeholder={""} options={options} name={"honorific"} data={customer} setData={setCustomer} />
+                        </div>
                     </div>
+                </div>
                     <div className='py-3'>
                         <hr className='' />
                     </div>
-                    <div className='py-2.5 font-bold text-xl'>明細</div>
-                    <div className='flex items-center'>
+                    <div className='pl-8 py-2.5 font-bold text-xl'>明細</div>
+                    <div className='flex items-center pl-8'>
                         <div>
                             <div className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>＋</div>
                         </div>
                         <div className=''>
                             <div className='flex items-center'>
                                 <div className=''>
-                                    <div className='text-sm pb-1.5'>商品コード <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'>商品コード <span className='ml-2 text-xs font-bold text-red-600'>必須</span></div>
                                     <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "120px" }} />
                                 </div>
                                 <div className='ml-4'>
-                                    <div className='text-sm pb-1.5'>商品名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'>商品名 <span className='ml-2 text-xs font-bold text-red-600'>必須</span></div>
                                     <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "440px" }} />
                                 </div>
                                 <div className='ml-4'>
-                                    <div className='text-sm pb-1.5'>数量 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'>数量 <span className='ml-2 text-xs font-bold text-red-600'>必須</span></div>
                                     <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "180px" }} />
                                 </div>
                                 <div className='ml-4'>
@@ -121,7 +135,7 @@ function StockInOutSlipsAdd() {
                                     <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "120px" }} />
                                 </div>
                                 <div className='ml-4'>
-                                    <div className='text-sm pb-1.5'>単価 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'>単価 <span className='ml-2 text-xs font-bold text-red-600'>必須</span></div>
                                     <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "180px" }} />
                                 </div>
                             </div>
@@ -140,11 +154,14 @@ function StockInOutSlipsAdd() {
                             </div>
                         </div>
                     </div>
-                    <div className='py-3'>
-                        <hr className='' />
-                    </div>
                     {/* <div className='py-2.5 font-bold text-xl'>明細</div> */}
-                    <div className='py-6 flex'>
+                    <div className='pb-6 flex flex-col mr-14'>
+                        <div className='flex items-center mr-10 pb-6'>
+                            <div className='ml-auto flex'>消費税額</div>
+                            <div className='ml-4'>0円</div>
+                            <div className='ml-10 flex'>金額</div>
+                            <div className='ml-4 text-lg font-semibold'>0円</div>
+                        </div>
                         <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
                             <div className='flex pb-2'>
                                 <div className='w-40'>税抜合計</div>
@@ -171,37 +188,16 @@ function StockInOutSlipsAdd() {
                     <div className='py-3'>
                         <hr className='' />
                     </div>
-                    <div className='py-2.5 font-bold text-xl'>備考</div>
-                    <div className='pb-2'>
-                       <textarea className='border rounded px-4 py-2.5 bg-white w-full resize-none' placeholder='' rows={5} name="" value={""} ></textarea>
+                    <div className='pl-8 py-2.5 font-bold text-xl'>備考</div>
+                    <div className='pl-8'>
+                       <textarea className='border rounded px-4 py-2.5 bg-white w-4/5 resize-none mb-16' placeholder='' rows={5} name="" value={""} ></textarea>
                     </div>
-                    <div className='py-3'>
-                        <hr className='' />
-                    </div>
-                    <div className='py-2.5 font-bold text-xl'>支払情報</div>
-                    <div className='pb-2'>
-                        <div className='w-40 text-sm pb-1.5'>締日</div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
-                    </div>
-                    <div className='pb-2'>
-                        <div className='w-40 text-sm pb-1.5'>支払期日</div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
-                    </div>
-                    <div className='pb-2'>
-                        <div className='w-40 text-sm pb-1.5'>支払方法</div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
-                    </div>
-                    <div className='py-3'>
-                        <hr className='' />
-                    </div>
-                    <div className='py-2.5 font-bold text-xl'>納品情報</div>
-                    <div className='pb-2'>
-                        <div className='w-40 text-sm pb-1.5'>入荷予定日</div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
-                    </div>
+                    <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
+                <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' >新規登録</div>
+                <Link to={`/master/payment-methods`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
+            </div>
                 </div>
             </div>
-        </div>
     );
 }
 
