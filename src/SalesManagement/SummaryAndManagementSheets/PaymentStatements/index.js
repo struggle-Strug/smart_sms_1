@@ -81,7 +81,7 @@ function Index() {
         <div className='w-full'>
             <div className='p-8'>
                 <div className='pb-6 flex items-center'>
-                <div className='text-2xl font-bold'>支払明細表</div>
+                <div className='text-2xl font-bold'>請求処理</div>
                     <div className='flex ml-auto'>
                         <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold flex'>
                             <div className='flex items-center'>
@@ -181,7 +181,7 @@ function Index() {
     )
 }
 
-function PaymentStatementsIndex() {
+function BillingProcessesIndex() {
     return (
         <Routes>
             <Route path="" element={<Index />} />
@@ -189,4 +189,4 @@ function PaymentStatementsIndex() {
     )
 }
 
-export default PaymentStatementsIndex;
+export default BillingProcessesIndex;

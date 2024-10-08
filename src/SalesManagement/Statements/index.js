@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
-import PaymentDetailSheetsIndex from './PaymentDetailSheets';
+import PaymentDetailSheetsIndex from './PaymentStatements';
 import QuotationDetailSheetsIndex from './QuotationDetailSheets';
 import OrderDetailSheetsIndex from './OrderDetailSheets';
 import SalesDetailSheetsIndex from './SalesDetailSheets';

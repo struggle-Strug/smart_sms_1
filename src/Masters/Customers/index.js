@@ -5,12 +5,14 @@ import CustomersAdd from './add';
 import CustomersEdit from './edit';
 import CustomersDetail from './detail';
 
+
 const { ipcRenderer } = window.require('electron');
 
 
 function Index() {
     const [customers, setCustomers] = useState([]);
-    const [isOpen, setIsOpen] = useState(false);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [customerIdToDelete, setCustomerIdToDelete] = useState(null);
     const dropdownRef = useRef(null);
     const location = useLocation();
     const [searchQuery, setSearchQuery] = useState('');
@@ -48,9 +50,17 @@ function Index() {
     };
 
     const handleDelete = (id) => {
-        if (window.confirm('本当にこの顧客を削除しますか？')) {
-            ipcRenderer.send('delete-customer', id);
-        }
+        setCustomerIdToDelete(id); // 削除する顧客のIDを設定
+        setIsDialogOpen(true); // ダイアログを開く
+    };
+
+    const handleConfirmDelete = () => {
+        ipcRenderer.send('delete-customer', customerIdToDelete);
+        setIsDialogOpen(false); // ダイアログを閉じる
+    };
+
+    const handleCancelDelete = () => {
+        setIsDialogOpen(false); // ダイアログを閉じる
     };
 
     const handleSearch = () => {
@@ -140,6 +150,12 @@ function Index() {
                     </tbody>
                 </table>
             </div>
+            <ConfirmDialog
+                isOpen={isDialogOpen}
+                message="本当にこの顧客を削除しますか？"
+                onConfirm={handleConfirmDelete}
+                onCancel={handleCancelDelete}
+            />
         </div>
     )
 }
