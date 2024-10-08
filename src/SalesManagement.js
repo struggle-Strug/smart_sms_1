@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import VoucherEntries from './SalesManagement/VoucherEntries';
 import Statements from './SalesManagement/Statements';
+import SummaryAndManagementSheets from './SalesManagement/SummaryAndManagementSheets';
 
 function SalesManagement() {
   const [isOpen, setIsOpen] = useState(false);
@@ -52,7 +53,7 @@ function SalesManagement() {
               <div className='font-bold'>明細表</div>
               <div><img src='/Icon.png' width={24} /></div>
             </Link>
-            <Link to={"/sales-management/voucher-entries"} className='flex items-center py-3 px-4 border rounded  ml-5'>
+            <Link to={"/sales-management/summary-and-management-sheets"} className='flex items-center py-3 px-4 border rounded  ml-5'>
               <div className='font-bold'>集計・管理表</div>
               <div><img src='/Icon.png' width={24} /></div>
             </Link>
@@ -63,6 +64,7 @@ function SalesManagement() {
       <Routes>
         <Route path="voucher-entries/*" element={<VoucherEntries />} />
         <Route path="statements/*" element={<Statements />} />
+        <Route path="summary-and-management-sheets/*" element={<SummaryAndManagementSheets />} />
       </Routes>
     </div>)
 }

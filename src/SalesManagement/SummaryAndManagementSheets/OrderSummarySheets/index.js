@@ -2,9 +2,41 @@ import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import CustomSelect from '../../../Components/CustomSelect';
+import { BarChart } from '@mui/x-charts/BarChart';
 
 const { ipcRenderer } = window.require('electron');
 
+export function SimpleBarCharts() {
+    return (
+      <BarChart
+        xAxis={[
+          {
+            id: 'barCategories',
+            data: ['株式会社A', '株式会社B', '株式会社C', '株式会社D', '株式会社E', '株式会社F', '株式会社G', '株式会社H', '株式会社I', '株式会社J', '株式会社K', '株式会社L'],
+            scaleType: 'band',
+          },
+        ]}
+        yAxis={[
+            {
+              id: 'yAxisId',
+              label: '円',
+              min: 0,
+              max: 10,
+              tickCount: 10,
+            },
+          ]}
+        series={[
+          {
+            data: [2, 5, 3, 4, 7, 8, 5, 2, 3, 9, 5, 6],
+            color: '#2563EB'
+          },
+        ]}
+        width={1216}
+        height={644}
+        barWidth={5}
+      />
+    );
+  }
 
 function Index() {
     const options = [
@@ -103,12 +135,12 @@ function Index() {
         <div className='w-full'>
             <div className='p-8'>
                 <div className='pb-6 flex items-center'>
-                <div className='text-2xl font-bold'>発注明細表</div>
+                <div className='text-2xl font-bold'>受注集計表</div>
                     <div className='flex ml-auto'>
                         <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold flex'>
                             <div className='flex items-center'>
                             </div>
-                            明細表設定
+                            集計表設定
                         </Link>
                         </div>
                     </div>
@@ -143,11 +175,15 @@ function Index() {
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                         </div>
                         <div>
-                            <div className='text-sm pb-1.5'>仕入先</div>
+                            <div className='text-sm pb-1.5'>受注番号</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                         </div>
                         <div>
-                            <div className='text-sm pb-1.5'>商品名</div>
+                            <div className='text-sm pb-1.5'>得意先</div>
+                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                        </div>
+                        <div>
+                            <div className='text-sm pb-1.5'>商品</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                         </div>
                         <div>
@@ -161,7 +197,7 @@ function Index() {
                         <div>
                             <div className='text-sm pb-1.5'>ステータス</div>
                         <CustomSelect options={options} name={"honorific"} data={customer} setData={setCustomer} />
-                    </div>
+                        </div>
                         <div>
                             <div className='text-sm pb-1.5'>ロット番号</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
@@ -219,12 +255,15 @@ function Index() {
                         ))}
                     </tbody>
                 </table>
+                <div className='mt-8'>
+                    <SimpleBarCharts />
+                </div>
             </div>
         </div>
     )
 }
 
-function PurchaseOrderStatementsIndex() {
+function OrderSummarySheetsIndex() {
     return (
         <Routes>
             <Route path="" element={<Index />} />
@@ -232,4 +271,4 @@ function PurchaseOrderStatementsIndex() {
     )
 }
 
-export default PurchaseOrderStatementsIndex;
+export default OrderSummarySheetsIndex;

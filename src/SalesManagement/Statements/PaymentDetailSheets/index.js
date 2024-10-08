@@ -7,27 +7,27 @@ const { ipcRenderer } = window.require('electron');
 
 
 function Index() {
-    const options = [
-        { value: '御中', label: '御中' },
-        { value: '貴社', label: '貴社' },
-    ];
-
-    const [customer, setCustomer] = useState({
-        id: '',
-        name_primary: '',
-        name_secondary: '',
-        name_kana: '',
-        honorific: '',
-        phone_number: '',
-        fax_number: '',
-        zip_code: '',
-        address: '',
-        email: '',
-        remarks: '',
-        billing_code: '',
-        billing_information: '',
-        monthly_sales_target: ''
-    });
+        const options = [
+            { value: '御中', label: '御中' },
+            { value: '貴社', label: '貴社' },
+        ];
+    
+        const [customer, setCustomer] = useState({
+            id: '',
+            name_primary: '',
+            name_secondary: '',
+            name_kana: '',
+            honorific: '',
+            phone_number: '',
+            fax_number: '',
+            zip_code: '',
+            address: '',
+            email: '',
+            remarks: '',
+            billing_code: '',
+            billing_information: '',
+            monthly_sales_target: ''
+        });
     const [customers, setCustomers] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
@@ -103,7 +103,7 @@ function Index() {
         <div className='w-full'>
             <div className='p-8'>
                 <div className='pb-6 flex items-center'>
-                <div className='text-2xl font-bold'>仕入明細表</div>
+                <div className='text-2xl font-bold'>入金明細表</div>
                     <div className='flex ml-auto'>
                         <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold flex'>
                             <div className='flex items-center'>
@@ -112,7 +112,7 @@ function Index() {
                         </Link>
                         </div>
                     </div>
-                <div className='bg-gray-100 rounded p-6'>
+                    <div className='bg-gray-100 rounded p-6'>
                     <div className='pb-6 text-lg font-bold'>
                         表示条件指定
                     </div>
@@ -143,11 +143,15 @@ function Index() {
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                         </div>
                         <div>
-                            <div className='text-sm pb-1.5'>仕入先</div>
+                            <div className='text-sm pb-1.5'>見積番号</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                         </div>
                         <div>
-                            <div className='text-sm pb-1.5'>商品名</div>
+                            <div className='text-sm pb-1.5'>得意先</div>
+                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                        </div>
+                        <div>
+                            <div className='text-sm pb-1.5'>商品</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                         </div>
                         <div>
@@ -160,8 +164,8 @@ function Index() {
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>ステータス</div>
-                            <CustomSelect options={options} name={"honorific"} data={customer} setData={setCustomer} />
-                        </div>
+                        <CustomSelect options={options} name={"honorific"} data={customer} setData={setCustomer} />
+                    </div>
                         <div>
                             <div className='text-sm pb-1.5'>ロット番号</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
@@ -224,7 +228,7 @@ function Index() {
     )
 }
 
-function PurchaseDetailStatementsIndex() {
+function PaymentDetailSheetsIndex() {
     return (
         <Routes>
             <Route path="" element={<Index />} />
@@ -232,4 +236,4 @@ function PurchaseDetailStatementsIndex() {
     )
 }
 
-export default PurchaseDetailStatementsIndex;
+export default PaymentDetailSheetsIndex;
