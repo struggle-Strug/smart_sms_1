@@ -9,19 +9,16 @@ const { ipcRenderer } = window.require('electron');
 function SetProductEdit() {
     const { id } = useParams(); // URLから商品のIDを取得
     const [product, setProduct] = useState({
-        name: '',
-        classification_primary: '',
-        classification_secondary: '',
+        id: id, // 追加
+        set_product_name: '',
+        category: '',
+        sub_category: '',
         jan_code: '',
-        standard_retail_price: '',
-        procurement_cost: '',
-        manufacturer_name: '',
-        specification: '',
-        unit: '',
-        country_of_origin: '',
-        storage_location: '',
-        storage_method: '',
-        threshold: ''
+        tax_rate: '',
+        warning_threshold: '',
+        product_search: '',
+        set_product_contents: '',
+        set_product_price: ''
     });
 
     const unitOptions = [
@@ -40,16 +37,18 @@ function SetProductEdit() {
 
     useEffect(() => {
         // 初期ロード時に商品のデータを取得
-        ipcRenderer.send('edit-product', id);
-        ipcRenderer.on('edit-product', (event, productData) => {
-            setProduct(productData);
+        ipcRenderer.send('edit-set-product', id);
+        ipcRenderer.on('edit-set-product', (event, setProductData) => {
+            setProduct(setProductData);
         });
 
         // コンポーネントのアンマウント時にリスナーを削除
         return () => {
-            ipcRenderer.removeAllListeners('edit-product');
+            ipcRenderer.removeAllListeners('edit-set-product');
         };
     }, [id]);
+
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -57,15 +56,18 @@ function SetProductEdit() {
     };
 
     const handleSubmit = () => {
-        validator.required(product.name, 'name', '商品名');
-        validator.required(product.classification_primary, 'classification_primary', 'カテゴリー');
+        validator.required(product.set_product_name, 'set_product_name', 'セット商品名');
+        validator.required(product.category, 'category', 'カテゴリー');
+        validator.required(product.sub_category, 'sub_category', 'サブカテゴリー');
         validator.required(product.jan_code, 'jan_code', 'JANコード');
-        validator.required(product.unit, 'unit', '単位');
+        // validator.required(product.tax_rate, 'tax_rate', '税率');
+        // validator.required(product.warning_threshold, 'warning_threshold', '警告値');
 
         setErrors(validator.getErrors());
 
         if (!validator.hasErrors()) {
-            ipcRenderer.send('save-product', product);
+            console.log('check');
+            ipcRenderer.send('save-set-product', product);
             alert('商品情報が更新されました。');
         }
     };
@@ -73,71 +75,56 @@ function SetProductEdit() {
     return (
         <div className='w-full'>
             <div className='p-8 mb-16'>
-                <div className='text-2xl font-bold mb-8'>{product.name}</div>
+                <div className='text-2xl font-bold mb-8'>{product.set_product_name}</div>
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
-                        <div className='p-4'>商品名 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
+                        <div className='p-4'>セット商品名 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
                         <input 
                             type='text' 
                             className='border rounded px-4 py-2.5 bg-white w-2/3' 
-                            placeholder='商品名を入力' 
-                            name="name" 
-                            value={product.name} 
+                            placeholder='セット商品名を入力' 
+                            name="set_product_name" 
+                            value={product.set_product_name} 
                             onChange={handleChange} 
                         />
                     </div>
                 </div>
-                {errors.name && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.name}</div>}
+                {errors.set_product_name && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.set_product_name}</div>}
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
-                        <div className='p-4'>商品コード <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
+                        <div className='p-4'>カテゴリー <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
                         <input 
                             type='text' 
                             className='border rounded px-4 py-2.5 bg-white w-2/3' 
-                            placeholder='商品コードを入力' 
-                            name="classification_primary" 
-                            value={product.classification_primary} 
+                            placeholder='カテゴリーを入力' 
+                            name="category" 
+                            value={product.category} 
                             onChange={handleChange} 
                         />
                     </div>
                 </div>
-                {errors.classification_primary && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.classification_primary}</div>}
+                {errors.category && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.category}</div>}
                 <div className="flex bg-white">
                     <div className="w-1/5">
-                        <div className='p-4'>カテゴリー<span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
+                        <div className='p-4'>サブカテゴリー<span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
                         <input 
                             type='text' 
                             className='border rounded px-4 py-2.5 bg-white w-2/3' 
-                            placeholder='商品分類1を入力' 
-                            name="classification_primary" 
-                            value={product.classification_primary} 
+                            placeholder='サブカテゴリーを入力' 
+                            name="sub_category" 
+                            value={product.sub_category} 
                             onChange={handleChange} 
                         />
                     </div>
                 </div>
-                {errors.classification_primary && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.classification_primary}</div>}
+                {errors.sub_category && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.sub_category}</div>}
                 <div className="flex bg-gray-100">
-                    <div className="w-1/5">
-                        <div className='p-4'>サブカテゴリー</div>
-                    </div>
-                    <div className="w-4/5 py-1.5">
-                        <input 
-                            type='text' 
-                            className='border rounded px-4 py-2.5 bg-white w-2/3' 
-                            placeholder='商品分類2を入力' 
-                            name="classification_secondary" 
-                            value={product.classification_secondary} 
-                            onChange={handleChange} 
-                        />
-                    </div>
-                </div>
-                <div className="flex bg白">
                     <div className="w-1/5">
                         <div className='p-4'>JANコード <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
@@ -153,124 +140,79 @@ function SetProductEdit() {
                     </div>
                 </div>
                 {errors.jan_code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.jan_code}</div>}
-                <div className="flex bg-gray-100">
+                <div className="flex bg白">
                     <div className="w-1/5">
-                        <div className='p-4'>標準売価</div>
+                        <div className='p-4'>税率 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
                         <input 
                             type='number' 
                             className='border rounded px-4 py-2.5 bg-white w-2/3' 
-                            placeholder='標準売価を入力' 
-                            name="standard_retail_price" 
-                            value={product.standard_retail_price} 
+                            placeholder='税率を入力' 
+                            name="tax_rate" 
+                            value={product.tax_rate} 
                             onChange={handleChange} 
                         />
                     </div>
                 </div>
-                <div className="flex bg白">
+                {errors.tax_rate && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.tax_rate}</div>}
+                <div className="flex bg-gray-100">
                     <div className="w-1/5">
-                        <div className='p-4'>仕入単価</div>
+                        <div className='p-4'>警告値 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
                         <input 
                             type='number' 
-                            className='border rounded px-4 py-2.5 bg白 w-2/3' 
-                            placeholder='仕入単価を入力' 
-                            name="procurement_cost" 
-                            value={product.procurement_cost} 
-                            onChange={handleChange} 
-                        />
-                    </div>
-                </div>
-                <div className="flex bg-gray-100">
-                    <div className="w-1/5">
-                        <div className='p-4'>メーカー名</div>
-                    </div>
-                    <div className="w-4/5 py-1.5">
-                        <input 
-                            type='text' 
                             className='border rounded px-4 py-2.5 bg-white w-2/3' 
-                            placeholder='メーカー名を入力' 
-                            name="manufacturer_name" 
-                            value={product.manufacturer_name} 
-                            onChange={handleChange} 
-                        />
-                    </div>
-                </div>
-                <div className="flex bg白">
-                    <div className="w-1/5">
-                        <div className='p-4'>規格・仕様</div>
-                    </div>
-                    <div className="w-4/5 py-1.5">
-                        <input 
-                            type='text' 
-                            className='border rounded px-4 py-2.5 bg白 w-2/3' 
-                            placeholder='規格・仕様を入力' 
-                            name="specification" 
-                            value={product.specification} 
-                            onChange={handleChange} 
-                        />
-                    </div>
-                </div>
-                <div className="flex bg-gray-100">
-                    <div className="w-1/5">
-                        <div className='p-4'>単位<span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
-                    </div>
-                    <div className="w-4/5 py-1.5">
-                        <CustomSelect placeholder={"1つ選んでください"} options={unitOptions} name={"unit"} data={product} setData={setProduct} />
-                    </div>
-                </div>
-                {errors.unit && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.unit}</div>}
-                <div className="flex bg白">
-                    <div className="w-1/5">
-                        <div className='p-4'>原産国</div>
-                    </div>
-                    <div className="w-4/5 py-1.5">
-                        <input 
-                            type='text' 
-                            className='border rounded px-4 py-2.5 bg白 w-2/3' 
-                            placeholder='原産国を入力' 
-                            name="country_of_origin" 
-                            value={product.country_of_origin} 
-                            onChange={handleChange} 
-                        />
-                    </div>
-                </div>
-                <div className="flex bg-gray-100">
-                    <div className="w-1/5">
-                        <div className='p-4'>保管場所</div>
-                    </div>
-                    <div className="w-4/5 py-1.5">
-                        <CustomSelect placeholder={"1つ選んでください"} options={storageLocation} name={"storage_location"} data={product} setData={setProduct} />
-                    </div>
-                </div>
-                <div className="flex bg白">
-                    <div className="w-1/5">
-                        <div className='p-4'>保管方法</div>
-                    </div>
-                    <div className="w-4/5 py-1.5">
-                        <input 
-                            type='text' 
-                            className='border rounded px-4 py-2.5 bg白 w-2/3' 
-                            placeholder='保管方法を入力' 
-                            name="storage_method" 
-                            value={product.storage_method} 
-                            onChange={handleChange} 
-                        />
-                    </div>
-                </div>
-                <div className="flex bg-gray-100">
-                    <div className="w-1/5">
-                        <div className='p-4'>警告値</div>
-                    </div>
-                    <div className="w-4/5 py-1.5">
-                        <input 
-                            type='number' 
-                            className='border rounded px-4 py-2.5 bg白 w-2/3' 
                             placeholder='警告値を入力' 
-                            name="threshold" 
-                            value={product.threshold} 
+                            name="warning_threshold" 
+                            value={product.warning_threshold} 
+                            onChange={handleChange} 
+                        />
+                    </div>
+                </div>
+                {errors.warning_threshold && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.warning_threshold}</div>}
+                <div className="flex bg白">
+                    <div className="w-1/5">
+                        <div className='p-4'>商品検索</div>
+                    </div>
+                    <div className="w-4/5 py-1.5">
+                        <input 
+                            type='text' 
+                            className='border rounded px-4 py-2.5 bg白 w-2/3' 
+                            placeholder='商品検索を入力' 
+                            name="product_search" 
+                            value={product.product_search} 
+                            onChange={handleChange} 
+                        />
+                    </div>
+                </div>
+                <div className="flex bg-gray-100">
+                    <div className="w-1/5">
+                        <div className='p-4'>セット内容</div>
+                    </div>
+                    <div className="w-4/5 py-1.5">
+                        <input 
+                            type='text' 
+                            className='border rounded px-4 py-2.5 bg-white w-2/3' 
+                            placeholder='セット内容を入力' 
+                            name="set_product_contents" 
+                            value={product.set_product_contents} 
+                            onChange={handleChange} 
+                        />
+                    </div>
+                </div>
+                <div className="flex bg白">
+                    <div className="w-1/5">
+                        <div className='p-4'>セット販売価格</div>
+                    </div>
+                    <div className="w-4/5 py-1.5">
+                        <input 
+                            type='number' 
+                            className='border rounded px-4 py-2.5 bg白 w-2/3' 
+                            placeholder='セット販売価格を入力' 
+                            name="set_product_price" 
+                            value={product.set_product_price} 
                             onChange={handleChange} 
                         />
                     </div>

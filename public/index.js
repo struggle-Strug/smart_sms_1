@@ -14,6 +14,7 @@ require('./ipc/masters/companies');
 require('./ipc/masters/primarySections');
 require('./ipc/masters/secondarySections');
 require('./ipc/masters/shops');
+require('./ipc/masters/setProducts'); // 追加
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -61,6 +62,8 @@ function createWindow() {
   secondarySectionsDB.initializeDatabase();
   const shopsSectionsDB = require('./database/masters/shops');
   shopsSectionsDB.initializeDatabase();
+  const setProductsSectionsDB = require('./database/masters/setProducts'); // 追加
+  setProductsSectionsDB.initializeDatabase();
 }
 
 const dbPath = path.join(app.getPath('userData'), 'database.db');
