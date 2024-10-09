@@ -61,7 +61,7 @@ function ProductEdit() {
         validator.required(product.name, 'name', '商品名');
         validator.required(product.classification_primary, 'classification_primary', 'カテゴリー');
         validator.required(product.jan_code, 'jan_code', 'JANコード');
-        // validator.required(product.unit, 'unit', '単位');
+        validator.required(product.unit, 'unit', '単位');
 
         setErrors(validator.getErrors());
 

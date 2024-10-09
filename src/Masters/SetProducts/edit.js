@@ -60,8 +60,9 @@ function SetProductEdit() {
         validator.required(product.category, 'category', 'カテゴリー');
         validator.required(product.sub_category, 'sub_category', 'サブカテゴリー');
         validator.required(product.jan_code, 'jan_code', 'JANコード');
-        // validator.required(product.tax_rate, 'tax_rate', '税率');
-        // validator.required(product.warning_threshold, 'warning_threshold', '警告値');
+        validator.required(product.tax_rate, 'tax_rate', '税率');
+        validator.required(product.warning_threshold, 'warning_threshold', '警告値');
+        validator.maxLength(product.set_product_name, 'set_product_name', 'セット商品名') // 追加
 
         setErrors(validator.getErrors());
 
@@ -220,7 +221,7 @@ function SetProductEdit() {
             </div>
             <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg白'>
                 <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>保存</div>
-                <Link to={`/master/products`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
+                <Link to={`/master/set-products`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
             </div>
         </div>
     );

@@ -3,16 +3,42 @@ class Validator {
       this.errors = {};
     }
   
+    // required(value, fieldName, displayName) {
+    //   console.log(displayName)
+    //   console.log(value)
+    //   if (!value || value.trim() === '') {
+    //     this.errors[fieldName] = `${displayName}は必須項目なので、入力してください。`;
+    //     return false;
+    //   }
+    //   delete this.errors[fieldName];
+    //   return true;
+    // }
+
     required(value, fieldName, displayName) {
       console.log(displayName)
       console.log(value)
-      if (!value || value.trim() === '') {
+      if (!value) {
+        this.errors[fieldName] = `${displayName}は必須項目なので、入力してください。`;
+        return false;
+      } else if (typeof value === 'string' && value.trim() === ''){
         this.errors[fieldName] = `${displayName}は必須項目なので、入力してください。`;
         return false;
       }
       delete this.errors[fieldName];
       return true;
     }
+
+    maxLength(value, fieldName, displayName, maxLength=255) {
+      console.log(displayName);
+      console.log(value);
+  
+      if (value.length > maxLength) {
+          this.errors[fieldName] = `${displayName}は${maxLength}文字以内で入力してください。`;
+          return false;
+      }
+      delete this.errors[fieldName];
+      return true;
+  }
   
     
     getErrors() {

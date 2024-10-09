@@ -20,11 +20,11 @@ function SetProductList() {
             setProducts(data);
         });
 
-        ipcRenderer.on('product-deleted', (event, id) => {
+        ipcRenderer.on('product-set-deleted', (event, id) => {
             setProducts((prevProducts) => prevProducts.filter(product => product.id !== id));
         });
 
-        ipcRenderer.on('search-products-result', (event, data) => {
+        ipcRenderer.on('search-set-products-result', (event, data) => {
             setProducts(data);
         });
 
@@ -52,7 +52,7 @@ function SetProductList() {
     };
 
     const handleSearch = () => {
-        ipcRenderer.send('search-products', searchQuery);
+        ipcRenderer.send('search-set-products', searchQuery);
     };
 
     const handleKeyDown = (event) => {

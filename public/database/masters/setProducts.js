@@ -57,11 +57,39 @@ function deleteSetProductById(id, callback) {
 }
 
 
+function searchSetProducts(query, callback) {
+  let sql;
+  let params = [];
+
+  if (query && query.trim() !== '') {
+      sql = `
+      SELECT * FROM set_products 
+      WHERE set_product_name LIKE ? 
+      OR id LIKE ? 
+      OR category LIKE ? 
+      OR sub_category LIKE ? 
+      OR set_product_price LIKE ? 
+      `;
+      params = [
+          `%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`, 
+          `%${query}%`
+      ];
+  } else {
+      // クエリが空の場合はすべてのデータを返す
+      sql = `SELECT * FROM set_products`;
+  }
+
+  db.all(sql, params, (err, rows) => {
+      callback(err, rows);
+  });
+}
+
 
 module.exports = {
   initializeDatabase,
   loadSetProducts,
   getSetProductById, 
   saveSetProduct, 
-  deleteSetProductById
+  deleteSetProductById, 
+  searchSetProducts
 };

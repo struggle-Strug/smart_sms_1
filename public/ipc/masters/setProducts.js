@@ -1,5 +1,5 @@
 const { ipcMain } = require('electron');
-const { loadSetProducts, saveSetProduct, getSetProductById, deleteSetProductById } = require('../../database/masters/setProducts');
+const { loadSetProducts, saveSetProduct, getSetProductById, deleteSetProductById, searchSetProducts } = require('../../database/masters/setProducts');
 
 ipcMain.on('load-set-products', (event) => {
     loadSetProducts((err, rows) => {
@@ -56,4 +56,14 @@ ipcMain.on('get-set-product-detail', (event, id) => {
           event.sender.send('set-product-detail-data', row);
       }
   });
+});
+
+ipcMain.on('search-set-products', (event, query) => {
+    searchSetProducts(query, (err, query) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('search-set-products-result', query);
+        }
+    });
 });
