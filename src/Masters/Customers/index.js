@@ -4,15 +4,15 @@ import { useLocation } from 'react-router-dom';
 import CustomersAdd from './add';
 import CustomersEdit from './edit';
 import CustomersDetail from './detail';
-
+import ConfirmDialog from '../../Components/ConfirmDialog';
 
 const { ipcRenderer } = window.require('electron');
-
 
 function Index() {
     const [customers, setCustomers] = useState([]);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [customerIdToDelete, setCustomerIdToDelete] = useState(null);
+    const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
     const location = useLocation();
     const [searchQuery, setSearchQuery] = useState('');
@@ -50,17 +50,17 @@ function Index() {
     };
 
     const handleDelete = (id) => {
-        setCustomerIdToDelete(id); // 削除する顧客のIDを設定
-        setIsDialogOpen(true); // ダイアログを開く
+        setCustomerIdToDelete(id);
+        setIsDialogOpen(true);
     };
 
     const handleConfirmDelete = () => {
         ipcRenderer.send('delete-customer', customerIdToDelete);
-        setIsDialogOpen(false); // ダイアログを閉じる
+        setIsDialogOpen(false);
     };
 
     const handleCancelDelete = () => {
-        setIsDialogOpen(false); // ダイアログを閉じる
+        setIsDialogOpen(false);
     };
 
     const handleSearch = () => {
@@ -152,12 +152,18 @@ function Index() {
             </div>
             <ConfirmDialog
                 isOpen={isDialogOpen}
-                message="本当にこの顧客を削除しますか？"
+                message="｛マスタ名タイトル｝を削除しますか？"
+                additionalMessage={
+                    <>
+                       この操作は取り消しできません。<br />
+                       確認し、問題ない場合は削除ボタンを押してください。
+                    </>
+                }
                 onConfirm={handleConfirmDelete}
                 onCancel={handleCancelDelete}
             />
         </div>
-    )
+    );
 }
 
 function CustomersIndex() {
