@@ -34,7 +34,7 @@ function StockInOutSlipsAdd() {
                 <div className='pt-8 pb-6 flex border-b px-8 items-center'>
                     <div className='text-2xl font-bold'>{'株式会社テスト'}</div>
                     <div className='flex ml-auto'>
-                        <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
+                        <Link to="/stock-in-output-invoice-settings" className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
                             <div className='pr-1.5 pl-1 flex items-center'>
                                 <svg width="21" height="19" viewBox="0 0 21 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M17.3926 5.72949H16.3926V0.729492H4.39258V5.72949H3.39258C1.73258 5.72949 0.392578 7.06949 0.392578 8.72949V14.7295H4.39258V18.7295H16.3926V14.7295H20.3926V8.72949C20.3926 7.06949 19.0526 5.72949 17.3926 5.72949ZM6.39258 2.72949H14.3926V5.72949H6.39258V2.72949ZM14.3926 16.7295H6.39258V12.7295H14.3926V16.7295ZM16.3926 12.7295V10.7295H4.39258V12.7295H2.39258V8.72949C2.39258 8.17949 2.84258 7.72949 3.39258 7.72949H17.3926C17.9426 7.72949 18.3926 8.17949 18.3926 8.72949V12.7295H16.3926Z" fill="#1F2937" />

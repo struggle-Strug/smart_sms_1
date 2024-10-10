@@ -8,7 +8,8 @@ import SalesManagement from './SalesManagement';
 import { useLocation } from 'react-router-dom';
 import Procurement from './Procurement';
 import Master from './Master';
-import InvoiceSettings from './Components/InvoiceSettings'; 
+import InvoiceSettings from './Components/InvoiceSettings/InvoiceSettings'; 
+import StockInOutputInvoiceSettings from './Components/InvoiceSettings/StockInOutputInvoiceSettings';
 
 function App() {
   const location = useLocation();
@@ -33,7 +34,8 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/master/*" element={<Master />} />
         <Route path="/procurement/*" element={<Procurement />} />
-        <Route path="/document-settings" element={<InvoiceSettings />} />
+        <Route path="/invoice-settings" element={<InvoiceSettings />} />
+        <Route path="/stock-in-output-invoice-settings" element={<StockInOutputInvoiceSettings />} />
       </Routes>
     </div>
   );
