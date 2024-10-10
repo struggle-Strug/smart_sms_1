@@ -114,7 +114,7 @@ function App() {
         <div className='ml-auto text-xl py-3 pr-10'>国際キャリア事業協同組合</div>
       </div>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/*" element={<Home />} />
         <Route path="/sales-management" element={<SalesManagement />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/master/*" element={<Master />} />
