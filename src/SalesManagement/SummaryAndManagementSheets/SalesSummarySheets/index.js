@@ -89,6 +89,12 @@ function Index() {
         };
     }, []);
 
+    const [showFilters, setShowFilters] = useState(false);
+
+    const toggleFilters = () => {
+        setShowFilters(prev => !prev);
+    };
+
     const DropDown = (id) => {
         return (
             <div ref={dropdownRef} className='absolute right-0 origin-top-right mt-6 rounded shadow-lg z-50 bg-white p-3' style={{ top: "50px", width: "120px" }}>
@@ -103,78 +109,91 @@ function Index() {
         <div className='w-full'>
             <div className='p-8'>
                 <div className='pb-6 flex items-center'>
-                <div className='text-2xl font-bold'>売上集計表</div>
+                    <div className='text-2xl font-bold'>売上集計表</div>
                     <div className='flex ml-auto'>
                         <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold flex'>
                             <div className='flex items-center'>
                             </div>
                             明細表設定
                         </Link>
-                        </div>
                     </div>
+                </div>
                 <div className='bg-gray-100 rounded p-6'>
                     <div className='pb-6 text-lg font-bold'>
                         表示条件指定
                     </div>
                     <div className='grid grid-cols-3 gap-6'>
                         <div>
-                        <div className='flex items-center'>
-                            <div>
-                            <div className='text-sm pb-1.5'>期間指定 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <div className='flex items-center'>
+                                <div>
+                                    <div className='text-sm pb-1.5'>期間指定 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
+                                    <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                                </div>
+                                <div>
+                                    <div className='w-1'>&nbsp;</div>
+                                    <div className='flex items-center px-2'>〜</div>
+                                </div>
+
+                                <div>
+                                    <div className='text-sm pb-1.5 text-gray-100'>期間指定</div>
+                                    <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                                </div>
                             </div>
-                            <div>
-                            <div className='w-1'>&nbsp;</div>
-                            <div className='flex items-center px-2'>〜</div>
-                            </div>
-                            
-                            <div>
-                            <div className='text-sm pb-1.5 text-gray-100'>期間指定</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
-                            </div>
-                        </div>
                         </div>
                         <div>
-                            <div className='text-sm pb-1.5'>カテゴリー</div>
+                            <div className='text-sm pb-1.5'>得意先</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                         </div>
                         <div>
-                            <div className='text-sm pb-1.5'>サブカテゴリー</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
-                        </div>
-                        <div>
-                            <div className='text-sm pb-1.5'>仕入先</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
-                        </div>
-                        <div>
-                            <div className='text-sm pb-1.5'>商品名</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
-                        </div>
-                        <div>
-                            <div className='text-sm pb-1.5'>担当者</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
-                        </div>
-                        <div>
-                            <div className='text-sm pb-1.5'>倉庫</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
-                        </div>
-                        <div>
-                            <div className='text-sm pb-1.5'>ステータス</div>
-                            <CustomSelect options={options} name={"honorific"} data={customer} setData={setCustomer} />
-                        </div>
-                        <div>
-                            <div className='text-sm pb-1.5'>ロット番号</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
-                        </div>
-                        <div>
-                            <div className='text-sm pb-1.5'>区分１</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
-                        </div>
-                        <div>
-                            <div className='text-sm pb-1.5'>区分２</div>
+                            <div className='text-sm pb-1.5'>商品</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                         </div>
                     </div>
+                    <div>
+                        <Link to="#" onClick={toggleFilters} className='pt-3 text-sm flex'>
+                            {showFilters ? '' : 'フィルターを表示'}
+                        </Link>
+                    </div>
+
+                    {showFilters && (
+                        <div className='flex-col'>
+                            <div className='grid grid-cols-3 gap-6 mt-4'>
+                                <div>
+                                    <div className='text-sm pb-1.5'>カテゴリー</div>
+                                    <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                                </div>
+                                <div>
+                                    <div className='text-sm pb-1.5'>サブカテゴリー</div>
+                                    <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                                </div>
+                                <div>
+                                    <div className='text-sm pb-1.5'>担当者</div>
+                                    <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                                </div>
+                            </div>
+                            <div className='grid grid-cols-2 gap-6 mt-6'>
+                                <div>
+                                    <div className='text-sm pb-1.5'>倉庫</div>
+                                    <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                                </div>
+                                <div>
+                                    <div className='text-sm pb-1.5'>ロット番号</div>
+                                    <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                                </div>
+                                <div>
+                                    <div className='text-sm pb-1.5'>区分１</div>
+                                    <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                                </div>
+                                <div>
+                                    <div className='text-sm pb-1.5'>区分２</div>
+                                    <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                                </div>
+                                <div className='text-sm cursor-pointer' onClick={toggleFilters}>
+                                    フィルターを閉じる
+                                </div>
+                            </div>
+                        </div>
+                    )}
                     <div className='flex mt-6'>
                         <div className='border rounded-lg py-3 px-7 text-base font-bold bg-blue-600 text-white'>適用して表示</div>
                     </div>
@@ -182,8 +201,8 @@ function Index() {
                 <div className='flex justify-end'>
                     <div className='flex ml-auto pt-6'>
                         <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold flex'>
-                    <div className='flex items-center'>
-                        </div>
+                            <div className='flex items-center'>
+                            </div>
                             エクスポート
                         </Link>
                     </div>

@@ -227,11 +227,17 @@ function Index() {
                 <table className="w-full mt-8 table-auto">
                     <thead className=''>
                         <tr className='border-b'>
-                            <th className='text-left pb-2.5'>支払日付</th>
-                            <th className='text-left pb-2.5'>伝票番号</th>
-                            <th className='text-left pb-2.5'>仕入先名</th>
-                            <th className='text-left pb-2.5'>仕入先コード</th>
-                            <th className='text-left pb-2.5'>備考</th>
+                            <th className='text-left pb-2.5'>順位</th>
+                            <th className='text-left pb-2.5'>得意先</th>
+                            <th className='text-left pb-2.5'>商品コード</th>
+                            <th className='text-left pb-2.5'>商品名</th>
+                            <th className='text-left pb-2.5'>単価</th>
+                            <th className='text-left pb-2.5'>数量</th>
+                            <th className='text-left pb-2.5'>金額</th>
+                            <th className='text-left pb-2.5'>商品名</th>
+                            <th className='text-left pb-2.5'>粗利益</th>
+                            <th className='text-left pb-2.5'>粗利率</th>
+                            <th className='text-left pb-2.5'>構成比</th>
                             <th className='text-right'></th>
                         </tr>
                     </thead>
@@ -255,6 +261,18 @@ function Index() {
                         ))}
                     </tbody>
                 </table>
+                <div className='flex items-end justify-end py-4'>
+                                <div className=''>
+                                    <div className='flex items-center'>
+                                        <div className='mr-4'>受注数量</div>
+                                        <div className='mr-12 font-bold text-lg'>200</div>
+                                        <div className='mr-4'>受注金額</div>
+                                        <div className='mr-12 font-bold text-lg'>20,000円</div>
+                                        <div className='mr-4'>構成比</div>
+                                        <div className='font-bold text-lg'>100％</div>
+                                    </div>
+                                </div>
+                            </div>
                 <div className='mt-8'>
                     <SimpleBarCharts />
                 </div>
