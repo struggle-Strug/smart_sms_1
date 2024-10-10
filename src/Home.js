@@ -1,6 +1,15 @@
-import React from 'react';
+// import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import TaxesIndex from './Home/Taxes';
+
 
 function Home() {
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef(null);
+    const location = useLocation();
+
     return (
         <div className='mx-40 my-9'>
             <div className='text-3xl font-bold my-2'>
@@ -75,6 +84,16 @@ function Home() {
                 <div className='flex items-center mt-6'>
                     
                 </div>
+            </div>
+
+            {/* 消費税テスト */}
+            <div className='text-3xl font-bold my-9'>
+                消費税テスト
+            </div>
+            <div className='flex'>
+                <Routes>
+                    <Route path="taxes/*" element={<TaxesIndex />} />
+                </Routes>
             </div>
         </div>
     )

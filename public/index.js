@@ -64,6 +64,8 @@ function createWindow() {
   shopsSectionsDB.initializeDatabase();
   const setProductsSectionsDB = require('./database/masters/setProducts'); // 追加
   setProductsSectionsDB.initializeDatabase();
+  const setTaxesDB = require('./database/home/taxes'); // 追加
+  setTaxesDB.initializeDatabase();
 }
 
 const dbPath = path.join(app.getPath('userData'), 'database.db');
