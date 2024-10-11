@@ -91,15 +91,6 @@ function App() {
                   </div>
                   <div className='px-3 pb-4'>
                     <div className='font-bold flex items-center'>
-                      <div className='w-36'>エクスポート</div>
-                      <div className='border w-full'></div>
-                    </div>
-                    <div className='grid grid-cols-2 text-gray-600'>
-                      <div>エクスポート</div>
-                    </div>
-                  </div>
-                  <div className='px-3 pb-4'>
-                    <div className='font-bold flex items-center'>
                       <div className='w-24'>請求処理</div>
                       <div className='border w-full'></div>
                     </div>
