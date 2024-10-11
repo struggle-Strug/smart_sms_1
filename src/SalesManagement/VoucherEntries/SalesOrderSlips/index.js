@@ -1,17 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
-import CustomersAdd from './add';
-import CustomersEdit from './edit';
-import CustomersDetail from './detail';
-import ConfirmDialog from '../../Components/ConfirmDialog';
+import SalesOrderSlipsAdd from './add';
+import SalesOrderSlipsEdit from './edit';
+import SalesOrderSlipsDetail from './detail';
 
 const { ipcRenderer } = window.require('electron');
 
+
 function Index() {
     const [customers, setCustomers] = useState([]);
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [customerIdToDelete, setCustomerIdToDelete] = useState(null);
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
     const location = useLocation();
@@ -50,17 +48,9 @@ function Index() {
     };
 
     const handleDelete = (id) => {
-        setCustomerIdToDelete(id);
-        setIsDialogOpen(true);
-    };
-
-    const handleConfirmDelete = () => {
-        ipcRenderer.send('delete-customer', customerIdToDelete);
-        setIsDialogOpen(false);
-    };
-
-    const handleCancelDelete = () => {
-        setIsDialogOpen(false);
+        if (window.confirm('本当にこの顧客を削除しますか？')) {
+            ipcRenderer.send('delete-customer', id);
+        }
     };
 
     const handleSearch = () => {
@@ -93,7 +83,7 @@ function Index() {
     return (
         <div className='w-full'>
             <div className='p-8'>
-                <div className='pb-6 text-2xl font-bold'>得意先</div>
+                <div className='pb-6 text-2xl font-bold'>受注伝票</div>
                 <div className='flex'>
                 <div className='border rounded-lg py-3 px-7 mb-8 text-base font-bold bg-blue-600 text-white'><Link to="add" className={``}>新規登録</Link></div>
                 </div>
@@ -120,12 +110,12 @@ function Index() {
                 </div>
                 <table className="w-full mt-8 table-auto">
                     <thead className=''>
-                        <tr className='border-b'>
-                            <th className='text-left pb-2.5'>得意先名1</th>
-                            <th className='text-left pb-2.5'>得意先名2</th>
-                            <th className='text-left pb-2.5'>得意先コード</th>
-                            <th className='text-left pb-2.5'>電話番号</th>
-                            <th className='text-left pb-2.5'>メールアドレス</th>
+                    <tr className='border-b'>
+                            <th className='text-left pb-2.5'>仕入日付</th>
+                            <th className='text-left pb-2.5'>伝票番号</th>
+                            <th className='text-left pb-2.5'>仕入先名</th>
+                            <th className='text-left pb-2.5'>仕入先コード</th>
+                            <th className='text-left pb-2.5'>備考</th>
                             <th className='text-right'></th>
                         </tr>
                     </thead>
@@ -150,31 +140,19 @@ function Index() {
                     </tbody>
                 </table>
             </div>
-            <ConfirmDialog
-                isOpen={isDialogOpen}
-                message="｛マスタ名タイトル｝を削除しますか？"
-                additionalMessage={
-                    <>
-                       この操作は取り消しできません。<br />
-                       確認し、問題ない場合は削除ボタンを押してください。
-                    </>
-                }
-                onConfirm={handleConfirmDelete}
-                onCancel={handleCancelDelete}
-            />
         </div>
-    );
+    )
 }
 
-function CustomersIndex() {
+function SalesOrderSlipsIndex() {
     return (
         <Routes>
             <Route path="" element={<Index />} />
-            <Route path="add" element={<CustomersAdd />} />
-            <Route path="edit/:id" element={<CustomersEdit />} />
-            <Route path="detail/:id" element={<CustomersDetail />} />
+            <Route path="add" element={<SalesOrderSlipsAdd />} />
+            <Route path="detail/:id" element={<SalesOrderSlipsDetail />} />
+            <Route path="edit/:id" element={<SalesOrderSlipsEdit />} />
         </Routes>
     )
 }
 
-export default CustomersIndex;
+export default SalesOrderSlipsIndex;
