@@ -2,6 +2,8 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 
+
+//マスタ管理
 require('./ipc/masters/customers'); 
 require('./ipc/masters/deliveryCustomers');
 require('./ipc/masters/products');
@@ -14,6 +16,11 @@ require('./ipc/masters/companies');
 require('./ipc/masters/primarySections');
 require('./ipc/masters/secondarySections');
 require('./ipc/masters/shops');
+
+//仕入管理
+require('./ipc/procurements/purchaseOrders');
+require('./ipc/procurements/purchaseInvoices');
+require('./ipc/procurements/stockInOutSlips');
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -53,14 +60,20 @@ function createWindow() {
   shippingMethodsDB.initializeDatabase();
   const companiesDB = require('./database/masters/companies');
   companiesDB.initializeDatabase();
-  // companiesDB.addZipCodeColumn();
-  // companiesDB.addAccountHolderColumn();
   const primarySectionsDB = require('./database/masters/primarySections');
   primarySectionsDB.initializeDatabase();
   const secondarySectionsDB = require('./database/masters/secondarySections');
   secondarySectionsDB.initializeDatabase();
   const shopsSectionsDB = require('./database/masters/shops');
   shopsSectionsDB.initializeDatabase();
+
+  // 仕入管理
+  const purchaseOrdersDB = require('./database/procurements/purchaseOrders');
+  purchaseOrdersDB.initializeDatabase();
+  const purchaseInvoicesDB = require('./database/procurements/purchaseInvoices');
+  purchaseInvoicesDB.initializeDatabase();
+  const stockInOutSlipsDB = require('./database/procurements/stockInOutSlips');
+  stockInOutSlipsDB.initializeDatabase();
 }
 
 const dbPath = path.join(app.getPath('userData'), 'database.db');

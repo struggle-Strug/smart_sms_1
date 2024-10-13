@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip'
 import CustomSelect from '../../../Components/CustomSelect';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import Validator from '../../../utils/validator';
 const { ipcRenderer } = window.require('electron');
 
 function PurchaseOrdersAdd() {
@@ -12,22 +13,55 @@ function PurchaseOrdersAdd() {
         { value: '貴社', label: '貴社' },
     ];
 
-    const [customer, setCustomer] = useState({
+    const [purchaseOrder, setPurchaseOrder] = useState({
         id: '',
-        name_primary: '',
-        name_secondary: '',
-        name_kana: '',
+        order_date: '',
+        vender_id: '',
+        vender_name: '',
         honorific: '',
-        phone_number: '',
-        fax_number: '',
-        zip_code: '',
-        address: '',
-        email: '',
+        vender_contact_person: '',
         remarks: '',
-        billing_code: '',
-        billing_information: '',
-        monthly_sales_target: ''
+        closing_date: '',
+        payment_due_date: '',
+        payment_method: '',
+        estimated_delivery_date: '',
     });
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setPurchaseOrder({ ...purchaseOrder, [name]: value });
+    };
+
+    const validator = new Validator();
+
+    const handleSubmit = () => {
+        // バリデーションを実行
+        validator.required(purchaseOrder.id, 'id', '伝票番号');
+        validator.required(purchaseOrder.order_date, 'order_date', '発注日付');
+        validator.required(purchaseOrder.vender_id, 'vender_id', '仕入先コード');
+        validator.required(purchaseOrder.vender_name, 'vender_name', '仕入先名');
+
+        if (!validator.hasErrors()) {
+
+            ipcRenderer.send('save-purchase-order', purchaseOrder);
+            setPurchaseOrder({
+                id: '',
+                order_date: '',
+                vender_id: '',
+                vender_name: '',
+                honorific: '',
+                vender_contact_person: '',
+                remarks: '',
+                closing_date: '',
+                payment_due_date: '',
+                payment_method: '',
+                estimated_delivery_date: '',
+            });
+            alert('新規登録が完了しました。');
+        }
+    };
+
+
     return (
         <div className='w-full'>
             <div className=''>
@@ -49,11 +83,11 @@ function PurchaseOrdersAdd() {
                     <div className='py-2.5 font-bold text-xl'>伝票番号</div>
                     <div className='pb-2'>
                         <div className='w-40 text-sm pb-1.5'>伝票番号 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
+                        <input type='number' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="id" value={purchaseOrder.id} onChange={handleChange} />
                     </div>
                     <div className='pb-2'>
                         <div className='w-40 text-sm pb-1.5'>発注日付 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="order_date" value={purchaseOrder.order_date} onChange={handleChange} />
                     </div>
                     <div className='py-3'>
                         <hr className='' />
@@ -63,21 +97,21 @@ function PurchaseOrdersAdd() {
                         <div className='flex'>
                             <div>
                                 <div className='w-40 text-sm pb-1.5'>仕入先コード</div>
-                                <input type='text' className='border rounded px-4 py-2.5 bg-white w-28' placeholder='' name="" value={""} />
+                                <input type='text' className='border rounded px-4 py-2.5 bg-white w-28' placeholder='' name="vender_id" value={purchaseOrder.vender_id} onChange={handleChange} />
                             </div>
                             <div>
                                 <div className='w-40 text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                <input type='text' className='border rounded px-4 py-2.5 bg-white w-80' placeholder='' name="" value={""} />
+                                <input type='text' className='border rounded px-4 py-2.5 bg-white w-80' placeholder='' name="vender_name" value={purchaseOrder.vender_name} onChange={handleChange} />
                             </div>
                             <div className='ml-12'>
                                 <div className='w-40 text-sm pb-1.5'></div>
-                                <CustomSelect options={options} name={"honorific"} data={customer} setData={setCustomer} placeholder='御中' />
+                                <CustomSelect options={options} name={"honorific"} data={purchaseOrder} setData={setPurchaseOrder} placeholder='御中' />
                             </div>
                         </div>
                     </div>
                     <div className='pb-2'>
                         <div className='w-40 text-sm pb-1.5'>先方担当者</div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="vender_contact_person" value={purchaseOrder.vender_contact_person} onChange={handleChange} />
                     </div>
                     <div className='py-3'>
                         <hr className='' />
@@ -166,7 +200,7 @@ function PurchaseOrdersAdd() {
                     </div>
                     <div className='py-2.5 font-bold text-xl'>備考</div>
                     <div className='pb-2'>
-                       <textarea className='border rounded px-4 py-2.5 bg-white w-full resize-none' placeholder='' rows={5} name="" value={""} ></textarea>
+                        <textarea className='border rounded px-4 py-2.5 bg-white w-full resize-none' placeholder='' name="remarks" value={purchaseOrder.remarks} onChange={handleChange} ></textarea>
                     </div>
                     <div className='py-3'>
                         <hr className='' />
@@ -174,15 +208,15 @@ function PurchaseOrdersAdd() {
                     <div className='py-2.5 font-bold text-xl'>支払情報</div>
                     <div className='pb-2'>
                         <div className='w-40 text-sm pb-1.5'>締日</div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="closing_date" value={purchaseOrder.closing_date} onChange={handleChange} />
                     </div>
                     <div className='pb-2'>
                         <div className='w-40 text-sm pb-1.5'>支払期日</div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="payment_due_date" value={purchaseOrder.payment_due_date} onChange={handleChange} />
                     </div>
                     <div className='pb-2'>
                         <div className='w-40 text-sm pb-1.5'>支払方法</div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="payment_method" value={purchaseOrder.payment_method} onChange={handleChange} />
                     </div>
                     <div className='py-3'>
                         <hr className='' />
@@ -190,9 +224,13 @@ function PurchaseOrdersAdd() {
                     <div className='py-2.5 font-bold text-xl'>納品情報</div>
                     <div className='pb-2'>
                         <div className='w-40 text-sm pb-1.5'>入荷予定日</div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="estimated_delivery_date" value={purchaseOrder.estimated_delivery_date} onChange={handleChange} />
                     </div>
                 </div>
+            </div>
+            <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
+                <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>新規登録</div>
+                <Link to={`procurements/purchase-orders`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
             </div>
         </div>
     );
