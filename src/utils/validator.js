@@ -28,6 +28,7 @@ class Validator {
       return true;
     }
 
+    // これには欠点あり。同じfieldnameを共有しているため、requiredでfalseになってもこちらでtrueに更新されてしまう。
     maxLength(value, fieldName, displayName, maxLength=255) {
       console.log(displayName);
       console.log(value);

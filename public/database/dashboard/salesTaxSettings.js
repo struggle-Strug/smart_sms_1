@@ -20,10 +20,42 @@ function initializeDatabase() {
   `);
 }
 
+function loadSalesTaxSettings(callback) {
+  db.all('SELECT * FROM taxes', [], callback);
+}
 
+function getSalesTaxSettingById(id, callback) {
+  db.get('SELECT * FROM taxes WHERE id = ?', [id], callback);
+}
+
+function saveSalesTaxSetting(salesTaxSettingData, callback) {
+  const { id, tax_rate, start_date, end_date } = salesTaxSettingData;
+
+  if (id) {
+      db.run(
+          `UPDATE taxes SET tax_rate = ?, start_date = ?, end_date = ?, updated = datetime('now') WHERE id = ?`,
+          [tax_rate, start_date, end_date, id],
+          callback
+      );
+  } else {
+      db.run(
+          `INSERT INTO taxes (tax_rate, start_date, end_date, created, updated) VALUES (?, ?, ?, datetime('now'), datetime('now'))`,
+          [tax_rate, start_date, end_date],
+          callback
+      );
+  }
+}
+
+function deleteSalesTaxSettingById(id, callback) {
+  db.run('DELETE FROM taxes WHERE id = ?', [id], callback);
+}
 
 
 
 module.exports = {
   initializeDatabase,
+  loadSalesTaxSettings,
+  getSalesTaxSettingById,
+  saveSalesTaxSetting,
+  deleteSalesTaxSettingById
 };

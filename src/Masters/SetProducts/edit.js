@@ -62,12 +62,11 @@ function SetProductEdit() {
         validator.required(product.jan_code, 'jan_code', 'JANコード');
         validator.required(product.tax_rate, 'tax_rate', '税率');
         validator.required(product.warning_threshold, 'warning_threshold', '警告値');
-        validator.maxLength(product.set_product_name, 'set_product_name', 'セット商品名') // 追加
+        // validator.maxLength(product.set_product_name, 'set_product_name', 'セット商品名') // 追加
 
         setErrors(validator.getErrors());
 
         if (!validator.hasErrors()) {
-            console.log('check');
             ipcRenderer.send('save-set-product', product);
             alert('商品情報が更新されました。');
         }

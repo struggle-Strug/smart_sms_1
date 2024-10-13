@@ -15,6 +15,7 @@ require('./ipc/masters/primarySections');
 require('./ipc/masters/secondarySections');
 require('./ipc/masters/shops');
 require('./ipc/masters/setProducts'); // 追加
+require('./ipc/dashboard/salesTaxSettings'); // 追加
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -64,7 +65,7 @@ function createWindow() {
   shopsSectionsDB.initializeDatabase();
   const setProductsSectionsDB = require('./database/masters/setProducts'); // 追加
   setProductsSectionsDB.initializeDatabase();
-  const setTaxesDB = require('./database/home/taxes'); // 追加
+  const setTaxesDB = require('./database/dashboard/salesTaxSettings'); // 追加
   setTaxesDB.initializeDatabase();
 }
 
