@@ -17,6 +17,11 @@ class Validator {
     required(value, fieldName, displayName) {
       console.log(displayName)
       console.log(value)
+
+      if (this.errors[fieldName]) {
+        return false;
+      }
+
       if (!value) {
         this.errors[fieldName] = `${displayName}は必須項目なので、入力してください。`;
         return false;
@@ -28,10 +33,14 @@ class Validator {
       return true;
     }
 
-    // これには欠点あり。同じfieldnameを共有しているため、requiredでfalseになってもこちらでtrueに更新されてしまう。
+
     maxLength(value, fieldName, displayName, maxLength=255) {
       console.log(displayName);
       console.log(value);
+
+      if (this.errors[fieldName]) {
+        return false;
+      }
   
       if (value.length > maxLength) {
           this.errors[fieldName] = `${displayName}は${maxLength}文字以内で入力してください。`;

@@ -10,7 +10,7 @@ const { ipcRenderer } = window.require('electron');
 
 
 function Index() {
-    const [customers, setCustomers] = useState([]);
+    const [salesTaxSettings, setSalesTaxSettings] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
     const location = useLocation();
@@ -19,11 +19,11 @@ function Index() {
     useEffect(() => {
         ipcRenderer.send('load-sales-tax-settings');
         ipcRenderer.on('sales-tax-settings-data', (event, data) => {
-            setCustomers(data);
+            setSalesTaxSettings(data);
         });
 
         ipcRenderer.on('sales-tax-setting-deleted', (event, id) => {
-            setCustomers((prevCustomers) => prevCustomers.filter(customer => customer.id !== id));
+            setSalesTaxSettings((prevCustomers) => prevCustomers.filter(customer => customer.id !== id));
         });
 
         // ipcRenderer.on('search-customers-result', (event, data) => {
@@ -74,7 +74,7 @@ function Index() {
     const DropDown = (id) => {
         return (
             <div ref={dropdownRef} className='absolute right-0 origin-top-right mt-6 rounded shadow-lg z-50 bg-white p-3' style={{ top: "50px", width: "120px" }}>
-                <div className='px-3 py-1 hover:text-blue-600 hover:underline'><Link to={`detail/${id.id}`} className={``}>詳細</Link></div>
+                {/* <div className='px-3 py-1 hover:text-blue-600 hover:underline'><Link to={`detail/${id.id}`} className={``}>詳細</Link></div> */}
                 <div className='px-3 py-1 hover:text-blue-600 hover:underline'><Link to={`edit/${id.id}`} className={``}>編集</Link></div>
                 <div className='px-3 py-1 hover:text-blue-600 hover:underline' onClick={() => handleDelete(id.id)}>削除</div>
             </div>
@@ -98,7 +98,7 @@ function Index() {
                         </tr>
                     </thead>
                     <tbody>
-                        {customers.map((customer) => (
+                        {salesTaxSettings.map((customer) => (
                             <tr className='border-b' key={customer.id}>
                                 <td>{customer.tax_rate || <div className='border w-4'></div>} %</td>
                                 <td>{customer.start_date || <div className='border w-4'></div>}</td>
