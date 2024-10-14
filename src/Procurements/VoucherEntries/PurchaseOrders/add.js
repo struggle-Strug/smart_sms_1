@@ -27,6 +27,49 @@ function PurchaseOrdersAdd() {
         estimated_delivery_date: '',
     });
 
+
+    const [purchaseOrderDetails, setPurchaseOrderDetails] = useState([
+        {
+            id: '',
+            purchase_order_id: '',
+            product_id: '',
+            number: '',
+            unit: '',
+            price: '',
+            tax_rate: '',
+            storage_facility: '',
+            stock: '',
+        }
+    ]);
+
+    const addPurchaseOrderDetail = () => {
+        setPurchaseOrderDetails([...purchaseOrderDetails, {
+            id: '',
+            purchase_order_id: '',
+            product_id: '',
+            product_name: '',
+            number: '',
+            unit: '',
+            price: '',
+            tax_rate: '',
+            storage_facility: '',
+            stock: '',
+        }]);
+    }
+
+    const removePurchaseOrderDetail = (index) => {
+        if (purchaseOrderDetails.length === 1) return;
+        setPurchaseOrderDetails(purchaseOrderDetails.filter((_, i) => i !== index));
+    };
+
+    const handleInputChange = (index, e) => {
+        const { name, value } = e.target;
+        const updatedDetails = purchaseOrderDetails.map((detail, i) => 
+            i === index ? { ...detail, [name]: value } : detail
+        );
+        setPurchaseOrderDetails(updatedDetails);
+    }
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setPurchaseOrder({ ...purchaseOrder, [name]: value });
@@ -40,6 +83,10 @@ function PurchaseOrdersAdd() {
         validator.required(purchaseOrder.order_date, 'order_date', '発注日付');
         validator.required(purchaseOrder.vender_id, 'vender_id', '仕入先コード');
         validator.required(purchaseOrder.vender_name, 'vender_name', '仕入先名');
+
+        for (let i = 0; i < purchaseOrderDetails.length; i++) {
+            ipcRenderer.send('save-purchase-order-detail', purchaseOrderDetails[i]);
+        }
 
         if (!validator.hasErrors()) {
 
@@ -61,12 +108,14 @@ function PurchaseOrdersAdd() {
         }
     };
 
+    console.log(purchaseOrderDetails)
+
 
     return (
         <div className='w-full'>
             <div className=''>
                 <div className='pt-8 pb-6 flex border-b px-8 items-center'>
-                    <div className='text-2xl font-bold'>{'株式会社テスト'}</div>
+                    <div className='text-2xl font-bold'>新規作成</div>
                     <div className='flex ml-auto'>
                         <Link to="/invoice-settings" className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
                             <div className='pr-1.5 pl-1 flex items-center'>
@@ -117,60 +166,63 @@ function PurchaseOrdersAdd() {
                         <hr className='' />
                     </div>
                     <div className='py-2.5 font-bold text-xl'>明細</div>
-                    <div className='flex items-center'>
-                        <div>
-                            <div className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>＋</div>
-                        </div>
-                        <div className=''>
+                    {
+                        purchaseOrderDetails.map((purchaseOrderDetail, index) => (
                             <div className='flex items-center'>
+                                <div>
+                                    <div className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex' onClick={addPurchaseOrderDetail}>＋</div>
+                                </div>
                                 <div className=''>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                    <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "120px" }} />
+                                    <div className='flex items-center'>
+                                        <div className=''>
+                                            <div className='text-sm pb-1.5'>商品コード <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                            <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="product_id" value={purchaseOrderDetail.product_id} onChange={(e) => handleInputChange(index, e)}  style={{ width: "120px" }} />
+                                        </div>
+                                        <div className='ml-4'>
+                                            <div className='text-sm pb-1.5'>商品名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                            <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="product_name" value={purchaseOrderDetail.product_name} onChange={(e) => handleInputChange(index, e)} style={{ width: "440px" }} />
+                                        </div>
+                                        <div className='ml-4'>
+                                            <div className='text-sm pb-1.5'>数量 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                            <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="number" value={purchaseOrderDetail.number} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
+                                        </div>
+                                        <div className='ml-4'>
+                                            <div className='text-sm pb-1.5'>単位 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                            <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="unit" value={purchaseOrderDetail.unit} onChange={(e) => handleInputChange(index, e)} style={{ width: "120px" }} />
+                                        </div>
+                                        <div className='ml-4'>
+                                            <div className='text-sm pb-1.5'>単価 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                            <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="price" value={purchaseOrderDetail.price} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
+                                        </div>
+                                    </div>
+                                    <div className='flex items-center mt-4'>
+                                        <div className=''>
+                                            <div className='text-sm pb-1.5 w-40'>税率 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                            <CustomSelect options={options} name={"honorific"} data={purchaseOrderDetail} setData={setPurchaseOrderDetails} placeholder='御中'/>
+                                        </div>
+                                        <div className='ml-4'>
+                                            <div className='text-sm pb-1.5 w-40'>倉庫 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                            <CustomSelect options={options} name={"honorific"} data={purchaseOrderDetail} setData={setPurchaseOrderDetails} placeholder='御中' />
+                                        </div>
+                                        <div className='ml-4'>
+                                            <div className='text-sm pb-1.5'>単位数 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                            <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="stock" value={purchaseOrderDetail.stock} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)}/>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className='ml-4'>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                    <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "440px" }} />
-                                </div>
-                                <div className='ml-4'>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                    <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "180px" }} />
-                                </div>
-                                <div className='ml-4'>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                    <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "120px" }} />
-                                </div>
-                                <div className='ml-4'>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                    <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "180px" }} />
+                                    <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={(e) => removePurchaseOrderDetail(index)}>
+                                        <svg width="15" height="19" viewBox="0 0 15 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M11.3926 6.72949V16.7295H3.39258V6.72949H11.3926ZM9.89258 0.729492H4.89258L3.89258 1.72949H0.392578V3.72949H14.3926V1.72949H10.8926L9.89258 0.729492ZM13.3926 4.72949H1.39258V16.7295C1.39258 17.8295 2.29258 18.7295 3.39258 18.7295H11.3926C12.4926 18.7295 13.3926 17.8295 13.3926 16.7295V4.72949Z" fill="#1F2937" />
+                                        </svg>
+                                    </div>
                                 </div>
                             </div>
-                            <div className='flex items-center mt-4'>
-                                <div className=''>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                    <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "120px" }} />
-                                </div>
-                                <div className='ml-4'>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                    <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "180px" }} />
-                                </div>
-                                <div className='ml-4'>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                    <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "180px" }} />
-                                </div>
-                            </div>
-                        </div>
-                        <div className='ml-4'>
-                            <div className='py-3 px-4 border rounded-lg text-base font-bold flex'>
-                                <svg width="15" height="19" viewBox="0 0 15 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M11.3926 6.72949V16.7295H3.39258V6.72949H11.3926ZM9.89258 0.729492H4.89258L3.89258 1.72949H0.392578V3.72949H14.3926V1.72949H10.8926L9.89258 0.729492ZM13.3926 4.72949H1.39258V16.7295C1.39258 17.8295 2.29258 18.7295 3.39258 18.7295H11.3926C12.4926 18.7295 13.3926 17.8295 13.3926 16.7295V4.72949Z" fill="#1F2937" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
+                        ))
+                    }
                     <div className='py-3'>
                         <hr className='' />
                     </div>
-                    {/* <div className='py-2.5 font-bold text-xl'>明細</div> */}
                     <div className='py-6 flex'>
                         <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
                             <div className='flex pb-2'>

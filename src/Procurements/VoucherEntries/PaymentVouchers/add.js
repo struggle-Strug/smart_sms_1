@@ -36,9 +36,10 @@ function PaymentVouchersAdd() {
     const handleSubmit = () => {
         validator.required(paymentVoucher.id, 'id', '伝票番号');
         validator.required(paymentVoucher.order_date, 'order_date', '発注日付');
+        console.log(paymentVoucher)
 
         if (!validator.hasErrors()) {
-            ipcRenderer.send('save-purchase-invoice', paymentVoucher);
+            ipcRenderer.send('save-payment-voucher', paymentVoucher);
             setPaymentVoucher({
                 id: '',
                 order_date: '',

@@ -21,6 +21,11 @@ require('./ipc/masters/shops');
 require('./ipc/procurements/purchaseOrders');
 require('./ipc/procurements/purchaseInvoices');
 require('./ipc/procurements/stockInOutSlips');
+require('./ipc/procurements/paymentVouchers');
+require('./ipc/procurements/purchaseOrderDetails');
+require('./ipc/procurements/purchaseInvoiceDetails');
+require('./ipc/procurements/stockInOutSlipDetails');
+require('./ipc/procurements/paymentVoucherDetails');
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -74,6 +79,18 @@ function createWindow() {
   purchaseInvoicesDB.initializeDatabase();
   const stockInOutSlipsDB = require('./database/procurements/stockInOutSlips');
   stockInOutSlipsDB.initializeDatabase();
+  const paymentVouchersDB = require('./database/procurements/paymentVouchers');
+  paymentVouchersDB.initializeDatabase();
+  const purchaseOrderDetailsDB = require('./database/procurements/purchaseOrderDetails');
+  purchaseOrderDetailsDB.initializeDatabase();
+  const purchaseInvoiceDetailsDB = require('./database/procurements/purchaseInvoiceDetails');
+  purchaseInvoiceDetailsDB.initializeDatabase();
+  const stockInOutSlipDetailsDB = require('./database/procurements/stockInOutSlipDetails');
+  stockInOutSlipDetailsDB.initializeDatabase();
+  const paymentVoucherDetailsDB = require('./database/procurements/paymentVoucherDetails');
+  paymentVoucherDetailsDB.initializeDatabase();
+
+  //集計管理
 }
 
 const dbPath = path.join(app.getPath('userData'), 'database.db');

@@ -4,37 +4,73 @@ import { useLocation } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip'
 import CustomSelect from '../../../Components/CustomSelect';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import Validator from '../../../utils/validator';
 const { ipcRenderer } = window.require('electron');
 
 function PurchaseInvoicesEdit() {
+    const { id } = useParams();  // URLから会社IDを取得
+
+    const [purchaseInvoice, setPurchaseInvoice] = useState({
+        id: '',
+        order_date: '',
+        vender_id: '',
+        vender_name: '',
+        honorific: '',
+        vender_contact_person: '',
+        contact_person: "",
+        purchase_order_id: "",
+        remarks: '',
+        closing_date: '',
+        payment_due_date: '',
+        payment_method: '',
+    });
+
+    const [errors, setErrors] = useState({}); // エラーメッセージ用の状態
+
+    const validator = new Validator(); // バリデーターを初期化
+
     const options = [
-        { value: '御中', label: '御中' },
-        { value: '貴社', label: '貴社' },
+        { value: '普通', label: '普通' },
+        { value: '当座', label: '当座' },
     ];
 
-    const [customer, setCustomer] = useState({
-        id: '',
-        name_primary: '',
-        name_secondary: '',
-        name_kana: '',
-        honorific: '',
-        phone_number: '',
-        fax_number: '',
-        zip_code: '',
-        address: '',
-        email: '',
-        remarks: '',
-        billing_code: '',
-        billing_information: '',
-        monthly_sales_target: ''
-    });
+    useEffect(() => {
+        // 初期ロード時に会社データを取得
+        ipcRenderer.send('edit-purchase-invoice', id);
+        ipcRenderer.on('edit-purchase-invoice', (event, purchaseInvoiceData) => {
+            setPurchaseInvoice(purchaseInvoiceData);
+        });
+
+        return () => {
+            ipcRenderer.removeAllListeners('edit-purchase-invoice');
+        };
+    }, [id]);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setPurchaseInvoice({ ...purchaseInvoice, [name]: value });
+    };
+
+    const handleSubmit = () => {
+        validator.required(purchaseInvoice.id, 'id', '伝票番号');
+        validator.required(purchaseInvoice.order_date, 'order_date', '発注日付');
+        validator.required(purchaseInvoice.vender_id, 'vender_id', '仕入先コード');
+        validator.required(purchaseInvoice.vender_name, 'vender_name', '仕入先名');
+
+        setErrors(validator.getErrors()); // エラーを設定
+
+        if (!validator.hasErrors()) {
+            ipcRenderer.send('save-purchase-invoice', purchaseInvoice);
+            alert('会社情報が更新されました。');
+        }
+    };
     return (
         <div className='w-full'>
             <div className=''>
                 <div className='pt-8 pb-6 flex border-b px-8 items-center'>
-                    <div className='text-2xl font-bold'>{'株式会社テスト'}</div>
+                    <div className='text-2xl font-bold'>仕入伝票</div>
                     <div className='flex ml-auto'>
-                        <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
+                        <Link to="/invoice-settings" className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
                             <div className='pr-1.5 pl-1 flex items-center'>
                                 <svg width="21" height="19" viewBox="0 0 21 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M17.3926 5.72949H16.3926V0.729492H4.39258V5.72949H3.39258C1.73258 5.72949 0.392578 7.06949 0.392578 8.72949V14.7295H4.39258V18.7295H16.3926V14.7295H20.3926V8.72949C20.3926 7.06949 19.0526 5.72949 17.3926 5.72949ZM6.39258 2.72949H14.3926V5.72949H6.39258V2.72949ZM14.3926 16.7295H6.39258V12.7295H14.3926V16.7295ZM16.3926 12.7295V10.7295H4.39258V12.7295H2.39258V8.72949C2.39258 8.17949 2.84258 7.72949 3.39258 7.72949H17.3926C17.9426 7.72949 18.3926 8.17949 18.3926 8.72949V12.7295H16.3926Z" fill="#1F2937" />
@@ -49,11 +85,11 @@ function PurchaseInvoicesEdit() {
                     <div className='py-2.5 font-bold text-xl'>伝票番号</div>
                     <div className='pb-2'>
                         <div className='text-sm pb-1.5'>伝票番号 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="id" value={purchaseInvoice.id} onChange={handleChange} />
                     </div>
                     <div className='pb-2'>
                         <div className='text-sm pb-1.5'>発注日付 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="order_date" value={purchaseInvoice.order_date} onChange={handleChange} />
                     </div>
                     <div className='py-3'>
                         <hr className='' />
@@ -62,22 +98,22 @@ function PurchaseInvoicesEdit() {
                     <div className='pb-2'>
                         <div className='flex'>
                             <div>
-                                <div className='text-sm pb-1.5'>仕入先コード</div>
-                                <input type='text' className='border rounded px-4 py-2.5 bg-white w-28' placeholder='' name="" value={""} />
+                                <div className='w-40 text-sm pb-1.5'>仕入先コード</div>
+                                <input type='text' className='border rounded px-4 py-2.5 bg-white w-28' placeholder='' name="vender_id" value={purchaseInvoice.vender_id} onChange={handleChange} />
                             </div>
-                            <div className='ml-4'>
-                                <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                <input type='text' className='border rounded px-4 py-2.5 bg-white w-80' placeholder='' name="" value={""} />
+                            <div>
+                                <div className='w-40 text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                <input type='text' className='border rounded px-4 py-2.5 bg-white w-80' placeholder='' name="vender_name" value={purchaseInvoice.vender_name} onChange={handleChange} />
                             </div>
-                            <div className='ml-4'>
-                                <div className='text-sm pb-1.5 w-40'>宛名</div>
-                                <CustomSelect options={options} name={"honorific"} data={customer} setData={setCustomer} placeholder='御中' />
+                            <div className='ml-12'>
+                                <div className='w-40 text-sm pb-1.5'></div>
+                                <CustomSelect options={options} name={"honorific"} data={purchaseInvoice} setData={setPurchaseInvoice} placeholder='御中' />
                             </div>
                         </div>
                     </div>
                     <div className='pb-2'>
                         <div className='text-sm pb-1.5'>先方担当者</div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="vender_contact_person" value={purchaseInvoice.vender_contact_person} onChange={handleChange} />
                     </div>
                     <div className='py-3'>
                         <hr className='' />
@@ -85,26 +121,12 @@ function PurchaseInvoicesEdit() {
                     <div className='py-2.5 font-bold text-xl'>自社情報</div>
                     <div className='pb-2'>
                         <div className='text-sm pb-1.5'>担当者</div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="" value={""} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="contact_person" value={purchaseInvoice.contact_person} onChange={handleChange} />
                     </div>
-                    <div className='py-2.5 font-bold text-xl'>仕入伝票</div>
-                    <div className='rounded-lg bg-gray-100 p-6 flex'>
-                        <div className=''>
-                            <div className='text-sm pb-1.5'>仕入日付</div>
-                            <div className='flex items-center'>
-                                <input type='text' className='border rounded px-4 py-2.5 bg-white w-48' placeholder='' name="" value={""} />
-                                <div>〜</div>
-                                <input type='text' className='border rounded px-4 py-2.5 bg-white w-48' placeholder='' name="" value={""} />
-                            </div>
-                        </div>
-                        <div className='ml-4'>
-                            <div className='text-sm pb-1.5'>仕入先名</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-80' placeholder='' name="" value={""} />
-                        </div>
-                        <div className='ml-4'>
-                            <div className='text-sm pb-1.5'>仕入伝票番号</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-80' placeholder='' name="" value={""} />
-                        </div>
+                    <div className='py-2.5 font-bold text-xl'>発注伝票</div>
+                    <div className='pb-2'>
+                        <div className='text-sm pb-1.5'>発注伝票番号</div>
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="purchase_order" value={purchaseInvoice.purchase_order} onChange={handleChange} />
                     </div>
                     <div className='py-3'>
                         <hr className='' />
@@ -167,9 +189,29 @@ function PurchaseInvoicesEdit() {
                     </div>
                     <div className='py-2.5 font-bold text-xl'>備考</div>
                     <div className='pb-2'>
-                        <textarea className='border rounded px-4 py-2.5 bg-white w-full resize-none' placeholder='' rows={5} name="" value={""} ></textarea>
+                        <textarea className='border rounded px-4 py-2.5 bg-white w-full resize-none' placeholder='' rows={5} name="remarks" value={purchaseInvoice.remarks} onChange={handleChange} ></textarea>
+                    </div>
+                    <div className='py-3'>
+                        <hr className='' />
+                    </div>
+                    <div className='py-2.5 font-bold text-xl'>支払情報</div>
+                    <div className='pb-2'>
+                        <div className='w-40 text-sm pb-1.5'>締日</div>
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="closing_date" value={purchaseInvoice.closing_date} onChange={handleChange} />
+                    </div>
+                    <div className='pb-2'>
+                        <div className='w-40 text-sm pb-1.5'>支払期日</div>
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="payment_due_date" value={purchaseInvoice.payment_due_date} onChange={handleChange} />
+                    </div>
+                    <div className='pb-2'>
+                        <div className='w-40 text-sm pb-1.5'>支払方法</div>
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="payment_method" value={purchaseInvoice.payment_method} onChange={handleChange} />
                     </div>
                 </div>
+            </div>
+            <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
+                <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>保存</div>
+                <Link to={`procurements/purchase-orders`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
             </div>
         </div>
     );
