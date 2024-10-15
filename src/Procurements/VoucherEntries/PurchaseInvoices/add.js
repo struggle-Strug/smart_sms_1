@@ -28,6 +28,49 @@ function PurchaseInvoicesAdd() {
         payment_method: '',
     });
 
+    const [purchaseInvoiceDetails, setPurchaseInvoiceDetails] = useState([
+        {
+            id: '',
+            purchase_invoice_id: '',
+            product_id: '',
+            product_name: '',
+            number: '',
+            unit: '',
+            price: '',
+            tax_rate: '',
+            storage_facility: '',
+            stock: '',
+        }
+    ]);
+
+    const addPurchaseInvoiceDetail = () => {
+        setPurchaseInvoiceDetails([...purchaseInvoiceDetails, {
+            id: '',
+            purchase_invoice_id: '',
+            product_id: '',
+            product_name: '',
+            number: '',
+            unit: '',
+            price: '',
+            tax_rate: '',
+            storage_facility: '',
+            stock: '',
+        }]);
+    }
+
+    const removePurchaseInvoiceDetail = (index) => {
+        if (purchaseInvoiceDetails.length === 1) return;
+        setPurchaseInvoiceDetails(purchaseInvoiceDetails.filter((_, i) => i !== index));
+    };
+
+    const handleInputChange = (index, e) => {
+        const { name, value } = e.target;
+        const updatedDetails = purchaseInvoiceDetails.map((detail, i) => 
+            i === index ? { ...detail, [name]: value } : detail
+        );
+        setPurchaseInvoiceDetails(updatedDetails);
+    }
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setPurchaseInvoice({ ...purchaseInvoice, [name]: value });
@@ -40,6 +83,11 @@ function PurchaseInvoicesAdd() {
         validator.required(purchaseInvoice.order_date, 'order_date', '発注日付');
         validator.required(purchaseInvoice.vender_id, 'vender_id', '仕入先コード');
         validator.required(purchaseInvoice.vender_name, 'vender_name', '仕入先名');
+
+        for (let i = 0; i < purchaseInvoiceDetails.length; i++) {
+            // console.log(purchaseInvoiceDetails[i]);
+            ipcRenderer.send('save-purchase-invoice-detail', purchaseInvoiceDetails[i]);
+        }
 
         if (!validator.hasErrors()) {
 
@@ -83,7 +131,7 @@ function PurchaseInvoicesAdd() {
                     <div className='py-2.5 font-bold text-xl'>伝票番号</div>
                     <div className='pb-2'>
                         <div className='text-sm pb-1.5'>伝票番号 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="id" value={purchaseInvoice.id} onChange={handleChange} />
+                        <input type='number' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="id" value={purchaseInvoice.id} onChange={handleChange} />
                     </div>
                     <div className='pb-2'>
                         <div className='text-sm pb-1.5'>発注日付 <span className='text-sm font-bold text-red-600'>必須</span></div>
@@ -124,13 +172,13 @@ function PurchaseInvoicesAdd() {
                     <div className='py-2.5 font-bold text-xl'>発注伝票</div>
                     <div className='pb-2'>
                         <div className='text-sm pb-1.5'>発注伝票番号</div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="purchase_order" value={purchaseInvoice.purchase_order} onChange={handleChange} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="purchase_order_id" value={purchaseInvoice.purchase_order_id} onChange={handleChange} />
                     </div>
                     <div className='py-3'>
                         <hr className='' />
                     </div>
                     <div className='py-2.5 font-bold text-xl'>明細</div>
-                    <div className='flex items-end'>
+                    {/* <div className='flex items-end'>
                         <div className=''>
                             <div className='flex items-end'>
                                 <div>
@@ -181,7 +229,93 @@ function PurchaseInvoicesAdd() {
                                 </div>
                             </div>
                         </div>
+                    </div> */}
+
+
+                    {
+                        purchaseInvoiceDetails.map((purchaseInvoiceDetail, index) => (
+                            <div className='flex items-center'>
+                                <div>
+                                    <div className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex' onClick={addPurchaseInvoiceDetail}>＋</div>
+                                </div>
+                                <div className=''>
+                                    <div className='flex items-center'>
+                                        <div className=''>
+                                            <div className='text-sm pb-1.5'>商品コード <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                            <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="product_id" value={purchaseInvoiceDetail.product_id} onChange={(e) => handleInputChange(index, e)}  style={{ width: "120px" }} />
+                                        </div>
+                                        <div className='ml-4'>
+                                            <div className='text-sm pb-1.5'>商品名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                            <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="product_name" value={purchaseInvoiceDetail.product_name} onChange={(e) => handleInputChange(index, e)} style={{ width: "440px" }} />
+                                        </div>
+                                        <div className='ml-4'>
+                                            <div className='text-sm pb-1.5'>数量 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                            <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="number" value={purchaseInvoiceDetail.number} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
+                                        </div>
+                                        <div className='ml-4'>
+                                            <div className='text-sm pb-1.5'>単位 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                            <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="unit" value={purchaseInvoiceDetail.unit} onChange={(e) => handleInputChange(index, e)} style={{ width: "120px" }} />
+                                        </div>
+                                        <div className='ml-4'>
+                                            <div className='text-sm pb-1.5'>単価 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                            <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="price" value={purchaseInvoiceDetail.price} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
+                                        </div>
+                                    </div>
+                                    <div className='flex items-center mt-4'>
+                                        <div className=''>
+                                            <div className='text-sm pb-1.5 w-40'>税率 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                            <CustomSelect options={options} name={"honorific"} data={purchaseInvoiceDetail} setData={setPurchaseInvoiceDetails} placeholder='御中'/>
+                                        </div>
+                                        <div className='ml-4'>
+                                            <div className='text-sm pb-1.5 w-40'>倉庫 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                            <CustomSelect options={options} name={"honorific"} data={purchaseInvoiceDetail} setData={setPurchaseInvoiceDetails} placeholder='御中' />
+                                        </div>
+                                        <div className='ml-4'>
+                                            <div className='text-sm pb-1.5'>単位数 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                            <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="stock" value={purchaseInvoiceDetail.stock} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)}/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className='ml-4'>
+                                    <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={(e) => removePurchaseInvoiceDetail(index)}>
+                                        <svg width="15" height="19" viewBox="0 0 15 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M11.3926 6.72949V16.7295H3.39258V6.72949H11.3926ZM9.89258 0.729492H4.89258L3.89258 1.72949H0.392578V3.72949H14.3926V1.72949H10.8926L9.89258 0.729492ZM13.3926 4.72949H1.39258V16.7295C1.39258 17.8295 2.29258 18.7295 3.39258 18.7295H11.3926C12.4926 18.7295 13.3926 17.8295 13.3926 16.7295V4.72949Z" fill="#1F2937" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    }
+                    <div className='py-3'>
+                        <hr className='' />
                     </div>
+                    <div className='py-6 flex'>
+                        <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>税抜合計</div>
+                                <div>5,000円</div>
+                            </div>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>消費税(8%)</div>
+                                <div>5,000円</div>
+                            </div>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>消費税(10%)</div>
+                                <div>5,000円</div>
+                            </div>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>消費税合計</div>
+                                <div>5,000円</div>
+                            </div>
+                            <div className='flex'>
+                                <div className='w-40'>税込合計</div>
+                                <div>5,000円</div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
                     <div className='py-3'>
                         <hr className='' />
                     </div>

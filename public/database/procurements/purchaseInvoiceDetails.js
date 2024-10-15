@@ -24,6 +24,7 @@ function savePurchaseInvoiceDetail(detailData, callback) {
         id,
         purchase_invoice_id,
         product_id,
+        product_name,
         number,
         unit,
         price,
@@ -47,6 +48,7 @@ function savePurchaseInvoiceDetail(detailData, callback) {
                         `UPDATE purchase_invoice_details SET 
                             purchase_invoice_id = ?, 
                             product_id = ?, 
+                            product_name = ?,
                             number = ?, 
                             unit = ?, 
                             price = ?, 
@@ -58,6 +60,7 @@ function savePurchaseInvoiceDetail(detailData, callback) {
                         [
                             purchase_invoice_id,
                             product_id,
+                            product_name,
                             number,
                             unit,
                             price,
@@ -71,12 +74,13 @@ function savePurchaseInvoiceDetail(detailData, callback) {
                 } else {
                     db.run(
                         `INSERT INTO purchase_invoice_details 
-                        (purchase_invoice_id, product_id, number, unit, price, tax_rate, storage_facility, stock, created, updated) 
+                        (purchase_invoice_id, product_id, pruduct_name, number, unit, price, tax_rate, storage_facility, stock, created, updated) 
                         VALUES 
-                        (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+                        (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
                         [
                             purchase_invoice_id,
                             product_id,
+                            product_name,
                             number,
                             unit,
                             price,
@@ -92,12 +96,13 @@ function savePurchaseInvoiceDetail(detailData, callback) {
     } else {
         db.run(
             `INSERT INTO purchase_invoice_details 
-            (purchase_invoice_id, product_id, number, unit, price, tax_rate, storage_facility, stock, created, updated) 
+            (purchase_invoice_id, product_id, product_name, number, unit, price, tax_rate, storage_facility, stock, created, updated) 
             VALUES 
-            (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
             [
                 purchase_invoice_id,
                 product_id,
+                product_name,
                 number,
                 unit,
                 price,
@@ -131,6 +136,7 @@ function initializeDatabase() {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         purchase_invoice_id INTEGER,
         product_id INTEGER,
+        product_name VARCHAR(255),
         number INTEGER,
         unit VARCHAR(255),
         price INTEGER,
