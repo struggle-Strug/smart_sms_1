@@ -4,8 +4,28 @@ import { useLocation } from 'react-router-dom';
 
 const { ipcRenderer } = window.require('electron');
 
-
 function Index() {
+    const options = [
+        { value: '御中', label: '御中' },
+        { value: '貴社', label: '貴社' },
+    ];
+
+    const [customer, setCustomer] = useState({
+        id: '',
+        name_primary: '',
+        name_secondary: '',
+        name_kana: '',
+        honorific: '',
+        phone_number: '',
+        fax_number: '',
+        zip_code: '',
+        address: '',
+        email: '',
+        remarks: '',
+        billing_code: '',
+        billing_information: '',
+        monthly_sales_target: ''
+    });
     const [customers, setCustomers] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
@@ -74,42 +94,40 @@ function Index() {
                 <div className='px-3 py-1 hover:text-blue-600 hover:underline'><Link to={`edit/${id.id}`} className={``}>編集</Link></div>
                 <div className='px-3 py-1 hover:text-blue-600 hover:underline' onClick={() => handleDelete(id.id)}>削除</div>
             </div>
-        )
+        );
     }
 
     return (
-        <div className='w-full'>
+        <div className='w-5/6'>
             <div className='p-8'>
                 <div className='pb-6 flex items-center'>
-                <div className='text-2xl font-bold'>支払明細表</div>
+                    <div className='text-2xl font-bold'>支払明細表</div>
                     <div className='flex ml-auto'>
-                        <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold flex'>
-                            <div className='flex items-center'>
-                            </div>
+                        <Link to={`/master/purchase-order-details/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold flex'>
                             明細表設定
                         </Link>
-                        </div>
                     </div>
+                </div>
                 <div className='bg-gray-100 rounded-lg p-6'>
                     <div className='pb-6 text-lg font-bold'>
                         表示条件指定
                     </div>
-                        <div className='grid grid-cols-2 gap-6 pb-6'>
+                    <div className='grid grid-cols-2 gap-6 pb-6'>
                         <div className='pl-0'>
-                        <div className='text-sm pb-1.5'>期間指定 <span className='text-xs ml-1 font-bold text-red-600'>必須</span>
-                        </div> {/* ボックスと波線の間隔を調整 */}
+                            <div className='text-sm pb-1.5'>期間指定 <span className='text-xs ml-1 font-bold text-red-600'>必須</span>
+                            </div> {/* ボックスと波線の間隔を調整 */}
                             <div className='flex items-center'>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/2' placeholder='' name="" value={""} />
-                            <div className='flex items-center px-2'>〜</div> {/* 波線 */}
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/2' placeholder='' name="" value={""} />
-                        </div>
+                                <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/2' placeholder='' name="" value={""} />
+                                <div className='flex items-center px-2'>〜</div> {/* 波線 */}
+                                <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/2' placeholder='' name="" value={""} />
+                            </div>
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>仕入先</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
-                            </div>
                         </div>
-                        
+                    </div>
+
                     <div className='grid grid-cols-3 gap-6'>
                         <div>
                             <div className='text-sm pb-1.5'>仕入先</div>
@@ -136,46 +154,57 @@ function Index() {
                         <div className='border rounded-lg py-3 px-7 text-base font-bold bg-blue-600 text-white'>適用して表示</div>
                     </div>
                 </div>
-                <div className='flex justify-end'>
-                    <div className='flex ml-auto pt-6'>
-                        <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold flex'>
-                    <div className='flex items-center'>
-                        </div>
-                            エクスポート
-                        </Link>
-                    </div>
+                <div className='flex justify-end pt-6'>
+                    <Link to={`/master/purchase-order-details/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold flex'>
+                        エクスポート
+                    </Link>
                 </div>
-                <table className="w-full mt-8 table-auto">
-                    <thead className=''>
-                        <tr className='border-b'>
-                            <th className='text-left pb-2.5'>支払日付</th>
-                            <th className='text-left pb-2.5'>伝票番号</th>
-                            <th className='text-left pb-2.5'>仕入先名</th>
-                            <th className='text-left pb-2.5'>仕入先コード</th>
-                            <th className='text-left pb-2.5'>備考</th>
-                            <th className='text-right'></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {customers.map((customer) => (
-                            <tr className='border-b' key={customer.id}>
-                                <td>{customer.name_primary || <div className='border w-4'></div>}</td>
-                                <td>{customer.name_primary || <div className='border w-4'></div>}</td>
-                                <td>{customer.billing_code || <div className='border w-4'></div>}</td>
-                                <td>{customer.phone_number || <div className='border w-4'></div>}</td>
-                                <td>{customer.email}</td>
-                                <td className='flex justify-center relative'>
-                                    <div className='border rounded px-4 py-3 relative hover:cursor-pointer' onClick={(e) => toggleDropdown(customer.id)}>
-                                        {isOpen === customer.id && <DropDown id={customer.id} />}
-                                        <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M6.30664 10.968C5.20664 10.968 4.30664 11.868 4.30664 12.968C4.30664 14.068 5.20664 14.968 6.30664 14.968C7.40664 14.968 8.30664 14.068 8.30664 12.968C8.30664 11.868 7.40664 10.968 6.30664 10.968ZM18.3066 10.968C17.2066 10.968 16.3066 11.868 16.3066 12.968C16.3066 14.068 17.2066 14.968 18.3066 14.968C19.4066 14.968 20.3066 14.068 20.3066 12.968C20.3066 11.868 19.4066 10.968 18.3066 10.968ZM12.3066 10.968C11.2066 10.968 10.3066 11.868 10.3066 12.968C10.3066 14.068 11.2066 14.968 12.3066 14.968C13.4066 14.968 14.3066 14.068 14.3066 12.968C14.3066 11.868 13.4066 10.968 12.3066 10.968Z" fill="#1A1A1A" />
-                                        </svg>
-                                    </div>
-                                </td>
+                <div className='px-8 pb-8 overflow-x-scroll'>
+                    <table className="w-full mt-8 table-auto" style={{ width: "2000px" }}>
+                        <thead className=''>
+                            <tr className='border-b'>
+                                <th className='text-left pb-2.5'>仕入日</th>
+                                <th className='text-left pb-2.5'>仕入番号</th>
+                                <th className='text-left pb-2.5'>仕入先</th>
+                                <th className='text-left pb-2.5'>商品コード</th>
+                                <th className='text-left pb-2.5'>商品名</th>
+                                <th className='text-left pb-2.5'>カテゴリー</th>
+                                <th className='text-left pb-2.5'>サブカテゴリー</th>
+                                <th className='text-left pb-2.5'>数量</th>
+                                <th className='text-left pb-2.5'>単価</th>
+                                <th className='text-left pb-2.5'>金額</th>
+                                <th className='text-left pb-2.5'>ロット番号</th>
+                                <th className='text-left pb-2.5'>倉庫</th>
+                                <th className='text-left pb-2.5'>担当者</th>
+                                <th className='text-left pb-2.5'>区分１</th>
+                                <th className='text-left pb-2.5'>区分２</th>
+                                <th className='text-left pb-2.5'>ステータス</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {customers.map((customer) => (
+                                <tr className='border-b' key={customer.id}>
+                                    <td className='py-4'>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     )

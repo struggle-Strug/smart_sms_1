@@ -100,7 +100,7 @@ function Index() {
     }
 
     return (
-        <div className='w-full'>
+        <div className='w-5/6'>
             <div className='p-8'>
                 <div className='pb-6 flex items-center'>
                     <div className='text-2xl font-bold'>仕入明細表</div>
@@ -187,37 +187,52 @@ function Index() {
                         </Link>
                     </div>
                 </div>
-                <table className="w-full mt-8 table-auto">
-                    <thead className=''>
-                        <tr className='border-b'>
-                            <th className='text-left pb-2.5'>支払日付</th>
-                            <th className='text-left pb-2.5'>伝票番号</th>
-                            <th className='text-left pb-2.5'>仕入先名</th>
-                            <th className='text-left pb-2.5'>仕入先コード</th>
-                            <th className='text-left pb-2.5'>備考</th>
-                            <th className='text-right'></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {customers.map((customer) => (
-                            <tr className='border-b' key={customer.id}>
-                                <td>{customer.name_primary || <div className='border w-4'></div>}</td>
-                                <td>{customer.name_primary || <div className='border w-4'></div>}</td>
-                                <td>{customer.billing_code || <div className='border w-4'></div>}</td>
-                                <td>{customer.phone_number || <div className='border w-4'></div>}</td>
-                                <td>{customer.email}</td>
-                                <td className='flex justify-center relative'>
-                                    <div className='border rounded px-4 py-3 relative hover:cursor-pointer' onClick={(e) => toggleDropdown(customer.id)}>
-                                        {isOpen === customer.id && <DropDown id={customer.id} />}
-                                        <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M6.30664 10.968C5.20664 10.968 4.30664 11.868 4.30664 12.968C4.30664 14.068 5.20664 14.968 6.30664 14.968C7.40664 14.968 8.30664 14.068 8.30664 12.968C8.30664 11.868 7.40664 10.968 6.30664 10.968ZM18.3066 10.968C17.2066 10.968 16.3066 11.868 16.3066 12.968C16.3066 14.068 17.2066 14.968 18.3066 14.968C19.4066 14.968 20.3066 14.068 20.3066 12.968C20.3066 11.868 19.4066 10.968 18.3066 10.968ZM12.3066 10.968C11.2066 10.968 10.3066 11.868 10.3066 12.968C10.3066 14.068 11.2066 14.968 12.3066 14.968C13.4066 14.968 14.3066 14.068 14.3066 12.968C14.3066 11.868 13.4066 10.968 12.3066 10.968Z" fill="#1A1A1A" />
-                                        </svg>
-                                    </div>
-                                </td>
+                <div className='px-8 pb-8 overflow-x-scroll'>
+                    <table className="w-full mt-8 table-auto" style={{ width: "2000px" }}>
+                        <thead className=''>
+                            <tr className='border-b'>
+                                <th className='text-left pb-2.5'>仕入日</th>
+                                <th className='text-left pb-2.5'>仕入番号</th>
+                                <th className='text-left pb-2.5'>仕入先</th>
+                                <th className='text-left pb-2.5'>商品コード</th>
+                                <th className='text-left pb-2.5'>商品名</th>
+                                <th className='text-left pb-2.5'>カテゴリー</th>
+                                <th className='text-left pb-2.5'>サブカテゴリー</th>
+                                <th className='text-left pb-2.5'>数量</th>
+                                <th className='text-left pb-2.5'>単価</th>
+                                <th className='text-left pb-2.5'>金額</th>
+                                <th className='text-left pb-2.5'>ロット番号</th>
+                                <th className='text-left pb-2.5'>倉庫</th>
+                                <th className='text-left pb-2.5'>担当者</th>
+                                <th className='text-left pb-2.5'>区分１</th>
+                                <th className='text-left pb-2.5'>区分２</th>
+                                <th className='text-left pb-2.5'>ステータス</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {customers.map((customer) => (
+                                <tr className='border-b' key={customer.id}>
+                                    <td className='py-4'>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     )

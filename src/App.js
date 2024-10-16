@@ -8,7 +8,7 @@ import SalesManagement from './SalesManagement';
 import { useLocation } from 'react-router-dom';
 import Procurement from './Procurement';
 import Master from './Master';
-import InvoiceSettings from './Components/InvoiceSettings/InvoiceSettings'; 
+import InvoiceSettings from './Components/InvoiceSettings/InvoiceSettings';
 import StockInOutputInvoiceSettings from './Components/InvoiceSettings/StockInOutputInvoiceSettings';
 import SalesMagement from './SalesManagement';
 
@@ -46,19 +46,19 @@ function App() {
                 onMouseLeave={handleMouseLeave}
                 className={`absolute bg-white shadow-md mt-2 top-12 p-3 left-0`}
               >
-                <div className='font-normal' style={{width: "344px"}}>
+                <div className='font-normal' style={{ width: "344px" }}>
                   <div className='px-3 pb-4'>
                     <div className='font-bold flex items-center'>
                       <div className='w-24'>伝票入力</div>
                       <div className='border w-full'></div>
                     </div>
                     <div className='grid grid-cols-2 text-gray-600'>
-                      <div>見積伝票</div>
-                      <div>売上伝票</div>
+                      <Link to="/procurement/voucher-entries/purchase-orders">発注伝票</Link>
+                      <Link to="/procurement/voucher-entries/purchase-invoices">仕入伝票</Link>
                     </div>
                     <div className='grid grid-cols-2 text-gray-600'>
-                      <div>受注伝票</div>
-                      <div>入金伝票</div>
+                      <Link to="/procurement/voucher-entries/stock-in-out-slips">入出庫伝票</Link>
+                      <Link to="/procurement/voucher-entries/payment-vouchers">支払伝票</Link>
                     </div>
                   </div>
                   <div className='px-3 pb-4'>
@@ -67,12 +67,12 @@ function App() {
                       <div className='border w-full'></div>
                     </div>
                     <div className='grid grid-cols-2 text-gray-600'>
-                      <div>見積伝票</div>
-                      <div>売上伝票</div>
+                    <Link to="/procurement/statements/purchase-order-statement">発注明細表</Link>
+                    <Link to="/procurement/statements/purchase-detail-statement">仕入明細表</Link>
                     </div>
                     <div className='grid grid-cols-2 text-gray-600'>
-                      <div>受注伝票</div>
-                      <div>入金伝票</div>
+                    <Link to="/procurement/statements/stock-in-out-statement">入出庫明細表</Link>
+                    <Link to="/procurement/statements/payment-statement">支払明細表</Link>
                     </div>
                   </div>
                   <div className='px-3 pb-4'>
@@ -81,15 +81,19 @@ function App() {
                       <div className='border w-full'></div>
                     </div>
                     <div className='grid grid-cols-2 text-gray-600'>
-                      <div>見積伝票</div>
-                      <div>売上伝票</div>
+                    <Link to="/procurement/summary-and-management-sheets/order-summary-sheet">発注集計表</Link>
+                    <Link to="/procurement/summary-and-management-sheets/purchase-summary-sheet">仕入集計表</Link>
                     </div>
                     <div className='grid grid-cols-2 text-gray-600'>
-                      <div>受注伝票</div>
-                      <div>入金伝票</div>
+                    <Link to="/procurement/summary-and-management-sheets/inventory-in-out-summary-sheet">入出庫集計表</Link>
+                    <Link to="/procurement/summary-and-management-sheets/payment-summary-sheet">支払集計表</Link>
+                    </div>
+                    <div className='grid grid-cols-2 text-gray-600'>
+                    <Link to="/procurement/summary-and-management-sheets/account-payment-balance">買掛金残高</Link>
+                    <Link to="/procurement/summary-and-management-sheets/inventory-sheet">在庫表</Link>
                     </div>
                   </div>
-                  <div className='px-3 pb-4'>
+                  {/* <div className='px-3 pb-4'>
                     <div className='font-bold flex items-center'>
                       <div className='w-24'>請求処理</div>
                       <div className='border w-full'></div>
@@ -97,7 +101,7 @@ function App() {
                     <div className='grid grid-cols-2 text-gray-600'>
                       <div>請求処理</div>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             )}

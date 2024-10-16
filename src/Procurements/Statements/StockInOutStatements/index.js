@@ -78,7 +78,7 @@ function Index() {
     }
 
     return (
-        <div className='w-full'>
+        <div className='w-5/6'>
             <div className='p-8'>
             <div className='pb-6 flex items-center'>
                 <div className='text-2xl font-bold'>入出庫明細表</div>
@@ -175,30 +175,44 @@ function Index() {
                     </div>
                 </div>
             </div>
-            <div className='px-8 pb-8'>
-                <table className="w-full mt-8 table-auto">
-                    <thead className=''>
-                        <tr className='border-b '>
-                            <th className='text-left pb-2.5'>支払日付</th>
-                            <th className='text-left pb-2.5'>伝票番号</th>
-                            <th className='text-left pb-2.5'>仕入先名</th>
-                            <th className='text-left pb-2.5'>仕入先コード</th>
-                            <th className='text-left pb-2.5'>備考</th>
-                        </tr>
-                    </thead>
-                    <tbody className=''>
-                        {customers.map((customer) => (
-                            <tr className='border-b' key={customer.id}>
-                                <td className='py-4'>{customer.name_primary || <div className='border w-4'></div>}</td>
-                                <td>{customer.name_primary || <div className='border w-4'></div>}</td>
-                                <td>{customer.billing_code || <div className='border w-4'></div>}</td>
-                                <td>{customer.phone_number || <div className='border w-4'></div>}</td>
-                                <td>{customer.email}</td>
+            <div className='px-8 pb-8 overflow-x-scroll'>
+                    <table className="w-full mt-8 table-auto" style={{ width: "2000px" }}>
+                        <thead className=''>
+                            <tr className='border-b'>
+                                <th className='text-left pb-2.5'>日付</th>
+                                <th className='text-left pb-2.5'>伝票番号</th>
+                                <th className='text-left pb-2.5'>処理種別</th>
+                                <th className='text-left pb-2.5'>商品コード</th>
+                                <th className='text-left pb-2.5'>商品名</th>
+                                <th className='text-left pb-2.5'>数量</th>
+                                <th className='text-left pb-2.5'>入出元倉庫</th>
+                                <th className='text-left pb-2.5'>出庫元倉庫</th>
+                                <th className='text-left pb-2.5'>ロット番号</th>
+                                <th className='text-left pb-2.5'>担当者</th>
+                                <th className='text-left pb-2.5'>区分１</th>
+                                <th className='text-left pb-2.5'>区分２</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            {customers.map((customer) => (
+                                <tr className='border-b' key={customer.id}>
+                                    <td className='py-4'>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                    <td>テスト</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
         </div>
     )
 }
