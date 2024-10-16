@@ -151,7 +151,7 @@ function Index() {
                         </Link>
                     </div>
                 </div>
-                <div className='bg-gray-100 rounded p-6'>
+                <div className='bg-gray-100 rounded p-6 mb-8'>
                     <div className='pb-6 text-2xl font-bold'>
                         表示条件指定
                     </div>
@@ -177,9 +177,18 @@ function Index() {
                             <CustomSelect className="w-full" options={options} name={"honorific"} data={customer} setData={setCustomer} />
                         </div>
                     </div>
-                    <div>
-                        <Link to="#" onClick={toggleFilters} className='pt-3 text-sm flex underline'>
+                    <div className='pt-3 flex items-center'>
+                        <Link to="#" onClick={toggleFilters} className='text-sm flex underline'>
                             {showFilters ? '' : 'フィルターを表示'}
+                            <svg
+                                className={`ml-1 w-4 h-4 transform transition-transform ${showFilters ? '' : ''}`}
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                            </svg>
                         </Link>
                     </div>
 
@@ -216,8 +225,17 @@ function Index() {
                                     <div className='text-sm pb-1.5'>区分２</div>
                                     <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                                 </div>
-                                <div className='text-sm cursor-pointer' onClick={toggleFilters}>
+                                <div className='flex text-sm cursor-pointer underline' onClick={toggleFilters}>
                                     フィルターを閉じる
+                                    <svg
+                                        className={`ml-1 w-4 h-4 transform transition-transform ${showFilters ? 'rotate-180' : ''}`}
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
                                 </div>
                             </div>
                         </div>
@@ -225,65 +243,78 @@ function Index() {
                     <div className='flex mt-6'>
                         <div className='border rounded-lg py-3 px-7 text-base font-bold bg-blue-600 text-white'>適用して表示</div>
                     </div>
-                </div>
-                <div className='flex justify-end'>
-                    <div className='flex ml-auto pt-6'>
-                        <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold flex'>
-                            <div className='flex items-center'>
-                            </div>
-                            エクスポート
-                        </Link>
                     </div>
-                </div>
-                <table className="w-full mt-8 table-auto">
-                    <thead className=''>
-                        <tr className='border-b'>
-                            <th className='text-left pb-2.5'>支払日付</th>
-                            <th className='text-left pb-2.5'>伝票番号</th>
-                            <th className='text-left pb-2.5'>仕入先名</th>
-                            <th className='text-left pb-2.5'>仕入先コード</th>
-                            <th className='text-left pb-2.5'>備考</th>
-                            <th className='text-right'></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {customers.map((customer) => (
-                            <tr className='border-b' key={customer.id}>
-                                <td>{customer.name_primary || <div className='border w-4'></div>}</td>
-                                <td>{customer.name_primary || <div className='border w-4'></div>}</td>
-                                <td>{customer.billing_code || <div className='border w-4'></div>}</td>
-                                <td>{customer.phone_number || <div className='border w-4'></div>}</td>
-                                <td>{customer.email}</td>
-                                <td className='flex justify-center relative'>
-                                    <div className='border rounded px-4 py-3 relative hover:cursor-pointer' onClick={(e) => toggleDropdown(customer.id)}>
-                                        {isOpen === customer.id && <DropDown id={customer.id} />}
-                                        <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M6.30664 10.968C5.20664 10.968 4.30664 11.868 4.30664 12.968C4.30664 14.068 5.20664 14.968 6.30664 14.968C7.40664 14.968 8.30664 14.068 8.30664 12.968C8.30664 11.868 7.40664 10.968 6.30664 10.968ZM18.3066 10.968C17.2066 10.968 16.3066 11.868 16.3066 12.968C16.3066 14.068 17.2066 14.968 18.3066 14.968C19.4066 14.968 20.3066 14.068 20.3066 12.968C20.3066 11.868 19.4066 10.968 18.3066 10.968ZM12.3066 10.968C11.2066 10.968 10.3066 11.868 10.3066 12.968C10.3066 14.068 11.2066 14.968 12.3066 14.968C13.4066 14.968 14.3066 14.068 14.3066 12.968C14.3066 11.868 13.4066 10.968 12.3066 10.968Z" fill="#1A1A1A" />
-                                        </svg>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-                <div className='flex items-end justify-end py-4'>
-                    <div className=''>
-                        <div className='flex items-center'>
-                            <div className='mr-4'>数量</div>
-                            <div className='mr-12 font-bold text-lg'>200</div>
-                            <div className='mr-4'>金額</div>
-                            <div className='mr-12 font-bold text-lg'>20,000円</div>
-                            <div className='mr-4'>構成比</div>
-                            <div className='font-bold text-lg'>100％</div>
-                        </div>
+
+                    <div class="relative overflow-x-auto">
+                        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3">
+                                        Product name
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Color
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Category
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Price
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        Apple MacBook Pro 17"
+                                    </th>
+                                    <td class="px-6 py-4">
+                                        Silver
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        Laptop
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        $2999
+                                    </td>
+                                </tr>
+                                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        Microsoft Surface Pro
+                                    </th>
+                                    <td class="px-6 py-4">
+                                        White
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        Laptop PC
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        $1999
+                                    </td>
+                                </tr>
+                                <tr class="bg-white dark:bg-gray-800">
+                                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        Magic Mouse 2
+                                    </th>
+                                    <td class="px-6 py-4">
+                                        Black
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        Accessories
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        $99
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                </div>
-                <div className='text-2xl font-bold mr-auto'>売上グラフ</div>
-                <div className='mt-6'>
-                    <SimpleBarCharts />
+                    <div className='text-2xl font-bold mr-auto'>売上グラフ</div>
+                    <div className='mt-6'>
+                        <SimpleBarCharts />
+                    </div>
                 </div>
             </div>
-        </div>
     )
 }
 

@@ -1,11 +1,66 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
+import CustomSelect from '../../../Components/CustomSelect';
+import { BarChart } from '@mui/x-charts/BarChart';
 
 const { ipcRenderer } = window.require('electron');
 
+export function SimpleBarCharts() {
+    return (
+      <BarChart
+        xAxis={[
+          {
+            id: 'barCategories',
+            data: ['株式会社A', '株式会社B', '株式会社C', '株式会社D', '株式会社E', '株式会社F', '株式会社G', '株式会社H', '株式会社I', '株式会社J', '株式会社K', '株式会社L'],
+            scaleType: 'band',
+          },
+        ]}
+        yAxis={[
+            {
+              id: 'yAxisId',
+              label: '円',
+              min: 0,
+              max: 10,
+              tickCount: 10,
+            },
+          ]}
+        series={[
+          {
+            data: [2, 5, 3, 4, 7, 8, 5, 2, 3, 9, 5, 6],
+            color: '#2563EB'
+          },
+        ]}
+        width={1216}
+        height={644}
+        barWidth={5}
+      />
+    );
+  }
+
 
 function Index() {
+    const options = [
+        { value: '御中', label: '御中' },
+        { value: '貴社', label: '貴社' },
+    ];
+
+    const [customer, setCustomer] = useState({
+        id: '',
+        name_primary: '',
+        name_secondary: '',
+        name_kana: '',
+        honorific: '',
+        phone_number: '',
+        fax_number: '',
+        zip_code: '',
+        address: '',
+        email: '',
+        remarks: '',
+        billing_code: '',
+        billing_information: '',
+        monthly_sales_target: ''
+    });
     const [customers, setCustomers] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
@@ -67,6 +122,12 @@ function Index() {
         };
     }, []);
 
+    const [showFilters, setShowFilters] = useState(false);
+
+    const toggleFilters = () => {
+        setShowFilters(prev => !prev);
+    };
+
     const DropDown = (id) => {
         return (
             <div ref={dropdownRef} className='absolute right-0 origin-top-right mt-6 rounded shadow-lg z-50 bg-white p-3' style={{ top: "50px", width: "120px" }}>
@@ -81,54 +142,48 @@ function Index() {
         <div className='w-full'>
             <div className='p-8'>
                 <div className='pb-6 flex items-center'>
-                <div className='text-2xl font-bold'>請求処理</div>
+                    <div className='text-3xl font-bold'>入金予定表</div>
                     <div className='flex ml-auto'>
                         <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold flex'>
                             <div className='flex items-center'>
                             </div>
-                            明細表設定
+                            出力設定
                         </Link>
-                        </div>
                     </div>
-                <div className='bg-gray-100 rounded-lg p-6'>
-                    <div className='pb-6 text-lg font-bold'>
-                        表示条件指定
-                    </div>
-                        <div className='grid grid-cols-2 gap-6 pb-6'>
-                        <div className='pl-0'>
-                        <div className='text-sm pb-1.5'>期間指定 <span className='text-xs ml-1 font-bold text-red-600'>必須</span>
-                        </div> {/* ボックスと波線の間隔を調整 */}
-                            <div className='flex items-center'>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/2' placeholder='' name="" value={""} />
-                            <div className='flex items-center px-2'>〜</div> {/* 波線 */}
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/2' placeholder='' name="" value={""} />
-                        </div>
-                        </div>
+                </div>
+                <div className='bg-gray-100 rounded p-6'>
+                    <div className='grid grid-cols-5 gap-6'>
                         <div>
-                            <div className='text-sm pb-1.5'>仕入先</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <div className='flex items-center'>
+                                <div>
+                                    <div className='text-sm pb-1.5'>期間 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
+                                    <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                                </div>
+                                <div>
+                                    <div className='w-1'>&nbsp;</div>
+                                    <div className='flex items-center px-2'>〜</div>
+                                </div>
+
+                                <div>
+                                    <div className='text-sm pb-1.5 text-gray-100'>期間</div>
+                                    <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                                </div>
                             </div>
                         </div>
-                        
-                    <div className='grid grid-cols-3 gap-6'>
                         <div>
-                            <div className='text-sm pb-1.5'>仕入先</div>
+                            <div className='text-sm pb-1.5'>締日</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                         </div>
                         <div>
-                            <div className='text-sm pb-1.5'>支払方法</div>
+                            <div className='text-sm pb-1.5'>入金ステータス</div>
+                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                        </div>
+                        <div>
+                            <div className='text-sm pb-1.5'>入金方法</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>担当者</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
-                        </div>
-                        <div>
-                            <div className='text-sm pb-1.5'>区分１</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
-                        </div>
-                        <div>
-                            <div className='text-sm pb-1.5'>区分２</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                         </div>
                     </div>
@@ -139,8 +194,8 @@ function Index() {
                 <div className='flex justify-end'>
                     <div className='flex ml-auto pt-6'>
                         <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold flex'>
-                    <div className='flex items-center'>
-                        </div>
+                            <div className='flex items-center'>
+                            </div>
                             エクスポート
                         </Link>
                     </div>
@@ -148,11 +203,12 @@ function Index() {
                 <table className="w-full mt-8 table-auto">
                     <thead className=''>
                         <tr className='border-b'>
-                            <th className='text-left pb-2.5'>支払日付</th>
-                            <th className='text-left pb-2.5'>伝票番号</th>
-                            <th className='text-left pb-2.5'>仕入先名</th>
-                            <th className='text-left pb-2.5'>仕入先コード</th>
-                            <th className='text-left pb-2.5'>備考</th>
+                            <th className='text-left pb-2.5'>得意先</th>
+                            <th className='text-left pb-2.5'>入金ステータス</th>
+                            <th className='text-left pb-2.5'>入金予定日</th>
+                            <th className='text-left pb-2.5'>入金予定金額</th>
+                            <th className='text-left pb-2.5'>入金方法</th>
+                            <th className='text-left pb-2.5'>担当者</th>
                             <th className='text-right'></th>
                         </tr>
                     </thead>
@@ -176,12 +232,24 @@ function Index() {
                         ))}
                     </tbody>
                 </table>
+                <div className='flex items-end justify-end py-4'>
+                                <div className=''>
+                                    <div className='flex items-center'>
+                                        <div className='mr-4'>数量</div>
+                                        <div className='mr-12 font-bold text-lg'>200</div>
+                                        <div className='mr-4'>金額</div>
+                                        <div className='mr-12 font-bold text-lg'>20,000円</div>
+                                        <div className='mr-4'>構成比</div>
+                                        <div className='font-bold text-lg'>100％</div>
+                                    </div>
+                                </div>
+                            </div>
             </div>
         </div>
     )
 }
 
-function BillingProcessesIndex() {
+function IncomingPaymentScheduleIndex() {
     return (
         <Routes>
             <Route path="" element={<Index />} />
@@ -189,4 +257,4 @@ function BillingProcessesIndex() {
     )
 }
 
-export default BillingProcessesIndex;
+export default IncomingPaymentScheduleIndex;
