@@ -33,6 +33,7 @@ function PurchaseOrdersAdd() {
             id: '',
             purchase_order_id: '',
             product_id: '',
+            product_name: '',
             number: '',
             unit: '',
             price: '',
@@ -108,9 +109,6 @@ function PurchaseOrdersAdd() {
         }
     };
 
-    console.log(purchaseOrderDetails)
-
-
     return (
         <div className='w-full'>
             <div className=''>
@@ -176,7 +174,7 @@ function PurchaseOrdersAdd() {
                                     <div className='flex items-center'>
                                         <div className=''>
                                             <div className='text-sm pb-1.5'>商品コード <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                            <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="product_id" value={purchaseOrderDetail.product_id} onChange={(e) => handleInputChange(index, e)}  style={{ width: "120px" }} />
+                                            <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="product_id" value={purchaseOrderDetail.product_id} onChange={(e) => handleInputChange(index, e)}  style={{ width: "120px" }} />
                                         </div>
                                         <div className='ml-4'>
                                             <div className='text-sm pb-1.5'>商品名 <span className='text-sm font-bold text-red-600'>必須</span></div>
@@ -184,7 +182,7 @@ function PurchaseOrdersAdd() {
                                         </div>
                                         <div className='ml-4'>
                                             <div className='text-sm pb-1.5'>数量 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                            <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="number" value={purchaseOrderDetail.number} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
+                                            <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="number" value={purchaseOrderDetail.number} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
                                         </div>
                                         <div className='ml-4'>
                                             <div className='text-sm pb-1.5'>単位 <span className='text-sm font-bold text-red-600'>必須</span></div>
@@ -192,7 +190,7 @@ function PurchaseOrdersAdd() {
                                         </div>
                                         <div className='ml-4'>
                                             <div className='text-sm pb-1.5'>単価 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                            <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="price" value={purchaseOrderDetail.price} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
+                                            <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="price" value={purchaseOrderDetail.price} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
                                         </div>
                                     </div>
                                     <div className='flex items-center mt-4'>

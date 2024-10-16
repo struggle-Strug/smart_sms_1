@@ -24,6 +24,7 @@ function saveStockInOutSlipDetail(detailData, callback) {
         id,
         stock_in_out_slip_id,
         product_id,
+        product_name,
         number,
         unit,
         price,
@@ -37,6 +38,7 @@ function saveStockInOutSlipDetail(detailData, callback) {
             `UPDATE stock_in_out_slip_details SET 
                 stock_in_out_slip_id = ?, 
                 product_id = ?, 
+                product_name = ?
                 number = ?, 
                 unit = ?, 
                 price = ?, 
@@ -46,6 +48,7 @@ function saveStockInOutSlipDetail(detailData, callback) {
             [
                 stock_in_out_slip_id,
                 product_id,
+                product_name,
                 number,
                 unit,
                 price,
@@ -57,12 +60,13 @@ function saveStockInOutSlipDetail(detailData, callback) {
     } else {
         db.run(
             `INSERT INTO stock_in_out_slip_details 
-            (stock_in_out_slip_id, product_id, number, unit, price, lot_number, created, updated) 
+            (stock_in_out_slip_id, product_id, product_name, number, unit, price, lot_number, created, updated) 
             VALUES 
-            (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+            (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
             [
                 stock_in_out_slip_id,
                 product_id,
+                product_name,
                 number,
                 unit,
                 price,
@@ -93,6 +97,7 @@ function initializeDatabase() {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         stock_in_out_slip_id INTEGER,
         product_id INTEGER,
+        product_name VARCHAR(255),
         number INTEGER,
         unit VARCHAR(255),
         price INTEGER,

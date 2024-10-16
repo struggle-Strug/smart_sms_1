@@ -24,6 +24,7 @@ function savePurchaseOrderDetail(detailData, callback) {
         id,
         purchase_order_id,
         product_id,
+        product_name,
         number,
         unit,
         price,
@@ -46,6 +47,7 @@ function savePurchaseOrderDetail(detailData, callback) {
                         `UPDATE purchase_order_details SET 
                             purchase_order_id = ?, 
                             product_id = ?, 
+                            product_name = ?,
                             number = ?, 
                             unit = ?, 
                             price = ?, 
@@ -57,6 +59,7 @@ function savePurchaseOrderDetail(detailData, callback) {
                         [
                             purchase_order_id,
                             product_id,
+                            product_name,
                             number,
                             unit,
                             price,
@@ -71,12 +74,13 @@ function savePurchaseOrderDetail(detailData, callback) {
                     // レコードが存在しない場合はINSERT
                     db.run(
                         `INSERT INTO purchase_order_details 
-                        (purchase_order_id, product_id, number, unit, price, tax_rate, storage_facility, stock, created, updated) 
+                        (purchase_order_id, product_id, product_name, number, unit, price, tax_rate, storage_facility, stock, created, updated) 
                         VALUES 
                         (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
                         [
                             purchase_order_id,
                             product_id,
+                            product_name,
                             number,
                             unit,
                             price,
@@ -90,14 +94,16 @@ function savePurchaseOrderDetail(detailData, callback) {
             }
         );
     } else {
+        console.log('checkcheck');
         db.run(
             `INSERT INTO purchase_order_details 
-            (purchase_order_id, product_id, number, unit, price, tax_rate, storage_facility, stock, created, updated) 
+            (purchase_order_id, product_id, product_name, number, unit, price, tax_rate, storage_facility, stock, created, updated) 
             VALUES 
-            (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
             [
                 purchase_order_id,
                 product_id,
+                product_name,
                 number,
                 unit,
                 price,
@@ -131,6 +137,7 @@ function initializeDatabase() {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         purchase_order_id INTEGER,
         product_id INTEGER,
+        product_name VARCHAR(255),
         number INTEGER,
         unit VARCHAR(255),
         price INTEGER,

@@ -23,6 +23,45 @@ function StockInOutSlipsAdd() {
         remarks: '',
     });
 
+    const [stockInOutSlipDetails, setStockInOutSlipDetails] = useState([
+        {
+            id: '',
+            stock_in_out_slip_id: '',
+            product_id: '',
+            product_name: '',
+            number: '',
+            unit: '',
+            price: '',
+            lot_number: '',
+        }
+    ]);
+
+    const addStockInOutSlipDetail = () => {
+        setStockInOutSlipDetails([...stockInOutSlipDetails, {
+            id: '',
+            stock_in_out_slip_id: '',
+            product_id: '',
+            product_name: '',
+            number: '',
+            unit: '',
+            price: '',
+            lot_number: '',
+        }]);
+    }
+
+    const removeStockInOutSlipDetail = (index) => {
+        if (stockInOutSlipDetails.length === 1) return;
+        setStockInOutSlipDetails(stockInOutSlipDetails.filter((_, i) => i !== index));
+    };
+
+    const handleInputChange = (index, e) => {
+        const { name, value } = e.target;
+        const updatedDetails = stockInOutSlipDetails.map((detail, i) =>
+            i === index ? { ...detail, [name]: value } : detail
+        );
+        setStockInOutSlipDetails(updatedDetails);
+    }
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setStockInOutSlips({ ...stockInOutSlips, [name]: value });
@@ -33,6 +72,10 @@ function StockInOutSlipsAdd() {
     const handleSubmit = () => {
         validator.required(stockInOutSlips.id, 'id', '伝票番号');
         validator.required(stockInOutSlips.stock_in_out_date, 'stock_in_out_date', '発注日付');
+
+        for (let i = 0; i < stockInOutSlipDetails.length; i++) {
+            ipcRenderer.send('save-stock-in-out-slip-detail', stockInOutSlipDetails[i]);
+        }
 
         if (!validator.hasErrors()) {
 
@@ -72,7 +115,7 @@ function StockInOutSlipsAdd() {
                     <div className='pt-2.5 pb-4 font-bold text-xl'>伝票情報</div>
                     <div className='pb-4'>
                         <div className='w-40 text-sm pb-1.5'>伝票番号 <span className='ml-2 text-xs font-bold text-red-600'>必須</span></div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="id" value={stockInOutSlips.id} onChange={handleChange} />
+                        <input type='number' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="id" value={stockInOutSlips.id} onChange={handleChange} />
                     </div>
                     <div className='pb-4'>
                         <div className='w-40 text-sm pb-1.5'>入出庫日付 <span className='ml-2 text-xs font-bold text-red-600'>必須</span></div>
@@ -156,7 +199,7 @@ function StockInOutSlipsAdd() {
                     <hr className='' />
                 </div>
                 <div className='pl-8 py-2.5 font-bold text-xl'>明細</div>
-                <div className='flex items-center pl-8'>
+                {/* <div className='flex items-center pl-8'>
                     <div>
                         <div className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>＋</div>
                     </div>
@@ -197,9 +240,9 @@ function StockInOutSlipsAdd() {
                             </svg>
                         </div>
                     </div>
-                </div>
+                </div> */}
                 {/* <div className='py-2.5 font-bold text-xl'>明細</div> */}
-                <div className='pb-6 flex flex-col mr-14'>
+                {/* <div className='pb-6 flex flex-col mr-14'>
                     <div className='flex items-center mr-10 pb-6'>
                         <div className='ml-auto flex'>消費税額</div>
                         <div className='ml-4'>0円</div>
@@ -228,7 +271,84 @@ function StockInOutSlipsAdd() {
                             <div>5,000円</div>
                         </div>
                     </div>
+                </div> */}
+
+
+                {
+                    stockInOutSlipDetails.map((stockInOutSlipDetail, index) => (
+                        <div className='flex items-center'>
+                            <div>
+                                <div className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex' onClick={addStockInOutSlipDetail}>＋</div>
+                            </div>
+                            <div className=''>
+                                <div className='flex items-center'>
+                                    <div className=''>
+                                        <div className='text-sm pb-1.5'>商品コード <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                        <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="product_id" value={stockInOutSlipDetail.product_id} onChange={(e) => handleInputChange(index, e)} style={{ width: "120px" }} />
+                                    </div>
+                                    <div className='ml-4'>
+                                        <div className='text-sm pb-1.5'>商品名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                        <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="product_name" value={stockInOutSlipDetail.product_name} onChange={(e) => handleInputChange(index, e)} style={{ width: "440px" }} />
+                                    </div>
+                                    <div className='ml-4'>
+                                        <div className='text-sm pb-1.5'>数量 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                        <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="number" value={stockInOutSlipDetail.number} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
+                                    </div>
+                                    <div className='ml-4'>
+                                        <div className='text-sm pb-1.5'>単位 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                        <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="unit" value={stockInOutSlipDetail.unit} onChange={(e) => handleInputChange(index, e)} style={{ width: "120px" }} />
+                                    </div>
+                                    <div className='ml-4'>
+                                        <div className='text-sm pb-1.5'>単価 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                        <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="price" value={stockInOutSlipDetail.price} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
+                                    </div>
+                                    <div className='ml-4'>
+                                        <div className='text-sm pb-1.5'>ロット番号 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                        <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="lot_number" value={stockInOutSlipDetail.lot_number} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className='ml-4'>
+                                <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={(e) => removeStockInOutSlipDetail(index)}>
+                                    <svg width="15" height="19" viewBox="0 0 15 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M11.3926 6.72949V16.7295H3.39258V6.72949H11.3926ZM9.89258 0.729492H4.89258L3.89258 1.72949H0.392578V3.72949H14.3926V1.72949H10.8926L9.89258 0.729492ZM13.3926 4.72949H1.39258V16.7295C1.39258 17.8295 2.29258 18.7295 3.39258 18.7295H11.3926C12.4926 18.7295 13.3926 17.8295 13.3926 16.7295V4.72949Z" fill="#1F2937" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                }
+                <div className='py-3'>
+                    <hr className='' />
                 </div>
+                <div className='py-6 flex'>
+                    <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
+                        <div className='flex pb-2'>
+                            <div className='w-40'>税抜合計</div>
+                            <div>5,000円</div>
+                        </div>
+                        <div className='flex pb-2'>
+                            <div className='w-40'>消費税(8%)</div>
+                            <div>5,000円</div>
+                        </div>
+                        <div className='flex pb-2'>
+                            <div className='w-40'>消費税(10%)</div>
+                            <div>5,000円</div>
+                        </div>
+                        <div className='flex pb-2'>
+                            <div className='w-40'>消費税合計</div>
+                            <div>5,000円</div>
+                        </div>
+                        <div className='flex'>
+                            <div className='w-40'>税込合計</div>
+                            <div>5,000円</div>
+                        </div>
+                    </div>
+                </div>
+                <div className='py-3'>
+                    <hr className='' />
+                </div>
+
                 <div className='py-3'>
                     <hr className='' />
                 </div>
