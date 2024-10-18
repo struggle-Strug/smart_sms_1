@@ -5,8 +5,20 @@ const { app } = require('electron');
 const dbPath = path.join(app.getPath('userData'), 'database.db');
 const db = new sqlite3.Database(dbPath);
 
+// function loadPaymentVoucherDetails(callback) {
+//     const sql = `SELECT * FROM payment_voucher_details`;
+//     db.all(sql, [], (err, rows) => {
+//         callback(err, rows);
+//     });
+// }
+
 function loadPaymentVoucherDetails(callback) {
-    const sql = `SELECT * FROM payment_voucher_details`;
+    const sql = `
+        SELECT pvd.*, pv.*, v.*
+        FROM payment_voucher_details pvd
+        LEFT JOIN payment_vouchers pv ON pvd.payment_voucher_id = pv.id
+        LEFT JOIN vendors v ON pv.vender_id = v.id
+    `;
     db.all(sql, [], (err, rows) => {
         callback(err, rows);
     });
@@ -122,19 +134,48 @@ function initializeDatabase() {
     db.run(sql);
 }
 
-function searchPaymentVoucherDetails(query, callback) {
-    let sql;
+// function searchPaymentVoucherDetails(query, callback) {
+//     let sql;
+//     let params = [];
+
+//     if (query && query.trim() !== '') {
+//         sql = `
+//         SELECT * FROM payment_voucher_details 
+//         WHERE payment_method LIKE ? OR fees_and_charges LIKE ? OR payment_price LIKE ?
+//         `;
+//         params = [`%${query}%`, `%${query}%`, `%${query}%`];
+//     } else {
+//         sql = `SELECT * FROM payment_voucher_details`;
+//     }
+//     db.all(sql, params, (err, rows) => {
+//         callback(err, rows);
+//     });
+// }
+
+function searchPaymentVoucherDetails(conditions, callback) {
+    let sql = `
+        SELECT pvd.*, pv.*, v.*
+        FROM payment_voucher_details pvd
+        LEFT JOIN payment_vouchers pv ON pvd.payment_voucher_id = pv.id
+        LEFT JOIN vendors v ON pv.vender_id = v.id
+    `;
+
+    let whereClauses = [];
     let params = [];
 
-    if (query && query.trim() !== '') {
-        sql = `
-        SELECT * FROM payment_voucher_details 
-        WHERE payment_method LIKE ? OR fees_and_charges LIKE ? OR payment_price LIKE ?
-        `;
-        params = [`%${query}%`, `%${query}%`, `%${query}%`];
-    } else {
-        sql = `SELECT * FROM payment_voucher_details`;
+    // 条件オブジェクトのキーと値を動的にWHERE句に追加
+    if (conditions && Object.keys(conditions).length > 0) {
+        for (const [column, value] of Object.entries(conditions)) {
+            whereClauses.push(`${column} LIKE ?`);
+            params.push(`%${value}%`);
+        }
     }
+
+    // WHERE句がある場合はSQL文に追加
+    if (whereClauses.length > 0) {
+        sql += ` WHERE ` + whereClauses.join(" AND ");
+    }
+
     db.all(sql, params, (err, rows) => {
         callback(err, rows);
     });

@@ -5,7 +5,6 @@ import CustomSelect from '../../../Components/CustomSelect';
 
 const { ipcRenderer } = window.require('electron');
 
-
 function Index() {
     const options = [
         { value: '御中', label: '御中' },

@@ -5,8 +5,20 @@ const { app } = require('electron');
 const dbPath = path.join(app.getPath('userData'), 'database.db');
 const db = new sqlite3.Database(dbPath);
 
+// function loadStockInOutSlipDetails(callback) {
+//     const sql = `SELECT * FROM stock_in_out_slip_details`;
+//     db.all(sql, [], (err, rows) => {
+//         callback(err, rows);
+//     });
+// }
+
 function loadStockInOutSlipDetails(callback) {
-    const sql = `SELECT * FROM stock_in_out_slip_details`;
+    const sql = `
+        SELECT siod.*, sio.*, p.*
+        FROM stock_in_out_slip_details siod
+        LEFT JOIN stock_in_out_slips sio ON siod.stock_in_out_slip_id = sio.id
+        LEFT JOIN products p ON siod.product_id = p.id
+    `;
     db.all(sql, [], (err, rows) => {
         callback(err, rows);
     });
@@ -109,19 +121,48 @@ function initializeDatabase() {
     db.run(sql);
 }
 
-function searchStockInOutSlipDetails(query, callback) {
-    let sql;
+// function searchStockInOutSlipDetails(query, callback) {
+//     let sql;
+//     let params = [];
+
+//     if (query && query.trim() !== '') {
+//         sql = `
+//         SELECT * FROM stock_in_out_slip_details 
+//         WHERE product_id LIKE ? OR unit LIKE ? OR lot_number LIKE ?
+//         `;
+//         params = [`%${query}%`, `%${query}%`, `%${query}%`];
+//     } else {
+//         sql = `SELECT * FROM stock_in_out_slip_details`;
+//     }
+//     db.all(sql, params, (err, rows) => {
+//         callback(err, rows);
+//     });
+// }
+
+function searchStockInOutSlipDetails(conditions, callback) {
+    let sql = `
+        SELECT siod.*, sio.*, p.*
+        FROM stock_in_out_slip_details siod
+        LEFT JOIN stock_in_out_slips sio ON siod.stock_in_out_slip_id = sio.id
+        LEFT JOIN products p ON siod.product_id = p.id
+    `;
+
+    let whereClauses = [];
     let params = [];
 
-    if (query && query.trim() !== '') {
-        sql = `
-        SELECT * FROM stock_in_out_slip_details 
-        WHERE product_id LIKE ? OR unit LIKE ? OR lot_number LIKE ?
-        `;
-        params = [`%${query}%`, `%${query}%`, `%${query}%`];
-    } else {
-        sql = `SELECT * FROM stock_in_out_slip_details`;
+    // 条件オブジェクトのキーと値を動的にWHERE句に追加
+    if (conditions && Object.keys(conditions).length > 0) {
+        for (const [column, value] of Object.entries(conditions)) {
+            whereClauses.push(`${column} LIKE ?`);
+            params.push(`%${value}%`);
+        }
     }
+
+    // WHERE句がある場合はSQL文に追加
+    if (whereClauses.length > 0) {
+        sql += ` WHERE ` + whereClauses.join(" AND ");
+    }
+
     db.all(sql, params, (err, rows) => {
         callback(err, rows);
     });
