@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import CustomSelect from '../../../Components/CustomSelect';
+import SettingsDialog from '../../../Components/Statements/SettingsDialog';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -12,45 +13,49 @@ function Index() {
         { value: '貴社', label: '貴社' },
     ];
 
-    const [customer, setCustomer] = useState({
-        id: '',
-        name_primary: '',
-        name_secondary: '',
-        name_kana: '',
-        honorific: '',
-        phone_number: '',
-        fax_number: '',
-        zip_code: '',
-        address: '',
-        email: '',
-        remarks: '',
-        billing_code: '',
-        billing_information: '',
-        monthly_sales_target: ''
-    });
-    const [customers, setCustomers] = useState([]);
+    const [purchaseOrderDetails, setPurchaseOrderDetails] = useState([]);
+    const [purchaseOrderDetail, setPurchaseOrderDetail] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
     const location = useLocation();
-    const [searchQuery, setSearchQuery] = useState('');
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [customerIdToDelete, setCustomerIdToDelete] = useState(null);
+    const [searchQueryList, setSearchQueryList] = useState({
+        "v.name_primary": "",
+        "p.classification_primary": "",
+        "p.classification_secondary": "",
+        "pod.product_name": "",
+        "pod.contact_person": "",
+        "pod.storage_facility": "",
+        "pod.status": "",
+        "pod.lot_number": "",
+        "v.classification1": "",
+        "v.classification2": "",
+    });
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setSearchQueryList((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
 
     useEffect(() => {
-        ipcRenderer.send('get-customers');
-        ipcRenderer.on('customers-data', (event, data) => {
-            setCustomers(data);
-        });
-
-        ipcRenderer.on('customer-deleted', (event, id) => {
-            setCustomers((prevCustomers) => prevCustomers.filter(customer => customer.id !== id));
-        });
-
-        ipcRenderer.on('search-customers-result', (event, data) => {
-            setCustomers(data);
-        });
-
+        ipcRenderer.send('load-purchase-order-details');
+        
+        const handleLoadDetails = (event, data) => setPurchaseOrderDetails(data);
+        const handleSearchResult = (event, data) => {
+            
+            setPurchaseOrderDetails(data);
+        };
+    
+        ipcRenderer.on('load-purchase-order-details', handleLoadDetails);
+        ipcRenderer.on('search-purchase-order-details-result', handleSearchResult);
+    
         return () => {
-            ipcRenderer.removeAllListeners('customers-data');
-            ipcRenderer.removeAllListeners('search-customers-result');
+            ipcRenderer.removeListener('load-purchase-order-details', handleLoadDetails);
+            ipcRenderer.removeListener('search-purchase-order-details-result', handleSearchResult);
         };
     }, []);
 
@@ -73,13 +78,15 @@ function Index() {
     };
 
     const handleSearch = () => {
-        ipcRenderer.send('search-customers', searchQuery);
-    };
-
-    const handleKeyDown = (event) => {
-        if (event.key === 'Enter') {
-            handleSearch();
+        const searchColums = {}
+        setPurchaseOrderDetails([])
+        console.log(searchQueryList)
+        for (let key in searchQueryList) {
+            if (searchQueryList[key] !== "") {
+                searchColums[key] = searchQueryList[key]
+            }
         }
+        ipcRenderer.send('search-purchase-order-details', searchColums);
     };
 
     useEffect(() => {
@@ -99,17 +106,24 @@ function Index() {
         )
     }
 
+    const handleConfirmDelete = () => {
+        ipcRenderer.send('delete-customer', customerIdToDelete);
+        setIsDialogOpen(false);
+    };
+
+    const handleCancelDelete = () => {
+        setIsDialogOpen(false);
+    };
+
     return (
         <div className='w-5/6'>
             <div className='p-8'>
                 <div className='pb-6 flex items-center'>
                     <div className='text-2xl font-bold'>発注明細表</div>
                     <div className='flex ml-auto'>
-                        <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold flex'>
-                            <div className='flex items-center'>
-                            </div>
+                        <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={(e) => setIsDialogOpen(true)}>
                             明細表設定
-                        </Link>
+                        </div>
                     </div>
                 </div>
                 <div className='bg-gray-100 rounded p-6'>
@@ -136,47 +150,116 @@ function Index() {
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>カテゴリー</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="p.classification_primary"
+                                value={searchQueryList["p.classification_primary"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>サブカテゴリー</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="p.classification_secondary"
+                                value={searchQueryList["p.classification_secondary"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>仕入先</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="v.name_primary"
+                                value={searchQueryList["v.name_primary"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>商品名</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="pod.product_name"
+                                value={searchQueryList["pod.product_name"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>担当者</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="pod.contact_person"
+                                value={searchQueryList["pod.contact_person"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>倉庫</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="pod.storage_facility"
+                                value={searchQueryList["pod.storage_facility"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>ステータス</div>
-                            <CustomSelect options={options} name={"honorific"} data={customer} setData={setCustomer} />
+                            <CustomSelect
+                                options={options}
+                                name="pod.status"
+                                data={searchQueryList["pod.status"]}
+                                onChange={(value) => handleInputChange({ target: { name: "pod.status", value } })}
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>ロット番号</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="pod.lot_number"
+                                value={searchQueryList["pod.lot_number"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>区分１</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="v.classification1"
+                                value={searchQueryList["v.classification1"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>区分２</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="v.classification2"
+                                value={searchQueryList["v.classification2"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
+
                     </div>
                     <div className='flex mt-6'>
-                        <div className='border rounded-lg py-3 px-7 text-base font-bold bg-blue-600 text-white'>適用して表示</div>
+                        <div className='border rounded-lg py-3 px-7 text-base font-bold bg-blue-600 text-white' onClick={(e) => handleSearch()}>適用して表示</div>
                     </div>
                 </div>
                 <div className='flex justify-end'>
@@ -211,30 +294,35 @@ function Index() {
                             </tr>
                         </thead>
                         <tbody>
-                            {customers.map((customer) => (
-                                <tr className='border-b' key={customer.id}>
-                                    <td className='py-4'>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
+                            {purchaseOrderDetails.map((purchaseOrderDetail) => (
+                                <tr className='border-b' key={purchaseOrderDetail.id}>
+                                    <td className='py-4'>{purchaseOrderDetail.order_date || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseOrderDetail.order_date || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseOrderDetail.order_date || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseOrderDetail.product_id || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseOrderDetail.product_name || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseOrderDetail.classification_primary || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseOrderDetail.classification_secondary || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseOrderDetail.number || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseOrderDetail.price || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{parseInt(purchaseOrderDetail.number) * parseInt(purchaseOrderDetail.price) || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseOrderDetail.lot_number || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseOrderDetail.storage_facility || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseOrderDetail.contact_person || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseOrderDetail.classification1 || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseOrderDetail.classification2 || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseOrderDetail.status || <div className='border w-4'></div>}</td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
             </div>
+            <SettingsDialog
+                isOpen={isDialogOpen}
+                onConfirm={handleConfirmDelete}
+                onCancel={handleCancelDelete}
+            />
         </div>
     )
 }

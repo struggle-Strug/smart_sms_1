@@ -20,6 +20,12 @@ function initializeDatabase() {
             email VARCHAR(255) DEFAULT NULL,
             terms_of_trade VARCHAR(255) DEFAULT NULL,
             remarks VARCHAR(255) DEFAULT NULL,
+            classification1 VARCHAR(255) DEFAULT NULL,
+            classification2 VARCHAR(255) DEFAULT NULL,
+            tax_calculation VARCHAR(255) DEFAULT NULL,
+            closing_date DATE DEFAULT NULL,
+            payment_date DATE DEFAULT NULL,
+            payment_method VARCHAR(255) DEFAULT NULL,
             created DATE DEFAULT (datetime('now')),
             updated DATE DEFAULT (datetime('now'))
         )
@@ -37,23 +43,38 @@ function getVendorById(id, callback) {
 function saveVendor(vendorData, callback) {
     const {
         id, name_primary, name_secondary, name_kana, phone_number, fax_number,
-        zip_code, address, contact_person, email, terms_of_trade, remarks
+        zip_code, address, contact_person, email, terms_of_trade, remarks,
+        classification1, classification2, tax_calculation, closing_date,
+        payment_date, payment_method
     } = vendorData;
 
-    if (id) {
-        db.run(
-            `UPDATE vendors SET name_primary = ?, name_secondary = ?, name_kana = ?, phone_number = ?, fax_number = ?, zip_code = ?, address = ?, contact_person = ?, email = ?, terms_of_trade = ?, remarks = ?, updated = datetime('now') WHERE id = ?`,
-            [name_primary, name_secondary, name_kana, phone_number, fax_number, zip_code, address, contact_person, email, terms_of_trade, remarks, id],
-            callback
-        );
-    } else {
-        db.run(
-            `INSERT INTO vendors (name_primary, name_secondary, name_kana, phone_number, fax_number, zip_code, address, contact_person, email, terms_of_trade, remarks, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
-            [name_primary, name_secondary, name_kana, phone_number, fax_number, zip_code, address, contact_person, email, terms_of_trade, remarks],
-            callback
-        );
-    }
+    console.log("Processing saveVendor with data:", vendorData);
+
+    db.get(`SELECT id FROM vendors WHERE id = ?`, [id], (err, row) => {
+        if (err) {
+            return callback(err);
+        }
+
+        if (row) {
+            // If the record exists, perform an UPDATE
+            console.log("Updating existing vendor:", vendorData);
+            db.run(
+                `UPDATE vendors SET name_primary = ?, name_secondary = ?, name_kana = ?, phone_number = ?, fax_number = ?, zip_code = ?, address = ?, contact_person = ?, email = ?, terms_of_trade = ?, remarks = ?, classification1 = ?, classification2 = ?, tax_calculation = ?, closing_date = ?, payment_date = ?, payment_method = ?, updated = datetime('now') WHERE id = ?`,
+                [name_primary, name_secondary, name_kana, phone_number, fax_number, zip_code, address, contact_person, email, terms_of_trade, remarks, classification1, classification2, tax_calculation, closing_date, payment_date, payment_method, id],
+                callback
+            );
+        } else {
+            // If the record does not exist, perform an INSERT
+            console.log("Inserting new vendor:", vendorData);
+            db.run(
+                `INSERT INTO vendors (name_primary, name_secondary, name_kana, phone_number, fax_number, zip_code, address, contact_person, email, terms_of_trade, remarks, classification1, classification2, tax_calculation, closing_date, payment_date, payment_method, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+                [name_primary, name_secondary, name_kana, phone_number, fax_number, zip_code, address, contact_person, email, terms_of_trade, remarks, classification1, classification2, tax_calculation, closing_date, payment_date, payment_method],
+                callback
+            );
+        }
+    });
 }
+
 
 function deleteVendorById(id, callback) {
     db.run('DELETE FROM vendors WHERE id = ?', [id], callback);
@@ -70,9 +91,11 @@ function searchVendors(query, callback) {
         OR name_secondary LIKE ? 
         OR name_kana LIKE ? 
         OR id LIKE ? 
+        OR classification1 LIKE ? 
+        OR classification2 LIKE ?
         `;
         params = [
-            `%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`
+            `%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`
         ];
     } else {
         // クエリが空の場合はすべてのデータを返す
@@ -83,7 +106,6 @@ function searchVendors(query, callback) {
         callback(err, rows);
     });
 }
-
 
 module.exports = {
     initializeDatabase,

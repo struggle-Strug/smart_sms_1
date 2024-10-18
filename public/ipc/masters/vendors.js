@@ -33,6 +33,7 @@ ipcMain.on('edit-vendor', (event, id) => {
 
 ipcMain.on('save-vendor', (event, vendorData) => {
     saveVendor(vendorData, (err) => {
+        console.log(vendorData)
         if (err) {
             console.error(err.message);
         } else {

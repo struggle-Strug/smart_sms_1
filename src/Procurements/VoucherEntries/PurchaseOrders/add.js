@@ -31,7 +31,7 @@ function PurchaseOrdersAdd() {
     const [purchaseOrderDetails, setPurchaseOrderDetails] = useState([
         {
             id: '',
-            purchase_order_id: '',
+            purchase_order_id: "",
             product_id: '',
             product_name: '',
             number: '',
@@ -86,8 +86,12 @@ function PurchaseOrdersAdd() {
         validator.required(purchaseOrder.vender_name, 'vender_name', '仕入先名');
 
         for (let i = 0; i < purchaseOrderDetails.length; i++) {
-            ipcRenderer.send('save-purchase-order-detail', purchaseOrderDetails[i]);
+            const purchaseOrderDetailData =  purchaseOrderDetails[i]
+            purchaseOrderDetailData.purchase_order_id = purchaseOrder.id;
+            ipcRenderer.send('save-purchase-order-detail', purchaseOrderDetailData);
         }
+
+        console.log(purchaseOrderDetails)
 
         if (!validator.hasErrors()) {
 

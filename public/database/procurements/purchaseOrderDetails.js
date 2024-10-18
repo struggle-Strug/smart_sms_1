@@ -6,7 +6,13 @@ const dbPath = path.join(app.getPath('userData'), 'database.db');
 const db = new sqlite3.Database(dbPath);
 
 function loadPurchaseOrderDetails(callback) {
-    const sql = `SELECT * FROM purchase_order_details`;
+    const sql = `
+        SELECT pod.*, po.*, p.*, v.*
+        FROM purchase_order_details pod
+        LEFT JOIN purchase_orders po ON pod.purchase_order_id = po.id
+        LEFT JOIN products p ON pod.product_id = p.id
+        LEFT JOIN vendors v ON po.vender_id = v.id
+    `;
     db.all(sql, [], (err, rows) => {
         callback(err, rows);
     });
@@ -151,19 +157,31 @@ function initializeDatabase() {
     db.run(sql);
 }
 
-function searchPurchaseOrderDetails(query, callback) {
-    let sql;
+function searchPurchaseOrderDetails(conditions, callback) {
+    let sql = `
+        SELECT pod.*, po.*, p.*, v.*
+        FROM purchase_order_details pod
+        LEFT JOIN purchase_orders po ON pod.purchase_order_id = po.id
+        LEFT JOIN products p ON pod.product_id = p.id
+        LEFT JOIN vendors v ON po.vender_id = v.id
+    `;
+
+    let whereClauses = [];
     let params = [];
 
-    if (query && query.trim() !== '') {
-        sql = `
-        SELECT * FROM purchase_order_details 
-        WHERE product_id LIKE ? OR unit LIKE ? OR storage_facility LIKE ? OR remarks LIKE ?
-        `;
-        params = [`%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`];
-    } else {
-        sql = `SELECT * FROM purchase_order_details`;
+    // 条件オブジェクトのキーと値を動的にWHERE句に追加
+    if (conditions && Object.keys(conditions).length > 0) {
+        for (const [column, value] of Object.entries(conditions)) {
+            whereClauses.push(`${column} LIKE ?`);
+            params.push(`%${value}%`);
+        }
     }
+
+    // WHERE句がある場合はSQL文に追加
+    if (whereClauses.length > 0) {
+        sql += ` WHERE ` + whereClauses.join(" AND ");
+    }
+
     db.all(sql, params, (err, rows) => {
         callback(err, rows);
     });

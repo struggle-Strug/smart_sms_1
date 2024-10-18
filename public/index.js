@@ -26,6 +26,7 @@ require('./ipc/procurements/purchaseOrderDetails');
 require('./ipc/procurements/purchaseInvoiceDetails');
 require('./ipc/procurements/stockInOutSlipDetails');
 require('./ipc/procurements/paymentVoucherDetails');
+require('./ipc/procurements/statementSettings');
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -89,6 +90,8 @@ function createWindow() {
   stockInOutSlipDetailsDB.initializeDatabase();
   const paymentVoucherDetailsDB = require('./database/procurements/paymentVoucherDetails');
   paymentVoucherDetailsDB.initializeDatabase();
+  const statementSettingsDB = require('./database/procurements/statementSettings');
+  statementSettingsDB.initializeDatabase();
 
   //集計管理
 }
