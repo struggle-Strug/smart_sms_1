@@ -12,47 +12,82 @@ function Index() {
         { value: '貴社', label: '貴社' },
     ];
 
-    const [customer, setCustomer] = useState({
-        id: '',
-        name_primary: '',
-        name_secondary: '',
-        name_kana: '',
-        honorific: '',
-        phone_number: '',
-        fax_number: '',
-        zip_code: '',
-        address: '',
-        email: '',
-        remarks: '',
-        billing_code: '',
-        billing_information: '',
-        monthly_sales_target: ''
-    });
-    const [customers, setCustomers] = useState([]);
+    const [purchaseInvoiceDetails, setPurchaseInvoiceDetails] = useState([]);
+    const [purchaseInvoiceDetail, setPurchaseInvoiceDetail] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
     const location = useLocation();
-    const [searchQuery, setSearchQuery] = useState('');
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [customerIdToDelete, setCustomerIdToDelete] = useState(null);
+    const [searchQueryList, setSearchQueryList] = useState({
+        "v.name_primary": "",
+        "p.classification_primary": "",
+        "p.classification_secondary": "",
+        "pid.product_name": "",
+        "pid.contact_person": "",
+        "pid.storage_facility": "",
+        "pid.status": "",
+        "pid.lot_number": "",
+        "v.classification1": "",
+        "v.classification2": "",
+    });
+
+    
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setSearchQueryList((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
 
     useEffect(() => {
-        ipcRenderer.send('get-customers');
-        ipcRenderer.on('customers-data', (event, data) => {
-            setCustomers(data);
-        });
+        ipcRenderer.send('load-purchase-invoice-details');
 
-        ipcRenderer.on('customer-deleted', (event, id) => {
-            setCustomers((prevCustomers) => prevCustomers.filter(customer => customer.id !== id));
-        });
+        const handleLoadDetails = (event, data) => setPurchaseInvoiceDetails(data);
+        const handleSearchResult = (event, data) => {
 
-        ipcRenderer.on('search-customers-result', (event, data) => {
-            setCustomers(data);
-        });
+            setPurchaseInvoiceDetails(data);
+        };
+
+        ipcRenderer.on('load-purchase-invoice-details', handleLoadDetails);
+        ipcRenderer.on('search-purchase-invoice-details-result', handleSearchResult);
 
         return () => {
-            ipcRenderer.removeAllListeners('customers-data');
-            ipcRenderer.removeAllListeners('search-customers-result');
+            ipcRenderer.removeListener('load-purchase-invoice-details', handleLoadDetails);
+            ipcRenderer.removeListener('search-purchase-invoice-details-result', handleSearchResult);
         };
     }, []);
+
+    const [outputFormat, setOutputFormat] = useState('csv');
+    const [remarks, setRemarks] = useState('');
+    const [settingId, setSettingId] = useState(1)
+
+
+    useEffect(() => {
+        if (settingId) {
+            ipcRenderer.send('get-statement-setting-detail', settingId);
+            ipcRenderer.once('statement-setting-detail-data', (event, data) => {
+                if (data) {
+                    setOutputFormat(data.output_format || 'csv');
+                    setRemarks(data.remarks || '');
+                }
+            });
+        }
+    }, [settingId]);
+
+    const handleSave = () => {
+        const settingData = {
+            id: settingId,
+            output_format: outputFormat,
+            remarks: remarks,
+        };
+
+        ipcRenderer.send('save-statement-setting', settingData);
+        ipcRenderer.once('load-statement-settings', (event, data) => {
+            handleConfirmDelete(data); // 更新されたデータを返す
+        });
+    };
 
     const toggleDropdown = (id) => {
         console.log(id)
@@ -73,13 +108,15 @@ function Index() {
     };
 
     const handleSearch = () => {
-        ipcRenderer.send('search-customers', searchQuery);
-    };
-
-    const handleKeyDown = (event) => {
-        if (event.key === 'Enter') {
-            handleSearch();
+        const searchColums = {}
+        setPurchaseInvoiceDetails([])
+        console.log(searchQueryList)
+        for (let key in searchQueryList) {
+            if (searchQueryList[key] !== "") {
+                searchColums[key] = searchQueryList[key]
+            }
         }
+        ipcRenderer.send('search-purchase-invoice-details', searchColums);
     };
 
     useEffect(() => {
@@ -98,6 +135,15 @@ function Index() {
             </div>
         )
     }
+
+    const handleConfirmDelete = () => {
+        ipcRenderer.send('delete-customer', customerIdToDelete);
+        setIsDialogOpen(false);
+    };
+
+    const handleCancelDelete = () => {
+        setIsDialogOpen(false);
+    };
 
     return (
         <div className='w-5/6'>
@@ -128,54 +174,122 @@ function Index() {
                                     <div className='flex items-center px-2'>〜</div>
                                 </div>
                                 <div>
-                                    <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'></div>
                                     <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                                 </div>
                             </div>
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>カテゴリー</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="p.classification_primary"
+                                value={searchQueryList["p.classification_primary"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>サブカテゴリー</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="p.classification_secondary"
+                                value={searchQueryList["p.classification_secondary"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>仕入先</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="v.name_primary"
+                                value={searchQueryList["v.name_primary"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>商品名</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="pid.product_name"
+                                value={searchQueryList["pid.product_name"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>担当者</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="pid.contact_person"
+                                value={searchQueryList["pid.contact_person"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>倉庫</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="pid.storage_facility"
+                                value={searchQueryList["pid.storage_facility"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>ステータス</div>
-                            <CustomSelect options={options} name={"honorific"} data={customer} setData={setCustomer} />
+                            <CustomSelect
+                                options={options}
+                                name="pid.status"
+                                data={searchQueryList["pid.status"]}
+                                onChange={(value) => handleInputChange({ target: { name: "pid.status", value } })}
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>ロット番号</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="pid.lot_number"
+                                value={searchQueryList["pid.lot_number"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>区分１</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="v.classification1"
+                                value={searchQueryList["v.classification1"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>区分２</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="v.classification2"
+                                value={searchQueryList["v.classification2"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
                     </div>
                     <div className='flex mt-6'>
-                        <div className='border rounded-lg py-3 px-7 text-base font-bold bg-blue-600 text-white'>適用して表示</div>
+                        <div className='border rounded-lg py-3 px-7 text-base font-bold bg-blue-600 text-white' onClick={(e) => handleSearch()}>適用して表示</div>
                     </div>
                 </div>
                 <div className='flex justify-end'>
@@ -210,30 +324,102 @@ function Index() {
                             </tr>
                         </thead>
                         <tbody>
-                            {customers.map((customer) => (
-                                <tr className='border-b' key={customer.id}>
-                                    <td className='py-4'>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
+                        {purchaseInvoiceDetails.map((purchaseInvoiceDetail) => (
+                                <tr className='border-b' key={purchaseInvoiceDetail.id}>
+                                    <td className='py-4'>{purchaseInvoiceDetail.order_date || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseInvoiceDetail.order_date || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseInvoiceDetail.order_date || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseInvoiceDetail.product_id || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseInvoiceDetail.product_name || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseInvoiceDetail.classification_primary || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseInvoiceDetail.classification_secondary || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseInvoiceDetail.number || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseInvoiceDetail.price || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{parseInt(purchaseInvoiceDetail.number) * parseInt(purchaseInvoiceDetail.price) || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseInvoiceDetail.lot_number || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseInvoiceDetail.storage_facility || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseInvoiceDetail.contact_person || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseInvoiceDetail.classification1 || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseInvoiceDetail.classification2 || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseInvoiceDetail.status || <div className='border w-4'></div>}</td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
             </div>
+            {
+                isDialogOpen &&
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="container mx-auto sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl bg-white rounded-2xl shadow-md">
+                        <p className='text-2xl font-bold px-6 py-4'>明細表設定</p>
+                        <hr />
+                        <div className='flex-col px-6 pt-4'>
+                            <div className=''>出力形式選択</div>
+                            <div className='mt-2.5 flex'>
+                                <label className='text-base'>
+                                    <input
+                                        type="radio"
+                                        name="outputFormat"
+                                        value="csv"
+                                        checked={outputFormat === 'csv'}
+                                        onChange={() => setOutputFormat('csv')}
+                                        className='mr-2'
+                                    />csv
+                                </label>
+                                <label className='text-base ml-10'>
+                                    <input
+                                        type="radio"
+                                        name="outputFormat"
+                                        value="Excel"
+                                        checked={outputFormat === 'Excel'}
+                                        onChange={() => setOutputFormat('Excel')}
+                                        className='mr-2'
+                                    />Excel
+                                </label>
+                                <label className='text-base ml-10'>
+                                    <input
+                                        type="radio"
+                                        name="outputFormat"
+                                        value="PDF"
+                                        checked={outputFormat === 'PDF'}
+                                        onChange={() => setOutputFormat('PDF')}
+                                        className='mr-2'
+                                    />PDF
+                                </label>
+                                <label className='text-base ml-10'>
+                                    <input
+                                        type="radio"
+                                        name="outputFormat"
+                                        value="print"
+                                        checked={outputFormat === 'print'}
+                                        onChange={() => setOutputFormat('print')}
+                                        className='mr-2'
+                                    />印刷
+                                </label>
+                            </div>
+                        </div>
+                        <div className='px-6 pb-4'>
+                            <div className='py-2.5 text-xl'>備考</div>
+                            <div className='pb-2'>
+                                <textarea
+                                    className='border rounded px-4 py-2.5 bg-white w-full resize-none'
+                                    placeholder=''
+                                    rows={5}
+                                    name="remarks"
+                                    value={remarks}
+                                    onChange={(e) => setRemarks(e.target.value)}
+                                ></textarea>
+                            </div>
+                        </div>
+                        <hr />
+                        <div className="flex justify-end py-4 px-6">
+                            <button onClick={handleCancelDelete} className="px-5 py-3 font-semibold text-base mr-6 bg-white border border-gray-300 rounded-xl">キャンセル</button>
+                            <button onClick={handleSave} className="px-11 py-3 font-semibold text-base bg-blue-600 text-white border-0 rounded-xl">保存</button>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
     )
 }

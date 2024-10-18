@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
+import CustomSelect from '../../../Components/CustomSelect';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -10,47 +11,118 @@ function Index() {
         { value: '貴社', label: '貴社' },
     ];
 
-    const [customer, setCustomer] = useState({
-        id: '',
-        name_primary: '',
-        name_secondary: '',
-        name_kana: '',
-        honorific: '',
-        phone_number: '',
-        fax_number: '',
-        zip_code: '',
-        address: '',
-        email: '',
-        remarks: '',
-        billing_code: '',
-        billing_information: '',
-        monthly_sales_target: ''
-    });
-    const [customers, setCustomers] = useState([]);
+    // const [customer, setCustomer] = useState({
+    //     id: '',
+    //     name_primary: '',
+    //     name_secondary: '',
+    //     name_kana: '',
+    //     honorific: '',
+    //     phone_number: '',
+    //     fax_number: '',
+    //     zip_code: '',
+    //     address: '',
+    //     email: '',
+    //     remarks: '',
+    //     billing_code: '',
+    //     billing_information: '',
+    //     monthly_sales_target: ''
+    // });
+    // const [customers, setCustomers] = useState([]);
+    // const [isOpen, setIsOpen] = useState(false);
+    // const dropdownRef = useRef(null);
+    // const location = useLocation();
+    // const [searchQuery, setSearchQuery] = useState('');
+
+    const [paymentVoucherDetails, setPaymentVoucherDetails] = useState([]);
+    const [paymentVoucherDetail, setPaymentVoucherDetail] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
     const location = useLocation();
-    const [searchQuery, setSearchQuery] = useState('');
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [customerIdToDelete, setCustomerIdToDelete] = useState(null);
+    const [searchQueryList, setSearchQueryList] = useState({
+        "pvd.payment_method": "",
+        "pvd.vender_name": "",
+        "pvd.contact_person": "",
+        "v.classification1": "",
+        "v.classification2": "",
+    });
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setSearchQueryList((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
 
     useEffect(() => {
-        ipcRenderer.send('get-customers');
-        ipcRenderer.on('customers-data', (event, data) => {
-            setCustomers(data);
-        });
+        ipcRenderer.send('load-payment-voucher-details');
 
-        ipcRenderer.on('customer-deleted', (event, id) => {
-            setCustomers((prevCustomers) => prevCustomers.filter(customer => customer.id !== id));
-        });
+        const handleLoadDetails = (event, data) => setPaymentVoucherDetails(data);
+        const handleSearchResult = (event, data) => {
 
-        ipcRenderer.on('search-customers-result', (event, data) => {
-            setCustomers(data);
-        });
+            setPaymentVoucherDetails(data);
+        };
+
+        ipcRenderer.on('load-payment-voucher-details', handleLoadDetails);
+        ipcRenderer.on('search-payment-voucher-details-result', handleSearchResult);
 
         return () => {
-            ipcRenderer.removeAllListeners('customers-data');
-            ipcRenderer.removeAllListeners('search-customers-result');
+            ipcRenderer.removeListener('load-payment-voucher-details', handleLoadDetails);
+            ipcRenderer.removeListener('search-payment-voucher-details-result', handleSearchResult);
         };
     }, []);
+
+    // useEffect(() => {
+    //     ipcRenderer.send('get-customers');
+    //     ipcRenderer.on('customers-data', (event, data) => {
+    //         setCustomers(data);
+    //     });
+
+    //     ipcRenderer.on('customer-deleted', (event, id) => {
+    //         setCustomers((prevCustomers) => prevCustomers.filter(customer => customer.id !== id));
+    //     });
+
+    //     ipcRenderer.on('search-customers-result', (event, data) => {
+    //         setCustomers(data);
+    //     });
+
+    //     return () => {
+    //         ipcRenderer.removeAllListeners('customers-data');
+    //         ipcRenderer.removeAllListeners('search-customers-result');
+    //     };
+    // }, []);
+
+    const [outputFormat, setOutputFormat] = useState('csv');
+    const [remarks, setRemarks] = useState('');
+    const [settingId, setSettingId] = useState(1)
+
+    useEffect(() => {
+        if (settingId) {
+            ipcRenderer.send('get-statement-setting-detail', settingId);
+            ipcRenderer.once('statement-setting-detail-data', (event, data) => {
+                if (data) {
+                    setOutputFormat(data.output_format || 'csv');
+                    setRemarks(data.remarks || '');
+                }
+            });
+        }
+    }, [settingId]);
+
+    const handleSave = () => {
+        const settingData = {
+            id: settingId,
+            output_format: outputFormat,
+            remarks: remarks,
+        };
+
+        ipcRenderer.send('save-statement-setting', settingData);
+        ipcRenderer.once('load-statement-settings', (event, data) => {
+            handleConfirmDelete(data); // 更新されたデータを返す
+        });
+    };
+
 
     const toggleDropdown = (id) => {
         console.log(id)
@@ -71,14 +143,26 @@ function Index() {
     };
 
     const handleSearch = () => {
-        ipcRenderer.send('search-customers', searchQuery);
+        const searchColums = {}
+        setPaymentVoucherDetails([])
+        console.log(searchQueryList)
+        for (let key in searchQueryList) {
+            if (searchQueryList[key] !== "") {
+                searchColums[key] = searchQueryList[key]
+            }
+        }
+        ipcRenderer.send('search-payment-voucher-details', searchColums);
     };
 
-    const handleKeyDown = (event) => {
-        if (event.key === 'Enter') {
-            handleSearch();
-        }
-    };
+    // const handleSearch = () => {
+    //     ipcRenderer.send('search-customers', searchQuery);
+    // };
+
+    // const handleKeyDown = (event) => {
+    //     if (event.key === 'Enter') {
+    //         handleSearch();
+    //     }
+    // };
 
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
@@ -96,6 +180,15 @@ function Index() {
             </div>
         );
     }
+
+    const handleConfirmDelete = () => {
+        ipcRenderer.send('delete-customer', customerIdToDelete);
+        setIsDialogOpen(false);
+    };
+
+    const handleCancelDelete = () => {
+        setIsDialogOpen(false);
+    };
 
     return (
         <div className='w-5/6'>
@@ -123,7 +216,7 @@ function Index() {
                             </div>
                         </div>
                         <div>
-                            <div className='text-sm pb-1.5'>仕入先</div>
+                            <div className='text-sm pb-1.5'>支払方法</div>
                             <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
                         </div>
                     </div>
@@ -131,27 +224,62 @@ function Index() {
                     <div className='grid grid-cols-3 gap-6'>
                         <div>
                             <div className='text-sm pb-1.5'>仕入先</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="pvd.vender_name"
+                                value={searchQueryList["pvd.vender_name"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>支払方法</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="pvd.payment_method"
+                                value={searchQueryList["pvd.payment_method"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>担当者</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="pvd.contact_person"
+                                value={searchQueryList["pvd.contact_person"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>区分１</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="v.classification1"
+                                value={searchQueryList["v.classification1"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>区分２</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="v.classification2"
+                                value={searchQueryList["v.classification2"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
                     </div>
                     <div className='flex mt-6'>
-                        <div className='border rounded-lg py-3 px-7 text-base font-bold bg-blue-600 text-white'>適用して表示</div>
+                        <div className='border rounded-lg py-3 px-7 text-base font-bold bg-blue-600 text-white' onClick={(e) => handleSearch()}>適用して表示</div>
                     </div>
                 </div>
                 <div className='flex justify-end pt-6'>
@@ -163,43 +291,29 @@ function Index() {
                     <table className="w-full mt-8 table-auto" style={{ width: "2000px" }}>
                         <thead className=''>
                             <tr className='border-b'>
-                                <th className='text-left pb-2.5'>仕入日</th>
-                                <th className='text-left pb-2.5'>仕入番号</th>
+                                <th className='text-left pb-2.5'>支払伝票番号</th>
                                 <th className='text-left pb-2.5'>仕入先</th>
-                                <th className='text-left pb-2.5'>商品コード</th>
-                                <th className='text-left pb-2.5'>商品名</th>
-                                <th className='text-left pb-2.5'>カテゴリー</th>
-                                <th className='text-left pb-2.5'>サブカテゴリー</th>
-                                <th className='text-left pb-2.5'>数量</th>
-                                <th className='text-left pb-2.5'>単価</th>
-                                <th className='text-left pb-2.5'>金額</th>
-                                <th className='text-left pb-2.5'>ロット番号</th>
-                                <th className='text-left pb-2.5'>倉庫</th>
+                                <th className='text-left pb-2.5'>支払方法</th>
+                                <th className='text-left pb-2.5'>仕入金額税別</th>
+                                <th className='text-left pb-2.5'>支払金額税込</th>
                                 <th className='text-left pb-2.5'>担当者</th>
                                 <th className='text-left pb-2.5'>区分１</th>
                                 <th className='text-left pb-2.5'>区分２</th>
-                                <th className='text-left pb-2.5'>ステータス</th>
+                                <th className='text-left pb-2.5'>仕入伝票番号</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {customers.map((customer) => (
-                                <tr className='border-b' key={customer.id}>
-                                    <td className='py-4'>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
-                                    <td>テスト</td>
+                            {paymentVoucherDetails.map((paymentVoucherDetail) => (
+                                <tr className='border-b' key={paymentVoucherDetail.id}>
+                                    <td className='py-4'>{paymentVoucherDetail.payment_voucher_id || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{paymentVoucherDetail.vender_name || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{paymentVoucherDetail.payment_method || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{paymentVoucherDetail.payment_price || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{paymentVoucherDetail.payment_price || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{paymentVoucherDetail.contact_person || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{paymentVoucherDetail.classification1 || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{paymentVoucherDetail.classification2 || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{paymentVoucherDetail.status || <div className='border w-4'></div>}</td>
                                 </tr>
                             ))}
                         </tbody>
