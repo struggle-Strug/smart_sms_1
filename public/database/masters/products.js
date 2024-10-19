@@ -87,6 +87,50 @@ function searchProducts(query, callback) {
     });
 }
 
+function searchIdProducts(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM products 
+        WHERE id LIKE ?
+        `;
+        params = [
+            `%${query}%`
+        ];
+    } else {
+        // クエリが空の場合はすべてのデータを返す
+        sql = `SELECT * FROM products`;
+    }
+
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
+function searchNameProducts(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM products 
+        WHERE name LIKE ?
+        `;
+        params = [
+            `%${query}%`
+        ];
+    } else {
+        // クエリが空の場合はすべてのデータを返す
+        sql = `SELECT * FROM products`;
+    }
+
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
 
 module.exports = {
     initializeDatabase,
@@ -94,6 +138,8 @@ module.exports = {
     getProductById,
     saveProduct,
     deleteProductById,
-    searchProducts
+    searchProducts,
+    searchIdProducts,
+    searchNameProducts
 };
 

@@ -107,11 +107,57 @@ function searchVendors(query, callback) {
     });
 }
 
+function searchIdVendors(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM vendors 
+        WHERE id LIKE ? 
+        `;
+        params = [
+            `%${query}%`
+        ];
+    } else {
+        // クエリが空の場合はすべてのデータを返す
+        sql = `SELECT * FROM vendors`;
+    }
+
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
+function searchNameVendors(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM vendors 
+        WHERE name_primary LIKE ? 
+        `;
+        params = [
+            `%${query}%`
+        ];
+    } else {
+        // クエリが空の場合はすべてのデータを返す
+        sql = `SELECT * FROM vendors`;
+    }
+
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
 module.exports = {
     initializeDatabase,
     loadVendors,
     getVendorById,
     saveVendor,
     deleteVendorById,
-    searchVendors
+    searchVendors,
+    searchIdVendors,
+    searchNameVendors
 };

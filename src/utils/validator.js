@@ -4,8 +4,6 @@ class Validator {
     }
   
     required(value, fieldName, displayName) {
-      console.log(displayName)
-      console.log(value)
       if (!value || value.trim() === '') {
         this.errors[fieldName] = `${displayName}は必須項目なので、入力してください。`;
         return false;

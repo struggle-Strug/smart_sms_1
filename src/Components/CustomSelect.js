@@ -29,7 +29,7 @@ const CustomSelect = ({ options, placeholder = "Select an option", data, setData
   }, []);
 
   return (
-    <div className="relative w-2/3" ref={dropdownRef}>
+    <div className="relative w-2/3 z-1" ref={dropdownRef}>
       <div
         className="bg-white border rounded-md p-2 cursor-pointer flex justify-between items-center"
         onClick={toggleDropdown}
