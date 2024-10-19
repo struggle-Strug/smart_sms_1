@@ -10,29 +10,29 @@ const { ipcRenderer } = window.require('electron');
 
 
 function Index() {
-    const [customers, setCustomers] = useState([]);
+    const [salesTaxSettings, setSalesTaxSettings] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
     const location = useLocation();
     const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
-        ipcRenderer.send('get-customers');
-        ipcRenderer.on('customers-data', (event, data) => {
-            setCustomers(data);
+        ipcRenderer.send('load-sales-tax-settings');
+        ipcRenderer.on('sales-tax-settings-data', (event, data) => {
+            setSalesTaxSettings(data);
         });
 
-        ipcRenderer.on('customer-deleted', (event, id) => {
-            setCustomers((prevCustomers) => prevCustomers.filter(customer => customer.id !== id));
+        ipcRenderer.on('sales-tax-setting-deleted', (event, id) => {
+            setSalesTaxSettings((prevCustomers) => prevCustomers.filter(customer => customer.id !== id));
         });
 
-        ipcRenderer.on('search-customers-result', (event, data) => {
-            setCustomers(data);
-        });
+        // ipcRenderer.on('search-customers-result', (event, data) => {
+        //     setCustomers(data);
+        // });
 
         return () => {
-            ipcRenderer.removeAllListeners('customers-data');
-            ipcRenderer.removeAllListeners('search-customers-result');
+            ipcRenderer.removeAllListeners('sales-tax-settings-data');
+            // ipcRenderer.removeAllListeners('search-customers-result');
         };
     }, []);
 
@@ -50,19 +50,19 @@ function Index() {
 
     const handleDelete = (id) => {
         if (window.confirm('本当にこの顧客を削除しますか？')) {
-            ipcRenderer.send('delete-customer', id);
+            ipcRenderer.send('delete-sales-tax-setting', id);
         }
     };
 
-    const handleSearch = () => {
-        ipcRenderer.send('search-customers', searchQuery);
-    };
+    // const handleSearch = () => {
+    //     ipcRenderer.send('search-customers', searchQuery);
+    // };
 
-    const handleKeyDown = (event) => {
-        if (event.key === 'Enter') {
-            handleSearch();
-        }
-    };
+    // const handleKeyDown = (event) => {
+    //     if (event.key === 'Enter') {
+    //         handleSearch();
+    //     }
+    // };
 
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
@@ -74,7 +74,7 @@ function Index() {
     const DropDown = (id) => {
         return (
             <div ref={dropdownRef} className='absolute right-0 origin-top-right mt-6 rounded shadow-lg z-50 bg-white p-3' style={{ top: "50px", width: "120px" }}>
-                <div className='px-3 py-1 hover:text-blue-600 hover:underline'><Link to={`detail/${id.id}`} className={``}>詳細</Link></div>
+                {/* <div className='px-3 py-1 hover:text-blue-600 hover:underline'><Link to={`detail/${id.id}`} className={``}>詳細</Link></div> */}
                 <div className='px-3 py-1 hover:text-blue-600 hover:underline'><Link to={`edit/${id.id}`} className={``}>編集</Link></div>
                 <div className='px-3 py-1 hover:text-blue-600 hover:underline' onClick={() => handleDelete(id.id)}>削除</div>
             </div>
@@ -91,22 +91,18 @@ function Index() {
                 <table className="w-full mt-8 table-auto">
                     <thead className=''>
                         <tr className='border-b'>
-                            <th className='text-left pb-2.5'>支払日付</th>
-                            <th className='text-left pb-2.5'>伝票番号</th>
-                            <th className='text-left pb-2.5'>仕入先名</th>
-                            <th className='text-left pb-2.5'>仕入先コード</th>
-                            <th className='text-left pb-2.5'>備考</th>
-                            <th className='text-right'></th>
+                            <th className='text-left pb-2.5'>消費税率</th>
+                            <th className='text-left pb-2.5'>適用開始日</th>
+                            <th className='text-left pb-2.5'>適用終了日</th>
+                            <th className='text-center pb-2.5'>操作</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {customers.map((customer) => (
+                        {salesTaxSettings.map((customer) => (
                             <tr className='border-b' key={customer.id}>
-                                <td>{customer.name_primary || <div className='border w-4'></div>}</td>
-                                <td>{customer.name_primary || <div className='border w-4'></div>}</td>
-                                <td>{customer.billing_code || <div className='border w-4'></div>}</td>
-                                <td>{customer.phone_number || <div className='border w-4'></div>}</td>
-                                <td>{customer.email}</td>
+                                <td>{customer.tax_rate || <div className='border w-4'></div>} %</td>
+                                <td>{customer.start_date || <div className='border w-4'></div>}</td>
+                                <td>{customer.end_date || <div className='border w-4'></div>}</td>
                                 <td className='flex justify-center relative'>
                                     <div className='border rounded px-4 py-3 relative hover:cursor-pointer' onClick={(e) => toggleDropdown(customer.id)}>
                                         {isOpen === customer.id && <DropDown id={customer.id} />}

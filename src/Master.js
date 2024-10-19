@@ -5,6 +5,7 @@ import CustomersIndex from './Masters/Customers';
 import MastersIndex from './Masters';
 import DeliveryCustomersIndex from './Masters/DeliveryCustomers';
 import ProductsIndex from './Masters/Products';
+import SetProductsIndex from './Masters/SetProducts';
 import VendorsIndex from './Masters/Vendors';
 import StorageFacilitiesIndex from './Masters/StorageFacilities';
 import PaymentMethodsIndex from './Masters/PaymentMethods';
@@ -73,7 +74,7 @@ function Master() {
         <Route path="customers/*" element={<CustomersIndex />} />
         <Route path="delivery-customers/*" element={<DeliveryCustomersIndex />} />
         <Route path="products/*" element={<ProductsIndex />} />
-        <Route path="set-products/*" element={<ProductsIndex />} />
+        <Route path="set-products/*" element={<SetProductsIndex />} />
         <Route path="vendors/*" element={<VendorsIndex />} />
         <Route path="storage-facilities/*" element={<StorageFacilitiesIndex />} />
         <Route path="payment-methods/*" element={<PaymentMethodsIndex />} />

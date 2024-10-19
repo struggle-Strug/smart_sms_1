@@ -17,7 +17,6 @@ function ProductList() {
     useEffect(() => {
         ipcRenderer.send('load-products');
         ipcRenderer.on('load-products', (event, data) => {
-            console.log(data)
             setProducts(data);
         });
 
