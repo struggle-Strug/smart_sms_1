@@ -2,8 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import VoucherEntries from './SalesManagement/VoucherEntries';
+import Statements from './SalesManagement/Statements';
+import SummaryAndManagementSheets from './SalesManagement/SummaryAndManagementSheets';
 
-function Procurement() {
+function SalesManagement() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const location = useLocation();
@@ -38,18 +40,18 @@ function Procurement() {
   return (
     <div className='w-full'>
       <div className='px-40 py-10'>
-        <div className='pb-6 text-2xl font-bold'>仕入管理</div>
+        <div className='pb-6 text-2xl font-bold'>売上管理</div>
         <div className=''>
           <div className='flex items-center mb-4'>
             <Link to={"/sales-management/voucher-entries"} className='flex items-center py-3 px-4 border rounded'>
               <div className='font-bold'>伝票入力</div>
               <div><img src='/Icon.png' width={24} /></div>
             </Link>
-            <Link to={"/sales-management/voucher-entries"} className='flex items-center py-3 px-4 border rounded  ml-5'>
+            <Link to={"/sales-management/statements"} className='flex items-center py-3 px-4 border rounded  ml-5'>
               <div className='font-bold'>明細表</div>
               <div><img src='/Icon.png' width={24} /></div>
             </Link>
-            <Link to={"/sales-management/voucher-entries"} className='flex items-center py-3 px-4 border rounded  ml-5'>
+            <Link to={"/sales-management/summary-and-management-sheets"} className='flex items-center py-3 px-4 border rounded  ml-5'>
               <div className='font-bold'>集計・管理表</div>
               <div><img src='/Icon.png' width={24} /></div>
             </Link>
@@ -58,8 +60,10 @@ function Procurement() {
       </div>
       <Routes>
         <Route path="/sales-management/voucher-entries" element={<VoucherEntries />} />
+        <Route path="/sales-management/statements" element={<Statements />} />
+        <Route path="/sales-management/summary-and-management-sheets" element={<SummaryAndManagementSheets />} />
       </Routes>
     </div>)
 }
 
-export default sales-management;
+export default SalesManagement;

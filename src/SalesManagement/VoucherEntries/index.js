@@ -14,10 +14,10 @@ import { useLocation } from 'react-router-dom';
 // import PrimarySectionsIndex from './Masters/PrimarySections';
 // import SecondarySectionsIndex from './Masters/SecondarySections';
 // import ShopsIndex from './Masters/Shops';
-import PurchaseOrdersIndex from './PurchaseOrders';
-import PaymentVouchersIndex from './PaymentVouchers';
-import StockInOutSlipsIndex from './StockInOutSlips';
-import PurchaseInvoicesIndex from './PurchaseInvoices';
+import QuotationSlipIndex from './QuotationSlip';
+import PaymentSlipsIndex from './PaymentSlips';
+import SalesSlipsIndex from './SalesSlips';
+import SalesOrderSlipsIndex from './SalesOrderSlips';
 
 function VoucherEntries() {
   const [isOpen, setIsOpen] = useState(false);
@@ -56,17 +56,17 @@ function VoucherEntries() {
       <div className='border-r w-48 h-[100vh]'>
         <div className='text-center py-2 pt-4'></div>
         <div className='text-center py-2 pt-4 text-lg'></div>
-        <div className={`text-center py-2 text-lg ${location.pathname.includes("/procurement/voucher-entries/purchase-orders") && "font-bold border-l-4 border-blue-600"}`}><Link to="purchase-orders" className={``}>発注伝票</Link></div>
-        <div className={`text-center py-2 text-lg ${location.pathname.includes("/procurement/voucher-entries/purchase-invoices") && "font-bold border-l-4 border-blue-600"}`}><Link to="purchase-invoices" className={``}>仕入伝票</Link></div>
-        <div className={`text-center py-2 text-lg ${location.pathname.includes("/procurement/voucher-entries/stock-in-out-slips") && "font-bold border-l-4 border-blue-600"}`}><Link to="stock-in-out-slips" className={``}>入出庫伝票</Link></div>
-        <div className={`text-center py-2 text-lg ${location.pathname.includes("/procurement/voucher-entries/payment-vouchers") && "font-bold border-l-4 border-blue-600"}`}><Link to="payment-vouchers" className={``}>支払伝票</Link></div>
+        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/voucher-entries/quotation-slip") && "font-bold border-l-4 border-blue-600"}`}><Link to="quotation-slip" className={``}>見積伝票</Link></div>
+        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/voucher-entries/sales-order-slips") && "font-bold border-l-4 border-blue-600"}`}><Link to="sales-order-slips" className={``}>受注伝票</Link></div>
+        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/voucher-entries/sales-slips") && "font-bold border-l-4 border-blue-600"}`}><Link to="sales-slips" className={``}>売上伝票</Link></div>
+        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/voucher-entries/payment-slips") && "font-bold border-l-4 border-blue-600"}`}><Link to="payment-slips" className={``}>入金伝票</Link></div>
       </div>
       <Routes>
-        <Route path="" element={<PurchaseOrdersIndex />}/>
-        <Route path="purchase-orders/*" element={<PurchaseOrdersIndex />}/>
-        <Route path="purchase-invoices/*" element={<PurchaseInvoicesIndex />}/>
-        <Route path="stock-in-out-slips/*" element={<StockInOutSlipsIndex />}/>
-        <Route path="payment-vouchers/*" element={<PaymentVouchersIndex />}/>
+        <Route path="" element={<QuotationSlipIndex />}/>
+        <Route path="quotation-slip/*" element={<QuotationSlipIndex />}/>
+        <Route path="sales-order-slips/*" element={<SalesOrderSlipsIndex />}/>
+        <Route path="sales-slips/*" element={<SalesSlipsIndex />}/>
+        <Route path="payment-slips/*" element={<PaymentSlipsIndex />}/>
       </Routes>
     </div>)
 }
