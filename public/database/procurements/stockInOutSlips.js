@@ -22,40 +22,49 @@ function getStockInOutSlipById(id, callback) {
 function saveStockInOutSlip(slipData, callback) {
     const {
         id,
+        code,
         stock_in_out_date,
         processType,
         warehouse_from,
         warehouse_to,
         contact_person,
-        remarks,
-        created,
-        updated
+        remarks
     } = slipData;
 
     if (id) {
+        // IDが存在する場合はUPDATE
         db.run(
-            `INSERT INTO stock_in_out_slips 
-            (id, stock_in_out_date, processType, warehouse_from, warehouse_to, contact_person, remarks, created, updated) 
-            VALUES 
-            (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+            `UPDATE stock_in_out_slips SET 
+                code = ?,
+                stock_in_out_date = ?, 
+                processType = ?, 
+                warehouse_from = ?, 
+                warehouse_to = ?, 
+                contact_person = ?, 
+                remarks = ?, 
+                updated = datetime('now') 
+            WHERE id = ?`,
             [
-                id,
+                code,
                 stock_in_out_date,
                 processType,
                 warehouse_from,
                 warehouse_to,
                 contact_person,
-                remarks
+                remarks,
+                id
             ],
             callback
         );
     } else {
+        // IDが存在しない場合はINSERT
         db.run(
             `INSERT INTO stock_in_out_slips 
-            (stock_in_out_date, processType, warehouse_from, warehouse_to, contact_person, remarks, created, updated) 
+            (code, stock_in_out_date, processType, warehouse_from, warehouse_to, contact_person, remarks, created, updated) 
             VALUES 
-            (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+            (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
             [
+                code,
                 stock_in_out_date,
                 processType,
                 warehouse_from,
@@ -67,6 +76,7 @@ function saveStockInOutSlip(slipData, callback) {
         );
     }
 }
+
 
 function deleteStockInOutSlipById(id, callback) {
     const sql = `DELETE FROM stock_in_out_slips WHERE id = ?`;
@@ -86,6 +96,7 @@ function initializeDatabase() {
     const sql = `
     CREATE TABLE IF NOT EXISTS stock_in_out_slips (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        code VARCHAR(255),
         stock_in_out_date VARCHAR(255),
         processType VARCHAR(255),
         warehouse_from VARCHAR(255),

@@ -5,7 +5,9 @@ const {
     savePurchaseInvoiceDetail, 
     deletePurchaseInvoiceDetailById, 
     editPurchaseInvoiceDetail, 
-    searchPurchaseInvoiceDetails 
+    searchPurchaseInvoiceDetails,
+    searchPurchaseInvoicesByPurchaseInvoiceId,
+    deletePurchaseInvoiceDetailsByPiId
 } = require('../../database/procurements/purchaseInvoiceDetails');
 
 // 購入請求明細のデータをロード
@@ -79,3 +81,24 @@ ipcMain.on('search-purchase-invoice-details', (event, query) => {
         }
     });
 });
+
+ipcMain.on('search-purchase-invoice-details-by-purchase-invoice-id', (event, query) => {
+    searchPurchaseInvoicesByPurchaseInvoiceId(query, (err, results) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('search-purchase-invoice-details-by-purchase-invoice-id-result', results);
+        }
+    });
+});
+
+ipcMain.on('delete-purchase-invoice-details-by-pi-id', (event, purchaseInvoiceId) => {
+    deletePurchaseInvoiceDetailsByPiId(purchaseInvoiceId, (err) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('purchase-invoice-details-deleted-by-pi-id', purchaseInvoiceId);
+        }
+    });
+});
+

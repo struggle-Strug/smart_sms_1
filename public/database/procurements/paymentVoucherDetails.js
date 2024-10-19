@@ -181,6 +181,34 @@ function searchPaymentVoucherDetails(conditions, callback) {
     });
 }
 
+function searchPaymentVouchersByPaymentVoucherId(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM payment_vouchers
+        WHERE payment_voucher_id LIKE ?
+        `;
+        params = [`%${query}%`];
+    } else {
+        sql = `SELECT * FROM payment_voucher_details`;
+    }
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
+function deletePaymentVoucherDetailsByPvId(paymentVoucherId, callback) {
+    const sql = `
+        DELETE FROM payment_voucher_details
+        WHERE payment_voucher_id = ?
+    `;
+    db.run(sql, [paymentVoucherId], (err) => {
+        callback(err);
+    });
+}
+
 module.exports = {
     loadPaymentVoucherDetails,
     getPaymentVoucherDetailById,
@@ -188,5 +216,7 @@ module.exports = {
     deletePaymentVoucherDetailById,
     editPaymentVoucherDetail,
     initializeDatabase,
-    searchPaymentVoucherDetails
+    searchPaymentVoucherDetails,
+    searchPaymentVouchersByPaymentVoucherId,
+    deletePaymentVoucherDetailsByPvId
 };

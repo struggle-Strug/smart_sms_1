@@ -79,3 +79,25 @@ ipcMain.on('search-stock-in-out-slip-details', (event, query) => {
         }
     });
 });
+
+
+ipcMain.on('search-stock-in-out-slip-details-by-slip-id', (event, query) => {
+    searchStockInOutSlipDetailsBySlipId(query, (err, results) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('search-stock-in-out-slip-details-by-slip-id-result', results);
+        }
+    });
+});
+
+ipcMain.on('delete-stock-in-out-slip-details-by-slip-id', (event, stockInOutSlipId) => {
+    deleteStockInOutSlipDetailsBySlipId(stockInOutSlipId, (err) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('stock-in-out-slip-details-deleted-by-slip-id', stockInOutSlipId);
+        }
+    });
+});
+

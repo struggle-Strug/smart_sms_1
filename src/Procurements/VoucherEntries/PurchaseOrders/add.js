@@ -55,7 +55,7 @@ function PurchaseOrdersAdd() {
     };
 
     const [purchaseOrder, setPurchaseOrder] = useState({
-        id: '',
+        code: '',
         order_date: '',
         vender_id: '',
         vender_name: '',
@@ -88,6 +88,7 @@ function PurchaseOrdersAdd() {
             setProducts(data);
         });
 
+
         return () => {
             ipcRenderer.removeAllListeners('search-id-vendors-result');
             ipcRenderer.removeAllListeners('search-name-vendors-result');
@@ -99,7 +100,7 @@ function PurchaseOrdersAdd() {
 
     const [purchaseOrderDetails, setPurchaseOrderDetails] = useState([
         {
-            id: '',
+            code: '',
             purchase_order_id: "",
             product_id: '',
             product_name: '',
@@ -114,7 +115,7 @@ function PurchaseOrdersAdd() {
 
     const addPurchaseOrderDetail = () => {
         setPurchaseOrderDetails([...purchaseOrderDetails, {
-            id: '',
+            code: '',
             purchase_order_id: '',
             product_id: '',
             product_name: '',
@@ -177,23 +178,33 @@ function PurchaseOrdersAdd() {
     const validator = new Validator();
 
     const handleSubmit = () => {
-        // バリデーションを実行
-        // validator.required(purchaseOrder.id, 'id', '伝票番号');
+        setErrors(null);
+        validator.required(purchaseOrder.code, 'code', '伝票番号');
         validator.required(purchaseOrder.order_date, 'order_date', '発注日付');
-        // validator.required(purchaseOrder.vender_id, 'vender_id', '仕入先コード');
+        validator.required(purchaseOrder.vender_id, 'vender_id', '仕入先コード');
         validator.required(purchaseOrder.vender_name, 'vender_name', '仕入先名');
-
         for (let i = 0; i < purchaseOrderDetails.length; i++) {
-            const purchaseOrderDetailData = purchaseOrderDetails[i]
-            purchaseOrderDetailData.purchase_order_id = purchaseOrder.id;
-            ipcRenderer.send('save-purchase-order-detail', purchaseOrderDetailData);
+            validator.required(purchaseOrderDetails[i].product_id, 'product_id' + i, '商品コード');
+            validator.required(purchaseOrderDetails[i].product_name, 'product_name' + i, '商品名');
+            validator.required(purchaseOrderDetails[i].number, 'number' + i, '数量');
+            validator.required(purchaseOrderDetails[i].price, 'price' + i, '値段');
+            validator.required(purchaseOrderDetails[i].tax_rate, 'tax_rate' + i, '税率');
+            validator.required(purchaseOrderDetails[i].storage_facility, 'storage_facility' + i, '倉庫');
         }
+        setErrors(validator.getErrors());
 
         if (!validator.hasErrors()) {
 
             ipcRenderer.send('save-purchase-order', purchaseOrder);
+            ipcRenderer.on('save-purchase-order-result', (event, data) => {
+                for (let i = 0; i < purchaseOrderDetails.length; i++) {
+                    const purchaseOrderDetailData = purchaseOrderDetails[i];
+                    purchaseOrderDetailData.purchase_order_id = data.id;
+                    ipcRenderer.send('save-purchase-order-detail', purchaseOrderDetailData);
+                }
+            });
             setPurchaseOrder({
-                id: '',
+                code: '',
                 order_date: '',
                 vender_id: '',
                 vender_name: '',
@@ -285,8 +296,8 @@ function PurchaseOrdersAdd() {
                     <div className='py-2.5 font-bold text-xl'>伝票番号</div>
                     <div className='pb-2'>
                         <div className='w-40 text-sm pb-1.5'>伝票番号 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                        <input type='number' className='border rounded px-4 py-2.5 bg-white  w-[480px]' placeholder='' name="id" value={purchaseOrder.id} onChange={handleChange} />
-                        {errors.id && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.name}</div>}
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white  w-[480px]' placeholder='' name="code" value={purchaseOrder.code} onChange={handleChange} />
+                        {errors.code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.code}</div>}
                     </div>
                     <div className='pb-2'>
                         <div className='w-40 text-sm pb-1.5'>発注日付 <span className='text-sm font-bold text-red-600'>必須</span></div>
@@ -325,6 +336,7 @@ function PurchaseOrdersAdd() {
                                         </div>
                                     </div>
                                 }
+
                             </div>
                             <div className='relative'>
                                 <div className='w-40 text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
@@ -383,6 +395,8 @@ function PurchaseOrdersAdd() {
                             </div>
                         </div>
                     </div>
+                    {errors.vender_id && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.vender_id}</div>}
+                    {errors.vender_name && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.vender_name}</div>}
                     <div className='pb-2'>
                         <div className='w-40 text-sm pb-1.5'>先方担当者</div>
                         <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="vender_contact_person" value={purchaseOrder.vender_contact_person} onChange={handleChange} />
@@ -483,6 +497,10 @@ function PurchaseOrdersAdd() {
                                                 <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="price" value={purchaseOrderDetail.price} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
                                             </div>
                                         </div>
+                                        {errors["product_id" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["product_id" + index]}</div>}
+                                        {errors["product_name" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["product_name" + index]}</div>}
+                                        {errors["number" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["number" + index]}</div>}
+                                        {errors["price" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["price" + index]}</div>}
                                         <div className='flex items-center mt-4'>
                                             <div className=''>
                                                 <div className='text-sm pb-1.5 w-40'>税率 <span className='text-sm font-bold text-red-600'>必須</span></div>
@@ -557,6 +575,8 @@ function PurchaseOrdersAdd() {
                                                 <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="stock" value={purchaseOrderDetail.stock} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)} />
                                             </div>
                                         </div>
+                                        {errors["tax_rate" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["tax_rate" + index]}</div>}
+                                        {errors["storage_facility" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["storage_facility" + index]}</div>}
                                     </div>
                                     <div className='ml-4'>
                                         <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={(e) => removePurchaseOrderDetail(index)}>
@@ -611,6 +631,7 @@ function PurchaseOrdersAdd() {
                     <div className='py-2.5 font-bold text-xl'>備考</div>
                     <div className='pb-2'>
                         <textarea className='border rounded px-4 py-2.5 bg-white w-full resize-none' placeholder='' name="remarks" value={purchaseOrder.remarks} onChange={handleChange} ></textarea>
+                        {errors.remarks && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.remarks}</div>}
                     </div>
                     <div className='py-3'>
                         <hr className='' />
@@ -625,6 +646,7 @@ function PurchaseOrdersAdd() {
                             className='border rounded px-4 py-2.5 bg-white w-[480px]'
                             placeholderText='締日を選択'
                         />
+                        {errors.closing_date && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.closing_date}</div>}
                     </div>
                     <div className='pb-2'>
                         <div className='w-40 text-sm pb-1.5'>支払期日</div>
@@ -635,6 +657,7 @@ function PurchaseOrdersAdd() {
                             className='border rounded px-4 py-2.5 bg-white w-[480px]'
                             placeholderText='支払期日を選択'
                         />
+                        {errors.payment_due_date && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.payment_due_date}</div>}
                     </div>
                     <div className='pb-2'>
                         <div className='w-40 text-sm pb-1.5'>支払方法</div>
@@ -646,11 +669,20 @@ function PurchaseOrdersAdd() {
                             value={purchaseOrder.payment_method}
                             onChange={handleChange}
                         />
+                        {errors.payment_method && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.payment_method}</div>}
                     </div>
                     <div className='py-3'>
                         <hr className='' />
                     </div>
-                    <div className='py-2.5 font-bold text-xl'>納品情報</div>
+                    <div className='py-2.5 font-bold text-xl flex items-center'>
+                        納品情報
+                        <a data-tooltip-id="my-tooltip" data-tooltip-content="得意先名の続き、支店名、部署名等" className='flex ml-3'>
+                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M8.47315 4.57084H10.1398V6.23751H8.47315V4.57084ZM8.47315 7.90418H10.1398V12.9042H8.47315V7.90418ZM9.30648 0.404175C4.70648 0.404175 0.973145 4.13751 0.973145 8.73751C0.973145 13.3375 4.70648 17.0708 9.30648 17.0708C13.9065 17.0708 17.6398 13.3375 17.6398 8.73751C17.6398 4.13751 13.9065 0.404175 9.30648 0.404175ZM9.30648 15.4042C5.63148 15.4042 2.63981 12.4125 2.63981 8.73751C2.63981 5.06251 5.63148 2.07084 9.30648 2.07084C12.9815 2.07084 15.9731 5.06251 15.9731 8.73751C15.9731 12.4125 12.9815 15.4042 9.30648 15.4042Z" fill="#1F2937" />
+                                </svg>
+                        </a>
+                        <Tooltip id="my-tooltip" />
+                    </div>
                     <div className='pb-2'>
                         <div className='w-40 text-sm pb-1.5'>入荷予定日</div>
                         <DatePicker
@@ -658,9 +690,10 @@ function PurchaseOrdersAdd() {
                             onChange={(date) => handleDateChange(date, 'estimated_delivery_date')}
                             dateFormat="yyyy-MM-dd"
                             className='border rounded px-4 py-2.5 bg-white w-[480px]'
-                            style={{width: "480px"}}
+                            style={{ width: "480px" }}
                             placeholderText='入荷予定日を選択'
                         />
+                        {errors.estimated_delivery_date && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.estimated_delivery_date}</div>}
                     </div>
                 </div>
                 <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>

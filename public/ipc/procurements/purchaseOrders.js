@@ -30,19 +30,13 @@ ipcMain.on('get-purchase-order-detail', (event, id) => {
 });
 
 // 発注書を保存
-ipcMain.on('save-purchase-order', (event, orderData) => {
-    savePurchaseOrder(orderData, (err) => {
-        console.log(orderData);
+ipcMain.on('save-purchase-order', (event, purchaseOrder) => {
+    savePurchaseOrder(purchaseOrder, (err, result) => {
         if (err) {
             console.error(err.message);
         } else {
-            loadPurchaseOrders((loadErr, rows) => {
-                if (loadErr) {
-                    console.error(loadErr.message);
-                } else {
-                    event.sender.send('load-purchase-orders', rows);
-                }
-            });
+            // 挿入したレコードのIDを返す
+            event.sender.send('save-purchase-order-result', { id: result.lastID });
         }
     });
 });

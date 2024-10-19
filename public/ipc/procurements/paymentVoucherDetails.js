@@ -5,7 +5,9 @@ const {
     savePaymentVoucherDetail, 
     deletePaymentVoucherDetailById, 
     editPaymentVoucherDetail, 
-    searchPaymentVoucherDetails 
+    searchPaymentVoucherDetails ,
+    searchPaymentVouchersByPaymentVoucherId,
+    deletePaymentVoucherDetailsByPvId
 } = require('../../database/procurements/paymentVoucherDetails');
 
 // 支払伝票明細のデータをロード
@@ -79,3 +81,27 @@ ipcMain.on('search-payment-voucher-details', (event, query) => {
         }
     });
 });
+
+// payment_vouchers テーブルでの検索処理
+ipcMain.on('search-payment-voucher-details-by-payment-voucher-id', (event, query) => {
+    searchPaymentVouchersByPaymentVoucherId(query, (err, results) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('search-payment-voucher-details-by-payment-voucher-id-result', results);
+        }
+    });
+});
+
+// payment_vouchers テーブルでの削除処理
+ipcMain.on('delete-payment-voucher-details-by-pv-id', (event, paymentVoucherId) => {
+    deletePaymentVoucherDetailsByPvId(paymentVoucherId, (err) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('payment-voucher-details-deleted-by-pv-id', paymentVoucherId);
+        }
+    });
+});
+
+

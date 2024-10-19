@@ -22,6 +22,7 @@ function getPaymentVoucherById(id, callback) {
 function savePaymentVoucher(voucherData, callback) {
     const {
         id,
+        code,
         order_date,
         vender_id,
         vender_name,
@@ -34,43 +35,42 @@ function savePaymentVoucher(voucherData, callback) {
         updated
     } = voucherData;
 
-    // if (id) {
-    //     console.log(voucherData);
-    //     db.run(
-    //         `UPDATE payment_vouchers SET 
-    //             id = ?,
-    //             order_date = ?, 
-    //             vender_id = ?, 
-    //             vender_name = ?, 
-    //             honorific = ?, 
-    //             vender_contact_person = ?, 
-    //             contact_person = ?, 
-    //             purchase_voucher_id = ?, 
-    //             remarks = ?, 
-    //             updated = datetime('now') 
-    //         WHERE id = ?`,
-    //         [
-    //             id,
-    //             order_date,
-    //             vender_id,
-    //             vender_name,
-    //             honorific,
-    //             vender_contact_person,
-    //             contact_person,
-    //             purchase_voucher_id,
-    //             remarks,
-    //             id
-    //         ],
-    //         callback
-    //     );
-    // } else {
+    if (id) {
+        db.run(
+            `UPDATE payment_vouchers SET 
+                code = ?,
+                order_date = ?, 
+                vender_id = ?, 
+                vender_name = ?, 
+                honorific = ?, 
+                vender_contact_person = ?, 
+                contact_person = ?, 
+                purchase_voucher_id = ?, 
+                remarks = ?, 
+                updated = datetime('now') 
+            WHERE id = ?`,
+            [
+                code,
+                order_date,
+                vender_id,
+                vender_name,
+                honorific,
+                vender_contact_person,
+                contact_person,
+                purchase_voucher_id,
+                remarks,
+                id
+            ],
+            callback
+        );
+    } else {
         db.run(
             `INSERT INTO payment_vouchers 
-            (id, order_date, vender_id, vender_name, honorific, vender_contact_person, contact_person, purchase_voucher_id, remarks, created, updated) 
+            (code, order_date, vender_id, vender_name, honorific, vender_contact_person, contact_person, purchase_voucher_id, remarks, created, updated) 
             VALUES 
             (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
             [
-                id,
+                code,
                 order_date,
                 vender_id,
                 vender_name,
@@ -82,7 +82,7 @@ function savePaymentVoucher(voucherData, callback) {
             ],
             callback
         );
-    // }
+    }
 }
 
 function deletePaymentVoucherById(id, callback) {
@@ -103,6 +103,7 @@ function initializeDatabase() {
     const sql = `
     CREATE TABLE IF NOT EXISTS payment_vouchers (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        code VARCHAR(255),
         order_date VARCHAR(255),
         vender_id VARCHAR(255),
         vender_name VARCHAR(255),
