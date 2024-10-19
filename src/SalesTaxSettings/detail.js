@@ -7,6 +7,22 @@ function SalesTaxSettingsDetail() {
     const { id } = useParams();
     const [contactPerson, setContactPerson] = useState(null);
 
+    useEffect(() => {
+        ipcRenderer.send('get-sales-tax-setting-detail', id);
+        ipcRenderer.on('set-sales-tax-setting-detail-data', (event, salesTaxSettingData) => {
+            setContactPerson(salesTaxSettingData);
+            console.log(contactPerson);
+        });
+        
+        return () => {
+            ipcRenderer.removeAllListeners('sales-tax-setting-detail-data');
+        };
+    }, [id]);
+
+    // if (!contactPerson) {
+    //     return <div>Loading...</div>;
+    // }
+
     return (
         <div className='mx-40'>
             <div className='p-8'>
@@ -32,7 +48,12 @@ function SalesTaxSettingsDetail() {
                 </div>
             </div>
         </div>
+
+
+
     );
+
+    
 }
 
 export default SalesTaxSettingsDetail;

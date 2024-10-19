@@ -7,8 +7,8 @@ function SetProductDetail() {
     const [product, setProduct] = useState(null);
 
     useEffect(() => {
-        ipcRenderer.send('get-product-detail', id);
-        ipcRenderer.on('product-detail-data', (event, productData) => {
+        ipcRenderer.send('get-set-product-detail', id);
+        ipcRenderer.on('set-product-detail-data', (event, productData) => {
             setProduct(productData);
         });
         
@@ -21,21 +21,23 @@ function SetProductDetail() {
         return <div>Loading...</div>;
     }
 
+    console.log(product);
+
     return (
         <div className='w-full'>
             <div className='p-8'>
-                <div className='text-2xl font-bold mb-8'>{product.name || '商品詳細'}</div>
+                <div className='text-2xl font-bold mb-8'>{product.set_product_name || '商品詳細'}</div>
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
-                        <div className='p-4'>商品名</div>
+                        <div className='p-4'>セット商品名</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{product.name || ''}</div>
+                        <div className='px-4 py-2.5'>{product.set_product_name || ''}</div>
                     </div>
                 </div>
                 <div className="flex bg-white">
                     <div className="w-1/5">
-                        <div className='p-4'>商品コード</div>
+                        <div className='p-4'>セット商品コード</div>
                     </div>
                     <div className="w-4/5 py-1.5">
                         <div className='px-4 py-2.5'>{product.id || ''}</div>
@@ -46,7 +48,7 @@ function SetProductDetail() {
                         <div className='p-4'>カテゴリー</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{product.classification_primary || ''}</div>
+                        <div className='px-4 py-2.5'>{product.category || ''}</div>
                     </div>
                 </div>
                 <div className="flex bg-white">
@@ -54,7 +56,7 @@ function SetProductDetail() {
                         <div className='p-4'>サブカテゴリー</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{product.classification_secondary || ''}</div>
+                        <div className='px-4 py-2.5'>{product.sub_category || ''}</div>
                     </div>
                 </div>
                 <div className="flex bg-gray-100">
@@ -67,74 +69,42 @@ function SetProductDetail() {
                 </div>
                 <div className="flex bg-white">
                     <div className="w-1/5">
-                        <div className='p-4'>標準売価</div>
+                        <div className='p-4'>税率</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{product.standard_retail_price ? `${product.standard_retail_price}円` : ''}</div>
+                        <div className='px-4 py-2.5'>{product.tax_rate ? `${product.tax_rate}%` : ''}</div>
                     </div>
                 </div>
                 <div className="flex bg-gray-100">
-                    <div className="w-1/5">
-                        <div className='p-4'>仕入単価</div>
-                    </div>
-                    <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{product.procurement_cost ? `${product.procurement_cost}円` : ''}</div>
-                    </div>
-                </div>
-                <div className="flex bg-white">
-                    <div className="w-1/5">
-                        <div className='p-4'>メーカー名</div>
-                    </div>
-                    <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{product.manufacturer_name || ''}</div>
-                    </div>
-                </div>
-                <div className="flex bg-gray-100">
-                    <div className="w-1/5">
-                        <div className='p-4'>規格・仕様</div>
-                    </div>
-                    <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{product.specification || ''}</div>
-                    </div>
-                </div>
-                <div className="flex bg-white">
-                    <div className="w-1/5">
-                        <div className='p-4'>単位</div>
-                    </div>
-                    <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{product.unit || ''}</div>
-                    </div>
-                </div>
-                <div className="flex bg-gray-100">
-                    <div className="w-1/5">
-                        <div className='p-4'>原産国</div>
-                    </div>
-                    <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{product.country_of_origin || ''}</div>
-                    </div>
-                </div>
-                <div className="flex bg-white">
-                    <div className="w-1/5">
-                        <div className='p-4'>保管場所</div>
-                    </div>
-                    <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{product.storage_location || ''}</div>
-                    </div>
-                </div>
-                <div className="flex bg-gray-100">
-                    <div className="w-1/5">
-                        <div className='p-4'>保管方法</div>
-                    </div>
-                    <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{product.storage_method || ''}</div>
-                    </div>
-                </div>
-                <div className="flex bg-white">
                     <div className="w-1/5">
                         <div className='p-4'>警告値</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{product.threshold ? `${product.threshold}個` : ''}</div>
+                        <div className='px-4 py-2.5'>{product.warning_threshold || ''}</div>
+                    </div>
+                </div>
+                <div className="flex bg-gray-100">
+                    <div className="w-1/5">
+                        <div className='p-4'>商品検索</div>
+                    </div>
+                    <div className="w-4/5 py-1.5">
+                        <div className='px-4 py-2.5'>{product.product_search || ''}</div>
+                    </div>
+                </div>
+                <div className="flex bg-gray-100">
+                    <div className="w-1/5">
+                        <div className='p-4'>セット内容</div>
+                    </div>
+                    <div className="w-4/5 py-1.5">
+                        <div className='px-4 py-2.5'>{product.set_product_contents || ''}</div>
+                    </div>
+                </div>
+                <div className="flex bg-white">
+                    <div className="w-1/5">
+                        <div className='p-4'>セット販売価格</div>
+                    </div>
+                    <div className="w-4/5 py-1.5">
+                        <div className='px-4 py-2.5'>{product.set_product_price ? `${product.set_product_price}円` : ''}</div>
                     </div>
                 </div>
             </div>

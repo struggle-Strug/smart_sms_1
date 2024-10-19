@@ -15,17 +15,16 @@ function SetProductList() {
     const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
-        ipcRenderer.send('load-products');
-        ipcRenderer.on('load-products', (event, data) => {
-            console.log(data)
+        ipcRenderer.send('load-set-products');
+        ipcRenderer.on('load-set-products', (event, data) => {
             setProducts(data);
         });
 
-        ipcRenderer.on('product-deleted', (event, id) => {
+        ipcRenderer.on('product-set-deleted', (event, id) => {
             setProducts((prevProducts) => prevProducts.filter(product => product.id !== id));
         });
 
-        ipcRenderer.on('search-products-result', (event, data) => {
+        ipcRenderer.on('search-set-products-result', (event, data) => {
             setProducts(data);
         });
 
@@ -37,7 +36,7 @@ function SetProductList() {
 
     const handleDelete = (id) => {
         if (window.confirm('本当にこの商品を削除しますか？')) {
-            ipcRenderer.send('delete-product', id);
+            ipcRenderer.send('delete-set-product', id);
         }
     };
 
@@ -53,7 +52,7 @@ function SetProductList() {
     };
 
     const handleSearch = () => {
-        ipcRenderer.send('search-products', searchQuery);
+        ipcRenderer.send('search-set-products', searchQuery);
     };
 
     const handleKeyDown = (event) => {
@@ -82,7 +81,7 @@ function SetProductList() {
     return (
         <div className='w-full'>
             <div className='p-8'>
-                <div className='pb-6 text-2xl font-bold'>商品一覧</div>
+                <div className='pb-6 text-2xl font-bold'>セット商品一覧</div>
                 <div className='flex'>
                 <div className='border rounded-lg py-3 px-7 mb-8 text-base font-bold bg-blue-600 text-white'><Link to="add" className={``}>新規登録</Link></div>
                 </div>
@@ -110,22 +109,22 @@ function SetProductList() {
                 <table className="w-full mt-8 table-auto">
                     <thead className=''>
                         <tr className='border-b'>
-                            <th className='text-left pb-2.5'>商品名</th>
-                            <th className='text-left pb-2.5'>商品コード</th>
+                            <th className='text-left pb-2.5'>セット商品名</th>
+                            <th className='text-left pb-2.5'>セット商品コード</th>
                             <th className='text-left pb-2.5'>カテゴリー</th>
                             <th className='text-left pb-2.5'>サブカテゴリー</th>
-                            <th className='text-left pb-2.5'>標準売価</th>
+                            <th className='text-left pb-2.5'>販売売価</th>
                             <th className='text-right'></th>
                         </tr>
                     </thead>
                     <tbody>
                         {products.map((product) => (
                             <tr className='border-b' key={product.id}>
-                                <td>{product.name || <div className='border w-4'></div>}</td>
-                                <td>{product.classification_primary || <div className='border w-4'></div>}</td>
-                                <td>{product.standard_retail_price || <div className='border w-4'></div>}</td>
-                                <td>{product.standard_retail_price || <div className='border w-4'></div>}</td>
-                                <td>{product.standard_retail_price || <div className='border w-4'></div>}</td>
+                                <td>{product.set_product_name || <div className='border w-4'></div>}</td>
+                                <td>{product.id || <div className='border w-4'></div>}</td>
+                                <td>{product.category || <div className='border w-4'></div>}</td>
+                                <td>{product.sub_category || <div className='border w-4'></div>}</td>
+                                <td>{product.set_product_price || <div className='border w-4'></div>}</td>
                                 <td className='flex justify-center relative'>
                                     <div className='border rounded px-4 py-3 relative' onClick={(e) => toggleDropdown(product.id)}>
                                     {isOpen === product.id && <DropDown id={product.id} />}

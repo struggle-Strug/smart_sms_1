@@ -16,6 +16,8 @@ require('./ipc/masters/companies');
 require('./ipc/masters/primarySections');
 require('./ipc/masters/secondarySections');
 require('./ipc/masters/shops');
+require('./ipc/masters/setProducts'); // 追加
+require('./ipc/dashboard/salesTaxSettings'); // 追加
 
 //仕入管理
 require('./ipc/procurements/purchaseOrders');
@@ -72,6 +74,10 @@ function createWindow() {
   secondarySectionsDB.initializeDatabase();
   const shopsSectionsDB = require('./database/masters/shops');
   shopsSectionsDB.initializeDatabase();
+  const setProductsSectionsDB = require('./database/masters/setProducts'); // 追加
+  setProductsSectionsDB.initializeDatabase();
+  const setTaxesDB = require('./database/dashboard/salesTaxSettings'); // 追加
+  setTaxesDB.initializeDatabase();
 
   // 仕入管理
   const purchaseOrdersDB = require('./database/procurements/purchaseOrders');

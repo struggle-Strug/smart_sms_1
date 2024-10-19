@@ -9,6 +9,7 @@ const { ipcRenderer } = window.require('electron');
 function ProductEdit() {
     const { id } = useParams(); // URLから商品のIDを取得
     const [product, setProduct] = useState({
+        // id: id, //追加
         name: '',
         classification_primary: '',
         classification_secondary: '',
