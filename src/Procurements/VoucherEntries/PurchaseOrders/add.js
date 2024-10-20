@@ -11,11 +11,6 @@ import 'react-datepicker/dist/react-datepicker.css';
 const { ipcRenderer } = window.require('electron');
 
 function PurchaseOrdersAdd() {
-    const options = [
-        { value: '御中', label: '御中' },
-        { value: '貴社', label: '貴社' },
-    ];
-
     const [isVendorIdFocused, setIsVendorIdFocused] = useState(false);
     const [isVendorNameFocused, setIsVendorNameFocused] = useState(false);
     const [isProductIdFocused, setIsProductIdFocused] = useState(-1);
@@ -135,7 +130,6 @@ function PurchaseOrdersAdd() {
 
     const handleInputChange = (index, e) => {
         const { name, value } = e.target;
-        console.log(name)
         if (name === "product_id") {
             ipcRenderer.send('search-id-products', value);
         }
@@ -271,7 +265,6 @@ function PurchaseOrdersAdd() {
     const handleDateChange = (date, name) => {
         // 日付をフォーマットしてpurchaseOrderにセット
         const formattedDate = date ? date.toISOString().split('T')[0] : '';
-        console.log(formattedDate)
         setPurchaseOrder({ ...purchaseOrder, [name]: formattedDate });
     };
 
@@ -279,7 +272,7 @@ function PurchaseOrdersAdd() {
         <div className='w-full mb-20'>
             <div className=''>
                 <div className='pt-8 pb-6 flex border-b px-8 items-center'>
-                    <div className='text-2xl font-bold'>新規作成</div>
+                    <div className='text-2xl font-bold'>発注伝票</div>
                     <div className='flex ml-auto'>
                         <Link to="/invoice-settings" className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
                             <div className='pr-1.5 pl-1 flex items-center'>

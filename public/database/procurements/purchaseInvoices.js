@@ -68,7 +68,13 @@ function savePurchaseInvoice(invoiceData, callback) {
                 payment_method,
                 id
             ],
-            callback
+            function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                // 更新のため、IDをそのまま返す
+                callback(null, { lastID: id });
+            }
         );
     } else {
         db.run(
@@ -90,7 +96,12 @@ function savePurchaseInvoice(invoiceData, callback) {
                 payment_due_date,
                 payment_method
             ],
-            callback
+            function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                callback(null, { lastID: this.lastID });
+            }
         );
     }
 }

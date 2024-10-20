@@ -93,15 +93,6 @@ function App() {
                     <Link to="/procurement/summary-and-management-sheets/inventory-sheet">在庫表</Link>
                     </div>
                   </div>
-                  {/* <div className='px-3 pb-4'>
-                    <div className='font-bold flex items-center'>
-                      <div className='w-24'>請求処理</div>
-                      <div className='border w-full'></div>
-                    </div>
-                    <div className='grid grid-cols-2 text-gray-600'>
-                      <div>請求処理</div>
-                    </div>
-                  </div> */}
                 </div>
               </div>
             )}

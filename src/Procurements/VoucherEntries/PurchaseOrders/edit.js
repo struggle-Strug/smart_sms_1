@@ -203,7 +203,7 @@ function PurchaseOrdersEdit() {
 
     const handleSubmit = () => {
         setErrors(null);
-        validator.required(purchaseOrder.id, 'id', '伝票番号');
+        validator.required(purchaseOrder.code, 'code', '伝票番号');
         validator.required(purchaseOrder.order_date, 'order_date', '発注日付');
         validator.required(purchaseOrder.vender_id, 'vender_id', '仕入先コード');
         validator.required(purchaseOrder.vender_name, 'vender_name', '仕入先名');

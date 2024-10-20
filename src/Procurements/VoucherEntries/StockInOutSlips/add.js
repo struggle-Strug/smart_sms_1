@@ -3,17 +3,57 @@ import { useParams } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip'
 import CustomSelect from '../../../Components/CustomSelect';
+import ListTooltip from '../../../Components/ListTooltip';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Validator from '../../../utils/validator';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 const { ipcRenderer } = window.require('electron');
 
 function StockInOutSlipsAdd() {
     const options = [
-        { value: '御中', label: '御中' },
-        { value: '貴社', label: '貴社' },
+        { value: '倉庫A', label: '倉庫A' },
+        { value: '倉庫B', label: '倉庫B' },
     ];
+    const [isVendorIdFocused, setIsVendorIdFocused] = useState(false);
+    const [isVendorNameFocused, setIsVendorNameFocused] = useState(false);
+    const [isProductIdFocused, setIsProductIdFocused] = useState(-1);
+    const [isProductNameFocused, setIsProductNameFocused] = useState(-1);
+    const [errors, setErrors] = useState({});
 
-    const [stockInOutSlips, setStockInOutSlips] = useState({
+    const handleFocus = () => {
+        setIsVendorIdFocused(true);
+    };
+
+    const handleBlur = () => {
+        setIsVendorIdFocused(false);
+    };
+
+    const handleVendorNameFocus = () => {
+        setIsVendorNameFocused(true);
+    };
+
+    const handleVendorNameBlur = () => {
+        setIsVendorNameFocused(false);
+    };
+
+    const handleProductIdFocus = (index) => {
+        setIsProductIdFocused(index)
+    }
+
+    const handleeProductIdBlur = () => {
+        setIsProductIdFocused(-1);
+    };
+
+    const handleProductNameFocus = (index) => {
+        setIsProductNameFocused(index)
+    }
+
+    const handleeProductNameBlur = () => {
+        setIsProductNameFocused(-1);
+    };
+
+    const [stockInOutSlip, setStockInOutSlip] = useState({
         id: '',
         stock_in_out_date: '',
         processType: '',
@@ -22,6 +62,36 @@ function StockInOutSlipsAdd() {
         contact_person: '',
         remarks: '',
     });
+
+    const [vendors, setVendors] = useState([])
+    const [products, setProducts] = useState([])
+
+    useEffect(() => {
+        ipcRenderer.on('search-id-vendors-result', (event, data) => {
+            setVendors(data);
+        });
+
+        ipcRenderer.on('search-name-vendors-result', (event, data) => {
+            setVendors(data);
+        });
+
+        ipcRenderer.on('search-id-products-result', (event, data) => {
+            setProducts(data);
+        });
+
+        ipcRenderer.on('search-name-products-result', (event, data) => {
+            setProducts(data);
+        });
+
+
+        return () => {
+            ipcRenderer.removeAllListeners('search-id-vendors-result');
+            ipcRenderer.removeAllListeners('search-name-vendors-result');
+            ipcRenderer.removeAllListeners('search-id-products-result');
+            ipcRenderer.removeAllListeners('search-name-products-result');
+        };
+    }, []);
+
 
     const [stockInOutSlipDetails, setStockInOutSlipDetails] = useState([
         {
@@ -56,6 +126,13 @@ function StockInOutSlipsAdd() {
 
     const handleInputChange = (index, e) => {
         const { name, value } = e.target;
+        if (name === "product_id") {
+            ipcRenderer.send('search-id-products', value);
+        }
+
+        if (name === "product_name") {
+            ipcRenderer.send('search-name-products', value);
+        }
         const updatedDetails = stockInOutSlipDetails.map((detail, i) =>
             i === index ? { ...detail, [name]: value } : detail
         );
@@ -64,43 +141,133 @@ function StockInOutSlipsAdd() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setStockInOutSlips({ ...stockInOutSlips, [name]: value });
+        if (name === "vender_id") {
+            ipcRenderer.send('search-id-vendors', value);
+        }
+
+        if (name === "vender_name") {
+            ipcRenderer.send('search-name-vendors', value);
+        }
+        setStockInOutSlip({ ...stockInOutSlip, [name]: value });
     };
+
+
+    const handleOnClick = (name, value) => {
+        setStockInOutSlip({ ...stockInOutSlip, [name]: value });
+    };
+
+    const handleOnDetailClick = (name, value, index) => {
+        const updatedDetails = stockInOutSlipDetails.map((detail, i) =>
+            i === index ? { ...detail, [name]: value } : detail
+        );
+        setStockInOutSlipDetails(updatedDetails);
+    };
+
+
 
     const validator = new Validator();
 
     const handleSubmit = () => {
-        validator.required(stockInOutSlips.id, 'id', '伝票番号');
-        validator.required(stockInOutSlips.stock_in_out_date, 'stock_in_out_date', '発注日付');
-
+        setErrors(null);
+        validator.required(stockInOutSlip.code, 'code', '伝票番号');
+        validator.required(stockInOutSlip.stock_in_out_date, 'stock_in_out_date', '発注日付');
+        validator.required(stockInOutSlip.processType, 'processType', '処理種別');
         for (let i = 0; i < stockInOutSlipDetails.length; i++) {
-            ipcRenderer.send('save-stock-in-out-slip-detail', stockInOutSlipDetails[i]);
+            validator.required(stockInOutSlipDetails[i].product_id, 'product_id' + i, '商品コード');
+            validator.required(stockInOutSlipDetails[i].product_name, 'product_name' + i, '商品名');
+            validator.required(stockInOutSlipDetails[i].number, 'number' + i, '数量');
+            validator.required(stockInOutSlipDetails[i].price, 'price' + i, '値段');
         }
+        setErrors(validator.getErrors());
 
         if (!validator.hasErrors()) {
 
-            ipcRenderer.send('save-stock-in-out-slip', stockInOutSlips);
-            setStockInOutSlips({
-                id: '',
+            ipcRenderer.send('save-stock-in-out-slip', stockInOutSlip);
+            ipcRenderer.on('get-stock-in-out-slip-data-result', (event, data) => {
+                for (let i = 0; i < stockInOutSlipDetails.length; i++) {
+                    const stockInOutSlipDetailData = stockInOutSlipDetails[i];
+                    stockInOutSlipDetailData.stock_in_out_slip_id = data.id;
+                    ipcRenderer.send('save-stock-in-out-slip-detail', stockInOutSlipDetailData);
+                }
+            });
+            setStockInOutSlip({
+                code: '',
                 stock_in_out_date: '',
-                processType: '',
-                warehouse_from: '',
-                warehouse_to: '',
-                contact_person: '',
+                vender_id: '',
+                vender_name: '',
+                honorific: '',
+                vender_contact_person: '',
                 remarks: '',
+                closing_date: '',
+                payment_due_date: '',
                 payment_method: '',
+                estimated_delivery_date: '',
             });
             alert('新規登録が完了しました。');
         }
     };
 
+
+    const handleSumPrice = () => {
+        let SumPrice = 0
+
+        for (let i = 0; i < stockInOutSlipDetails.length; i++) {
+            SumPrice += stockInOutSlipDetails[i].price * stockInOutSlipDetails[i].number;
+        }
+
+        return { "subtotal": SumPrice, "consumptionTaxEight": SumPrice * 0.08, "consumptionTaxTen": 0, "totalConsumptionTax": SumPrice * 0.08, "Total": SumPrice * 1.08 }
+    }
+
+    const [isOpen, setIsOpen] = useState(null);
+    const [selectedOption, setSelectedOption] = useState(null);
+    const dropdownRef = useRef(null);
+
+    const toggleDropdown = (name) => {
+        if (isOpen === name) return setIsOpen(null)
+        setIsOpen(name);
+    };
+
+    const selectOption = (option, name, index) => {
+        setSelectedOption(option);
+        const updatedDetails = stockInOutSlipDetails.map((detail, i) =>
+            i === index ? { ...detail, [name]: option.value } : detail
+        );
+        setStockInOutSlipDetails(updatedDetails);
+        setIsOpen(name);
+    };
+
+    const selectStockInOutSlipOption = (option, name) => {
+        setSelectedOption(option);
+        setStockInOutSlip({ ...stockInOutSlip, [name]: option.value });
+        setIsOpen(name);
+    };
+
+    const handleClickOutside = (event) => {
+        // if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        //     setIsOpen(null);
+        // }
+    };
+
+    useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    const handleDateChange = (date, name) => {
+        // 日付をフォーマットしてstockInOutSlipにセット
+        const formattedDate = date ? date.toISOString().split('T')[0] : '';
+        setStockInOutSlip({ ...stockInOutSlip, [name]: formattedDate });
+    };
+
     return (
-        <div className='w-full'>
+        <div className='w-5/6 mb-20'>
             <div className=''>
                 <div className='pt-8 pb-6 flex border-b px-8 items-center'>
-                    <div className='text-2xl font-bold'>{'株式会社テスト'}</div>
+                    <div className='text-2xl font-bold'>発注伝票</div>
                     <div className='flex ml-auto'>
-                        <Link to="/stock-in-output-invoice-settings" className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
+                        <Link to="/invoice-settings" className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
                             <div className='pr-1.5 pl-1 flex items-center'>
                                 <svg width="21" height="19" viewBox="0 0 21 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M17.3926 5.72949H16.3926V0.729492H4.39258V5.72949H3.39258C1.73258 5.72949 0.392578 7.06949 0.392578 8.72949V14.7295H4.39258V18.7295H16.3926V14.7295H20.3926V8.72949C20.3926 7.06949 19.0526 5.72949 17.3926 5.72949ZM6.39258 2.72949H14.3926V5.72949H6.39258V2.72949ZM14.3926 16.7295H6.39258V12.7295H14.3926V16.7295ZM16.3926 12.7295V10.7295H4.39258V12.7295H2.39258V8.72949C2.39258 8.17949 2.84258 7.72949 3.39258 7.72949H17.3926C17.9426 7.72949 18.3926 8.17949 18.3926 8.72949V12.7295H16.3926Z" fill="#1F2937" />
@@ -112,14 +279,22 @@ function StockInOutSlipsAdd() {
                     </div>
                 </div>
                 <div className='px-8 py-6'>
-                    <div className='pt-2.5 pb-4 font-bold text-xl'>伝票情報</div>
-                    <div className='pb-4'>
-                        <div className='w-40 text-sm pb-1.5'>伝票番号 <span className='ml-2 text-xs font-bold text-red-600'>必須</span></div>
-                        <input type='number' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="id" value={stockInOutSlips.id} onChange={handleChange} />
+                    <div className='py-2.5 font-bold text-xl'>伝票番号</div>
+                    <div className='pb-2'>
+                        <div className='w-40 text-sm pb-1.5'>伝票番号 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white  w-[480px]' placeholder='' name="code" value={stockInOutSlip.code} onChange={handleChange} />
+                        {errors.code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.code}</div>}
                     </div>
-                    <div className='pb-4'>
-                        <div className='w-40 text-sm pb-1.5'>入出庫日付 <span className='ml-2 text-xs font-bold text-red-600'>必須</span></div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="stock_in_out_date" value={stockInOutSlips.stock_in_out_date} onChange={handleChange} />
+                    <div className='pb-2'>
+                        <div className='w-40 text-sm pb-1.5'>入出庫日付 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                        <DatePicker
+                            selected={stockInOutSlip.stock_in_out_date ? new Date(stockInOutSlip.stock_in_out_date) : null}
+                            onChange={(date) => handleDateChange(date, "stock_in_out_date")}
+                            dateFormat="yyyy-MM-dd"
+                            className='border rounded px-4 py-2.5 bg-white  w-[480px]'
+                            placeholderText='発注日付を選択'
+                        />
+                        {errors.stock_in_out_date && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.stock_in_out_date}</div>}
                     </div>
                     <div className='w-40 text-sm pb-1.5 flex items-center'>
                         処理種別
@@ -162,6 +337,10 @@ function StockInOutSlipsAdd() {
                             振替
                         </label>
                     </div>
+                    {errors.processType && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.processType}</div>}
+                    <div className='py-3'>
+                        <hr className='' />
+                    </div>
                     <div className='pb-2'>
                         <div className='flex items-center text-sm pb-1.5'>出庫元倉庫
                             <a href="#" className="my-tooltip ml-2.5">
@@ -170,10 +349,41 @@ function StockInOutSlipsAdd() {
                                 </svg>
                             </a>
                         </div>
-                        <div className="w-1/2 pb-1.5">
-                            <CustomSelect placeholder={""} options={options} name={"warehouse_to"} data={stockInOutSlips} setData={setStockInOutSlips} />
+                        <div className="w-[480px] pb-1.5">
+                            {/* <CustomSelect placeholder={""} options={options} name={"warehouse_to"} data={stockInOutSlip} setData={setStockInOutSlip} /> */}
+                            <div className="relative" ref={dropdownRef}>
+                                <div
+                                    className="bg-white border rounded px-4 py-2.5 cursor-pointer flex justify-between items-center"
+                                    onClick={() => toggleDropdown("warehouse_to")}
+                                >
+                                    <span>{stockInOutSlip.warehouse_to ? stockInOutSlip.warehouse_to : "倉庫"}</span>
+                                    <svg
+                                        className={`w-4 h-4 transform transition-transform ${isOpen === "warehouse_to" ? 'rotate-180' : ''}`}
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+
+                                {isOpen === "warehouse_to" && (
+                                    <div className="absolute z-10 mt-1 w-full bg-white border  rounded-md shadow-lg max-h-60 overflow-auto">
+                                        {[{ label: "倉庫A", value: "倉庫A" }, { label: "倉庫B", value: "倉庫B" }].map((option) => (
+                                            <div
+                                                key={option.value}
+                                                className="cursor-pointer p-2 hover:bg-gray-100"
+                                                onClick={() => selectStockInOutSlipOption(option, "warehouse_to")}
+                                            >
+                                                {option.label}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                        <CustomSelect />
+                        {/* <CustomSelect /> */}
                     </div>
                     <div className='pb-2'>
                         <div className='flex items-center text-sm pb-1.5'>入庫先倉庫
@@ -183,190 +393,211 @@ function StockInOutSlipsAdd() {
                                 </svg>
                             </a>
                         </div>
-                        <div className="w-1/2 pb-1.5">
-                            <CustomSelect placeholder={""} options={options} name={"warehouse_from"} data={stockInOutSlips} setData={setStockInOutSlips} />
-                        </div>
-                    </div>
-                    <div className='pb-2'>
-                        <div className='flex items-center text-sm pb-1.5'>担当者
-                        </div>
-                        <div className="w-1/2 pb-1.5">
-                            <CustomSelect placeholder={""} options={options} name={"contact_person"} data={stockInOutSlips} setData={setStockInOutSlips} />
-                        </div>
-                    </div>
-                </div>
-                <div className='py-3'>
-                    <hr className='' />
-                </div>
-                <div className='pl-8 py-2.5 font-bold text-xl'>明細</div>
-                {/* <div className='flex items-center pl-8'>
-                    <div>
-                        <div className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>＋</div>
-                    </div>
-                    <div className=''>
-                        <div className='flex items-center'>
-                            <div className=''>
-                                <div className='text-sm pb-1.5'>商品コード <span className='ml-2 text-xs font-bold text-red-600'>必須</span></div>
-                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "120px" }} />
-                            </div>
-                            <div className='ml-4'>
-                                <div className='text-sm pb-1.5'>商品名 <span className='ml-2 text-xs font-bold text-red-600'>必須</span></div>
-                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "440px" }} />
-                            </div>
-                            <div className='ml-4'>
-                                <div className='text-sm pb-1.5'>数量 <span className='ml-2 text-xs font-bold text-red-600'>必須</span></div>
-                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "180px" }} />
-                            </div>
-                            <div className='ml-4'>
-                                <div className='text-sm pb-1.5'>単位</div>
-                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "120px" }} />
-                            </div>
-                            <div className='ml-4'>
-                                <div className='text-sm pb-1.5'>単価 <span className='ml-2 text-xs font-bold text-red-600'>必須</span></div>
-                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "180px" }} />
-                            </div>
-                        </div>
-                        <div className='flex items-center mt-4'>
-                            <div className=''>
-                                <div className='text-sm pb-1.5'>ロット番号</div>
-                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="" value={""} style={{ width: "120px" }} />
-                            </div>
-                        </div>
-                    </div>
-                    <div className='ml-4'>
-                        <div className='py-3 px-4 border rounded-lg text-base font-bold flex'>
-                            <svg width="15" height="19" viewBox="0 0 15 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M11.3926 6.72949V16.7295H3.39258V6.72949H11.3926ZM9.89258 0.729492H4.89258L3.89258 1.72949H0.392578V3.72949H14.3926V1.72949H10.8926L9.89258 0.729492ZM13.3926 4.72949H1.39258V16.7295C1.39258 17.8295 2.29258 18.7295 3.39258 18.7295H11.3926C12.4926 18.7295 13.3926 17.8295 13.3926 16.7295V4.72949Z" fill="#1F2937" />
-                            </svg>
-                        </div>
-                    </div>
-                </div> */}
-                {/* <div className='py-2.5 font-bold text-xl'>明細</div> */}
-                {/* <div className='pb-6 flex flex-col mr-14'>
-                    <div className='flex items-center mr-10 pb-6'>
-                        <div className='ml-auto flex'>消費税額</div>
-                        <div className='ml-4'>0円</div>
-                        <div className='ml-10 flex'>金額</div>
-                        <div className='ml-4 text-lg font-semibold'>0円</div>
-                    </div>
-                    <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
-                        <div className='flex pb-2'>
-                            <div className='w-40'>税抜合計</div>
-                            <div>5,000円</div>
-                        </div>
-                        <div className='flex pb-2'>
-                            <div className='w-40'>消費税(8%)</div>
-                            <div>5,000円</div>
-                        </div>
-                        <div className='flex pb-2'>
-                            <div className='w-40'>消費税(10%)</div>
-                            <div>5,000円</div>
-                        </div>
-                        <div className='flex pb-2'>
-                            <div className='w-40'>消費税合計</div>
-                            <div>5,000円</div>
-                        </div>
-                        <div className='flex'>
-                            <div className='w-40'>税込合計</div>
-                            <div>5,000円</div>
-                        </div>
-                    </div>
-                </div> */}
-
-
-                {
-                    stockInOutSlipDetails.map((stockInOutSlipDetail, index) => (
-                        <div className='flex items-center'>
-                            <div>
-                                <div className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex' onClick={addStockInOutSlipDetail}>＋</div>
-                            </div>
-                            <div className=''>
-                                <div className='flex items-center'>
-                                    <div className=''>
-                                        <div className='text-sm pb-1.5'>商品コード <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                        <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="product_id" value={stockInOutSlipDetail.product_id} onChange={(e) => handleInputChange(index, e)} style={{ width: "120px" }} />
-                                    </div>
-                                    <div className='ml-4'>
-                                        <div className='text-sm pb-1.5'>商品名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                        <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="product_name" value={stockInOutSlipDetail.product_name} onChange={(e) => handleInputChange(index, e)} style={{ width: "440px" }} />
-                                    </div>
-                                    <div className='ml-4'>
-                                        <div className='text-sm pb-1.5'>数量 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                        <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="number" value={stockInOutSlipDetail.number} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
-                                    </div>
-                                    <div className='ml-4'>
-                                        <div className='text-sm pb-1.5'>単位 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                        <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="unit" value={stockInOutSlipDetail.unit} onChange={(e) => handleInputChange(index, e)} style={{ width: "120px" }} />
-                                    </div>
-                                    <div className='ml-4'>
-                                        <div className='text-sm pb-1.5'>単価 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                        <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="price" value={stockInOutSlipDetail.price} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
-                                    </div>
-                                    <div className='ml-4'>
-                                        <div className='text-sm pb-1.5'>ロット番号 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                        <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="lot_number" value={stockInOutSlipDetail.lot_number} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='ml-4'>
-                                <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={(e) => removeStockInOutSlipDetail(index)}>
-                                    <svg width="15" height="19" viewBox="0 0 15 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M11.3926 6.72949V16.7295H3.39258V6.72949H11.3926ZM9.89258 0.729492H4.89258L3.89258 1.72949H0.392578V3.72949H14.3926V1.72949H10.8926L9.89258 0.729492ZM13.3926 4.72949H1.39258V16.7295C1.39258 17.8295 2.29258 18.7295 3.39258 18.7295H11.3926C12.4926 18.7295 13.3926 17.8295 13.3926 16.7295V4.72949Z" fill="#1F2937" />
+                        <div className="w-[480px] pb-1.5">
+                            <div className="relative" ref={dropdownRef}>
+                                <div
+                                    className="bg-white border rounded px-4 py-2.5 cursor-pointer flex justify-between items-center"
+                                    onClick={() => toggleDropdown("warehouse_from")}
+                                >
+                                    <span>{stockInOutSlip.warehouse_from ? stockInOutSlip.warehouse_from : "倉庫"}</span>
+                                    <svg
+                                        className={`w-4 h-4 transform transition-transform ${isOpen === "warehouse_from" ? 'rotate-180' : ''}`}
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </div>
+
+                                {isOpen === "warehouse_from" && (
+                                    <div className="absolute z-10 mt-1 w-full bg-white border  rounded-md shadow-lg max-h-60 overflow-auto">
+                                        {[{ label: "倉庫A", value: "倉庫A" }, { label: "倉庫B", value: "倉庫B" }].map((option) => (
+                                            <div
+                                                key={option.value}
+                                                className="cursor-pointer p-2 hover:bg-gray-100"
+                                                onClick={() => selectStockInOutSlipOption(option, "warehouse_from")}
+                                            >
+                                                {option.label}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
-                        </div>
-                    ))
-                }
-                <div className='py-3'>
-                    <hr className='' />
-                </div>
-                <div className='py-6 flex'>
-                    <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
-                        <div className='flex pb-2'>
-                            <div className='w-40'>税抜合計</div>
-                            <div>5,000円</div>
-                        </div>
-                        <div className='flex pb-2'>
-                            <div className='w-40'>消費税(8%)</div>
-                            <div>5,000円</div>
-                        </div>
-                        <div className='flex pb-2'>
-                            <div className='w-40'>消費税(10%)</div>
-                            <div>5,000円</div>
-                        </div>
-                        <div className='flex pb-2'>
-                            <div className='w-40'>消費税合計</div>
-                            <div>5,000円</div>
-                        </div>
-                        <div className='flex'>
-                            <div className='w-40'>税込合計</div>
-                            <div>5,000円</div>
+                            {/* <CustomSelect placeholder={""} options={options} name={"warehouse_from"} data={stockInOutSlip} setData={setStockInOutSlip} /> */}
                         </div>
                     </div>
-                </div>
-                <div className='py-3'>
-                    <hr className='' />
-                </div>
-
-                <div className='py-3'>
-                    <hr className='' />
-                </div>
-                <div className='pl-8 py-2.5 font-bold text-xl'>備考</div>
-                <div className='pl-8'>
-                    <textarea className='border rounded px-4 py-2.5 bg-white w-4/5 resize-none mb-16' placeholder='' rows={5} name="remarks" value={stockInOutSlips.remarks} onChange={handleChange} ></textarea>
+                    <div className='py-3'>
+                        <hr className='' />
+                    </div>
+                    <div className='py-2.5 font-bold text-xl'>明細</div>
+                    {
+                        stockInOutSlipDetails.map((stockInOutSlipDetail, index) => (
+                            <div>
+                                <div className='flex items-center'>
+                                    <div>
+                                        <div className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex' onClick={addStockInOutSlipDetail}>＋</div>
+                                    </div>
+                                    <div className=''>
+                                        <div className='flex items-center'>
+                                            <div className='relative'>
+                                                <div className='text-sm pb-1.5'>商品コード <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                                <input type='number'
+                                                    className='border rounded px-4 py-2.5 bg-white w-30'
+                                                    placeholder=''
+                                                    name="product_id"
+                                                    value={stockInOutSlipDetail.product_id}
+                                                    onChange={(e) => handleInputChange(index, e)}
+                                                    style={{ width: "120px" }}
+                                                    onFocus={(e) => handleProductIdFocus(index)}
+                                                    onBlur={handleeProductIdBlur}
+                                                />
+                                                {
+                                                    isProductIdFocused === index &&
+                                                    <div className='absolute top-20 left-0 z-10' onMouseDown={(e) => e.preventDefault()}>
+                                                        <div className="relative inline-block">
+                                                            <div className="absolute left-5 -top-2 w-3 h-3 bg-white transform rotate-45 shadow-lg"></div>
+                                                            <div className="bg-white shadow-lg rounded-lg p-4 w-60">
+                                                                <div className="flex flex-col space-y-2">
+                                                                    {
+                                                                        products.map((product, idx) => (
+                                                                            <div key={idx}
+                                                                                className="p-2 hover:bg-gray-100 hover:cursor-pointer"
+                                                                                onClick={(e) => handleOnDetailClick("product_id", product.id, index)}
+                                                                            >
+                                                                                {product.name}
+                                                                            </div>
+                                                                        ))
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                            <div className='ml-4 relative'>
+                                                <div className='text-sm pb-1.5'>商品名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                                <input type='text'
+                                                    className='border rounded px-4 py-2.5 bg-white'
+                                                    placeholder=''
+                                                    name="product_name"
+                                                    value={stockInOutSlipDetail.product_name}
+                                                    onChange={(e) => handleInputChange(index, e)}
+                                                    style={{ width: "400px" }}
+                                                    onFocus={(e) => handleProductNameFocus(index)}
+                                                    onBlur={handleeProductNameBlur}
+                                                />
+                                                {
+                                                    isProductNameFocused === index &&
+                                                    <div className='absolute top-20 left-0 z-10' onMouseDown={(e) => e.preventDefault()}>
+                                                        <div className="relative inline-block">
+                                                            <div className="absolute left-5 -top-2 w-3 h-3 bg-white transform rotate-45 shadow-lg"></div>
+                                                            <div className="bg-white shadow-lg rounded-lg p-4 w-60">
+                                                                <div className="flex flex-col space-y-2">
+                                                                    {
+                                                                        products.map((product, idx) => (
+                                                                            <div key={idx}
+                                                                                className="p-2 hover:bg-gray-100 hover:cursor-pointer"
+                                                                                onClick={(e) => handleOnDetailClick("product_name", product.name, index)}
+                                                                            >
+                                                                                {product.name}
+                                                                            </div>
+                                                                        ))
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                            <div className='ml-4'>
+                                                <div className='text-sm pb-1.5'>数量 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                                <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="number" value={stockInOutSlipDetail.number} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
+                                            </div>
+                                            <div className='ml-4'>
+                                                <div className='text-sm pb-1.5'>単位</div>
+                                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="unit" value={stockInOutSlipDetail.unit} onChange={(e) => handleInputChange(index, e)} style={{ width: "120px" }} />
+                                            </div>
+                                            <div className='ml-4'>
+                                                <div className='text-sm pb-1.5'>単価 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                                <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="price" value={stockInOutSlipDetail.price} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
+                                            </div>
+                                        </div>
+                                        {errors["product_id" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["product_id" + index]}</div>}
+                                        {errors["product_name" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["product_name" + index]}</div>}
+                                        {errors["number" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["number" + index]}</div>}
+                                        {errors["price" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["price" + index]}</div>}
+                                        <div className='flex items-center mt-4'>
+                                            <div className=''>
+                                                <div className='text-sm pb-1.5'>ロット番号</div>
+                                                <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="lot_number" value={stockInOutSlipDetail.lot_number} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className='ml-4'>
+                                        <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={(e) => removeStockInOutSlipDetail(index)}>
+                                            <svg width="15" height="19" viewBox="0 0 15 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M11.3926 6.72949V16.7295H3.39258V6.72949H11.3926ZM9.89258 0.729492H4.89258L3.89258 1.72949H0.392578V3.72949H14.3926V1.72949H10.8926L9.89258 0.729492ZM13.3926 4.72949H1.39258V16.7295C1.39258 17.8295 2.29258 18.7295 3.39258 18.7295H11.3926C12.4926 18.7295 13.3926 17.8295 13.3926 16.7295V4.72949Z" fill="#1F2937" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className='flex items-center justify-end'>
+                                    <div className='flex items-center'>
+                                        <div className='mr-4'>消費税額</div>
+                                        <div className='mr-4'>{(stockInOutSlipDetails[index].price * stockInOutSlipDetails[index].number * 0.08).toFixed(0)}円</div>
+                                        <div className='mr-4'>金額</div>
+                                        <div className='text-lg font-bold'>{(stockInOutSlipDetails[index].price * stockInOutSlipDetails[index].number * 1.08).toFixed(0)}円</div>
+                                    </div>
+                                </div>
+                                <hr className='py-3' />
+                            </div>
+                        ))
+                    }
+                    <div className='py-3'>
+                        <hr className='' />
+                    </div>
+                    <div className='py-6 flex'>
+                        <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>税抜合計</div>
+                                <div>{handleSumPrice().subtotal.toFixed(0).toLocaleString()}円</div>
+                            </div>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>消費税(8%)</div>
+                                <div>{handleSumPrice().consumptionTaxEight.toFixed(0).toLocaleString()}円</div>
+                            </div>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>消費税(10%)</div>
+                                <div>{handleSumPrice().consumptionTaxTen.toFixed(0).toLocaleString()}円</div>
+                            </div>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>消費税合計</div>
+                                <div>{handleSumPrice().totalConsumptionTax.toFixed(0).toLocaleString()}円</div>
+                            </div>
+                            <div className='flex'>
+                                <div className='w-40'>税込合計</div>
+                                <div>{handleSumPrice().Total.toFixed(0).toLocaleString()}円</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className='py-3'>
+                        <hr className='' />
+                    </div>
+                    <div className='py-2.5 font-bold text-xl'>備考</div>
+                    <div className='pb-2'>
+                        <textarea className='border rounded px-4 py-2.5 bg-white w-full resize-none' placeholder='' name="remarks" value={stockInOutSlip.remarks} onChange={handleChange} ></textarea>
+                        {errors.remarks && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.remarks}</div>}
+                    </div>
                 </div>
                 <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
-                    <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' >新規登録</div>
-                    <Link to={`/master/payment-methods`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
+                    <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>新規登録</div>
+                    <Link to={`procurements/save-stock-in-out-slips`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
                 </div>
             </div>
-            <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
-                <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>新規登録</div>
-                <Link to={`procurements/purchase-orders`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
-            </div>
         </div>
-    );
+    )
 }
 
 export default StockInOutSlipsAdd;

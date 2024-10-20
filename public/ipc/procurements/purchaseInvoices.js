@@ -20,30 +20,23 @@ ipcMain.on('load-purchase-invoices', (event) => {
 });
 
 // 仕入請求書の詳細を取得
-ipcMain.on('get-purchase-invoice-detail', (event, id) => {
+ipcMain.on('get-purchase-invoice-data', (event, id) => {
     getPurchaseInvoiceById(id, (err, row) => {
         if (err) {
             console.error(err.message);
         } else {
-            event.sender.send('purchase-invoice-detail-data', row);
+            event.sender.send('get-purchase-invoice-data-result', row);
         }
     });
 });
 
 // 仕入請求書を保存
 ipcMain.on('save-purchase-invoice', (event, invoiceData) => {
-    savePurchaseInvoice(invoiceData, (err) => {
-        console.log(invoiceData);
+    savePurchaseInvoice(invoiceData, (err, result) => {
         if (err) {
             console.error(err.message);
         } else {
-            loadPurchaseInvoices((loadErr, rows) => {
-                if (loadErr) {
-                    console.error(loadErr.message);
-                } else {
-                    event.sender.send('load-purchase-invoices', rows);
-                }
-            });
+            event.sender.send('save-purchase-invoice-result', { id: result.lastID });
         }
     });
 });

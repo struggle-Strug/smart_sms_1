@@ -54,7 +54,13 @@ function saveStockInOutSlip(slipData, callback) {
                 remarks,
                 id
             ],
-            callback
+            function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                // 更新のため、IDをそのまま返す
+                callback(null, { lastID: id });
+            }
         );
     } else {
         // IDが存在しない場合はINSERT
@@ -72,7 +78,13 @@ function saveStockInOutSlip(slipData, callback) {
                 contact_person,
                 remarks
             ],
-            callback
+            function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                // 更新のため、IDをそのまま返す
+                callback(null, { lastID: this.lastID });
+            }
         );
     }
 }
