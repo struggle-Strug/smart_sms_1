@@ -213,6 +213,35 @@ function searchPurchaseInvoiceDetails(conditions, callback) {
     });
 }
 
+function searchPurchaseInvoicesByPurchaseInvoiceId(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM purchase_invoice_details 
+        WHERE purchase_invoice_id LIKE ?
+        `;
+        params = [`%${query}%`];
+    } else {
+        sql = `SELECT * FROM purchase_invoice_details`;
+    }
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
+function deletePurchaseInvoiceDetailsByPiId(purchaseInvoiceId, callback) {
+    const sql = `
+        DELETE FROM purchase_invoice_details
+        WHERE purchase_invoice_id = ?
+    `;
+    db.run(sql, [purchaseInvoiceId], (err) => {
+        callback(err);
+    });
+}
+
+
 module.exports = {
     loadPurchaseInvoiceDetails,
     getPurchaseInvoiceDetailById,
@@ -220,5 +249,7 @@ module.exports = {
     deletePurchaseInvoiceDetailById,
     editPurchaseInvoiceDetail,
     initializeDatabase,
-    searchPurchaseInvoiceDetails
+    searchPurchaseInvoiceDetails,
+    searchPurchaseInvoicesByPurchaseInvoiceId,
+    deletePurchaseInvoiceDetailsByPiId
 };

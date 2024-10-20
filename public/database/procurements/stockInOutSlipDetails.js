@@ -168,6 +168,38 @@ function searchStockInOutSlipDetails(conditions, callback) {
     });
 }
 
+// stock_in_out_slip_details テーブルでの検索処理
+function searchStockInOutSlipDetailsBySlipId(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM stock_in_out_slip_details
+        WHERE stock_in_out_slip_id LIKE ?
+        `;
+        params = [`%${query}%`];
+    } else {
+        sql = `SELECT * FROM stock_in_out_slip_details`;
+    }
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
+// stock_in_out_slip_details テーブルでの削除処理
+function deleteStockInOutSlipDetailsBySlipId(stockInOutSlipId, callback) {
+    const sql = `
+        DELETE FROM stock_in_out_slip_details
+        WHERE stock_in_out_slip_id = ?
+    `;
+    db.run(sql, [stockInOutSlipId], (err) => {
+        callback(err);
+    });
+}
+
+
+
 module.exports = {
     loadStockInOutSlipDetails,
     getStockInOutSlipDetailById,
@@ -175,5 +207,7 @@ module.exports = {
     deleteStockInOutSlipDetailById,
     editStockInOutSlipDetail,
     initializeDatabase,
-    searchStockInOutSlipDetails
+    searchStockInOutSlipDetails,
+    searchStockInOutSlipDetailsBySlipId,
+    deleteStockInOutSlipDetailsBySlipId
 };

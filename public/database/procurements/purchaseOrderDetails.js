@@ -187,6 +187,35 @@ function searchPurchaseOrderDetails(conditions, callback) {
     });
 }
 
+function searchPurchaseOrdersByPurchaseOrderId(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM purchase_order_details 
+        WHERE purchase_order_id LIKE ?
+        `;
+        params = [`%${query}%`];
+    } else {
+        sql = `SELECT * FROM purchase_order_details`;
+    }
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
+function deletePurchaseOrderDetailsByPoId(purchaseOrderId, callback) {
+    const sql = `
+        DELETE FROM purchase_order_details
+        WHERE purchase_order_id = ?
+    `;
+    db.run(sql, [purchaseOrderId], (err) => {
+        callback(err);
+    });
+}
+
+
 module.exports = {
     loadPurchaseOrderDetails,
     getPurchaseOrderDetailById,
@@ -194,5 +223,7 @@ module.exports = {
     deletePurchaseOrderDetailById,
     editPurchaseOrderDetail,
     initializeDatabase,
-    searchPurchaseOrderDetails
+    searchPurchaseOrderDetails,
+    searchPurchaseOrdersByPurchaseOrderId,
+    deletePurchaseOrderDetailsByPoId
 };

@@ -22,6 +22,7 @@ function getPurchaseInvoiceById(id, callback) {
 function savePurchaseInvoice(invoiceData, callback) {
     const {
         id,
+        code,
         order_date,
         vender_id,
         vender_name,
@@ -32,19 +33,28 @@ function savePurchaseInvoice(invoiceData, callback) {
         remarks,
         closing_date,
         payment_due_date,
-        payment_method,
-        created,
-        updated
+        payment_method
     } = invoiceData;
 
     if (id) {
         db.run(
-            `INSERT INTO purchase_invoices 
-            (id, order_date, vender_id, vender_name, honorific, vender_contact_person, contact_person, purchase_order_id, remarks, closing_date, payment_due_date, payment_method, created, updated) 
-            VALUES 
-            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+            `UPDATE purchase_invoices SET 
+                code = ?, 
+                order_date = ?, 
+                vender_id = ?, 
+                vender_name = ?, 
+                honorific = ?, 
+                vender_contact_person = ?, 
+                contact_person = ?, 
+                purchase_order_id = ?, 
+                remarks = ?, 
+                closing_date = ?, 
+                payment_due_date = ?, 
+                payment_method = ?, 
+                updated = datetime('now') 
+            WHERE id = ?`,
             [
-                id,
+                code,
                 order_date,
                 vender_id,
                 vender_name,
@@ -55,17 +65,25 @@ function savePurchaseInvoice(invoiceData, callback) {
                 remarks,
                 closing_date,
                 payment_due_date,
-                payment_method
+                payment_method,
+                id
             ],
-            callback
+            function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                // 更新のため、IDをそのまま返す
+                callback(null, { lastID: id });
+            }
         );
     } else {
         db.run(
             `INSERT INTO purchase_invoices 
-            (order_date, vender_id, vender_name, honorific, vender_contact_person, contact_person, purchase_order_id, remarks, closing_date, payment_due_date, payment_method, created, updated) 
+            (code, order_date, vender_id, vender_name, honorific, vender_contact_person, contact_person, purchase_order_id, remarks, closing_date, payment_due_date, payment_method, created, updated) 
             VALUES 
-            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
             [
+                code,
                 order_date,
                 vender_id,
                 vender_name,
@@ -78,10 +96,16 @@ function savePurchaseInvoice(invoiceData, callback) {
                 payment_due_date,
                 payment_method
             ],
-            callback
+            function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                callback(null, { lastID: this.lastID });
+            }
         );
     }
 }
+
 
 function deletePurchaseInvoiceById(id, callback) {
     const sql = `DELETE FROM purchase_invoices WHERE id = ?`;
@@ -101,6 +125,7 @@ function initializeDatabase() {
     const sql = `
     CREATE TABLE IF NOT EXISTS purchase_invoices (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        code VARCHAR(255),
         order_date VARCHAR(255),
         vender_id VARCHAR(255),
         vender_name VARCHAR(255),

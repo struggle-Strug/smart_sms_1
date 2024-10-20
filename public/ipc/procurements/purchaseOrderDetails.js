@@ -5,7 +5,9 @@ const {
     savePurchaseOrderDetail, 
     deletePurchaseOrderDetailById, 
     editPurchaseOrderDetail, 
-    searchPurchaseOrderDetails 
+    searchPurchaseOrderDetails,
+    searchPurchaseOrdersByPurchaseOrderId,
+    deletePurchaseOrderDetailsByPoId
 } = require('../../database/procurements/purchaseOrderDetails');
 
 // 購入注文明細のデータをロード
@@ -20,12 +22,12 @@ ipcMain.on('load-purchase-order-details', (event) => {
 });
 
 // 購入注文明細の詳細を取得
-ipcMain.on('get-purchase-order-detail', (event, id) => {
+ipcMain.on('get-purchase-order-detail-data', (event, id) => {
     getPurchaseOrderDetailById(id, (err, row) => {
         if (err) {
             console.error(err.message);
         } else {
-            event.sender.send('purchase-order-detail-data', row);
+            event.sender.send('purchase-order-detail-data-result', row);
         }
     });
 });
@@ -76,6 +78,26 @@ ipcMain.on('search-purchase-order-details', (event, query) => {
             console.error(err.message);
         } else {
             event.sender.send('search-purchase-order-details-result', results);
+        }
+    });
+});
+
+ipcMain.on('search-purchase-order-details-by-vender-id', (event, query) => {
+    searchPurchaseOrdersByPurchaseOrderId(query, (err, results) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('search-purchase-order-details-by-vender-id-result', results);
+        }
+    });
+});
+
+ipcMain.on('delete-purchase-order-details-by-po-id', (event, purchaseOrderId) => {
+    deletePurchaseOrderDetailsByPoId(purchaseOrderId, (err) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('purchase-order-details-deleted-by-po-id', purchaseOrderId);
         }
     });
 });

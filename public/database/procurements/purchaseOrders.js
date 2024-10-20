@@ -22,6 +22,7 @@ function getPurchaseOrderById(id, callback) {
 function savePurchaseOrder(orderData, callback) {
     const {
         id,
+        code,
         order_date,
         vender_id,
         vender_name,
@@ -31,20 +32,28 @@ function savePurchaseOrder(orderData, callback) {
         closing_date,
         payment_due_date,
         payment_method,
-        estimated_delivery_date,
-        created,
-        updated
+        estimated_delivery_date
     } = orderData;
 
     if (id) {
-        console.log("insert", orderData)
+        // IDが存在する場合は更新 (UPDATE)
         db.run(
-            `INSERT INTO purchase_orders 
-            (id, order_date, vender_id, vender_name, honorific, vender_contact_person, remarks, closing_date, payment_due_date, payment_method, estimated_delivery_date, created, updated) 
-            VALUES 
-            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+            `UPDATE purchase_orders SET 
+                    code = ?,
+                    order_date = ?, 
+                    vender_id = ?, 
+                    vender_name = ?, 
+                    honorific = ?, 
+                    vender_contact_person = ?, 
+                    remarks = ?, 
+                    closing_date = ?, 
+                    payment_due_date = ?, 
+                    payment_method = ?, 
+                    estimated_delivery_date = ?, 
+                    updated = datetime('now') 
+                WHERE id = ?`,
             [
-                id,
+                code,
                 order_date,
                 vender_id,
                 vender_name,
@@ -54,19 +63,26 @@ function savePurchaseOrder(orderData, callback) {
                 closing_date,
                 payment_due_date,
                 payment_method,
-                estimated_delivery_date
+                estimated_delivery_date,
+                id
             ],
-            callback
+            function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                // 更新のため、IDをそのまま返す
+                callback(null, { lastID: id });
+            }
         );
     } else {
-        console.log("orderData", orderData)
+        // IDが存在しない場合は新規追加 (INSERT)
         db.run(
             `INSERT INTO purchase_orders 
-            (id, order_date, vender_id, vender_name, honorific, vender_contact_person, remarks, closing_date, payment_due_date, payment_method, estimated_delivery_date, created, updated) 
-            VALUES 
-            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+                (code, order_date, vender_id, vender_name, honorific, vender_contact_person, remarks, closing_date, payment_due_date, payment_method, estimated_delivery_date, created, updated) 
+                VALUES 
+                (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
             [
-                id,
+                code,
                 order_date,
                 vender_id,
                 vender_name,
@@ -78,10 +94,17 @@ function savePurchaseOrder(orderData, callback) {
                 payment_method,
                 estimated_delivery_date
             ],
-            callback
+            function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                // 更新のため、IDをそのまま返す
+                callback(null, { lastID: this.lastID });
+            }
         );
-    }
+    };
 }
+
 
 function deletePurchaseOrderById(id, callback) {
     const sql = `DELETE FROM purchase_orders WHERE id = ?`;
@@ -101,6 +124,7 @@ function initializeDatabase() {
     const sql = `
     CREATE TABLE IF NOT EXISTS purchase_orders (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        code VARCHAR(255),
         order_date VARCHAR(255),
         vender_id VARCHAR(255),
         vender_name VARCHAR(255),
@@ -126,7 +150,8 @@ function searchPurchaseOrders(query, callback) {
     if (query && query.trim() !== '') {
         sql = `
         SELECT * FROM purchase_orders 
-        WHERE order_date LIKE ? 
+        WHERE code LINK ?
+        OR order_date LIKE ? 
         OR vender_id LIKE ? 
         OR vender_name LIKE ? 
         OR honorific LIKE ? 
@@ -137,7 +162,7 @@ function searchPurchaseOrders(query, callback) {
         OR payment_method LIKE ? 
         OR estimated_delivery_date LIKE ?
         `;
-        params = Array(10).fill(`%${query}%`);
+        params = Array(11).fill(`%${query}%`);
     } else {
         sql = `SELECT * FROM purchase_orders`;
     }

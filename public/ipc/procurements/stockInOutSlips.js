@@ -37,13 +37,7 @@ ipcMain.on('save-stock-in-out-slip', (event, slipData) => {
         if (err) {
             console.error(err.message);
         } else {
-            loadStockInOutSlips((loadErr, rows) => {
-                if (loadErr) {
-                    console.error(loadErr.message);
-                } else {
-                    event.sender.send('load-stock-in-out-slips', rows);
-                }
-            });
+            event.sender.send('get-stock-in-out-slip-data-result', slipData);
         }
     });
 });
