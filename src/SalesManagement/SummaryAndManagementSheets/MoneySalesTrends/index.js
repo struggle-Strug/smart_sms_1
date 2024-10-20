@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import CustomSelect from '../../../Components/CustomSelect';
 import { BarChart } from '@mui/x-charts/BarChart';
+import ProcessRegistrationIndex from '../ProcessRegistration';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -158,15 +159,15 @@ function Index() {
                     <div className='grid grid-cols-5 gap-6'>
                         <div>
                             <div className='text-sm pb-1.5'>最終年 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
-                            <CustomSelect className="w-full" options={options} name={"honorific"} data={customer} setData={setCustomer} />
+                            <CustomSelect className="w-full" options={options} placeholder={"2024"} name={"honorific"} data={customer} setData={setCustomer} />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>最終月 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
-                            <CustomSelect className="w-full" options={options} name={"honorific"} data={customer} setData={setCustomer} />
+                            <CustomSelect className="w-full" options={options} placeholder={"3月"}  name={"honorific"} data={customer} setData={setCustomer} />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>月数 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
-                            <CustomSelect className="w-full" options={options} name={"honorific"} data={customer} setData={setCustomer} />
+                            <CustomSelect className="w-full" options={options} placeholder={"12ヶ月"}  name={"honorific"} data={customer} setData={setCustomer} />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>得意先 </div>
@@ -245,65 +246,132 @@ function Index() {
                     </div>
                     </div>
 
-                    <div class="relative overflow-x-auto">
+                    <div class="relative overflow-x-auto mb-8">
                         <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <thead class="w-1/13 text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                 <tr>
-                                    <th scope="col" class="px-6 py-3">
-                                        Product name
+                                <th scope="col" class="px-2 py-2.5">
+                                        
                                     </th>
-                                    <th scope="col" class="px-6 py-3">
-                                        Color
+                                    <th scope="col" class="px-2 py-2.5">
+                                        2024年1月
                                     </th>
-                                    <th scope="col" class="px-6 py-3">
-                                        Category
+                                    <th scope="col" class="px-2 py-2.5">
+                                        2024年2月
                                     </th>
-                                    <th scope="col" class="px-6 py-3">
-                                        Price
+                                    <th scope="col" class="px-2 py-2.5">
+                                        2024年3月
+                                    </th>
+                                    <th scope="col" class="px-2 py-2.5">
+                                        2024年4月
+                                    </th>
+                                    <th scope="col" class="px-2 py-2.5">
+                                        2024年5月
+                                    </th>
+                                    <th scope="col" class="px-2 py-2.5">
+                                        2024年6月
+                                    </th>
+                                    <th scope="col" class="px-2 py-2.5">
+                                        2024年7月
+                                    </th>
+                                    <th scope="col" class="px-2 py-2.5">
+                                        2024年8月
+                                    </th>
+                                    <th scope="col" class="px-2 py-2.5">
+                                        2024年9月
+                                    </th>
+                                    <th scope="col" class="px-2 py-2.5">
+                                        2024年10月
+                                    </th>
+                                    <th scope="col" class="px-2 py-2.5">
+                                        2024年11月
+                                    </th>
+                                    <th scope="col" class="px-2 py-2.5">
+                                        2024年12月
                                     </th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        Apple MacBook Pro 17"
+                                    <th scope="row" class="px-2 py-1.5 font-medium text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 whitespace-nowrap">
+                                        売上金額
                                     </th>
-                                    <td class="px-6 py-4">
-                                        Silver
+                                    <td class="px-2 py-1.5">
+                                        ￥3,000,000
                                     </td>
-                                    <td class="px-6 py-4">
-                                        Laptop
+                                    <td class="px-2 py-1.5">
+                                        ￥3,000,000
                                     </td>
-                                    <td class="px-6 py-4">
-                                        $2999
+                                    <td class="px-2 py-1.5">
+                                        ￥3,000,000
+                                    </td>
+                                    <td class="px-2 py-1.5">
+                                        ￥3,000,000
+                                    </td>
+                                    <td class="px-2 py-1.5">
+                                        ￥3,000,000
+                                    </td>
+                                    <td class="px-2 py-1.5">
+                                        ￥3,000,000
+                                    </td>
+                                    <td class="px-2 py-1.5">
+                                        ￥3,000,000
+                                    </td>
+                                    <td class="px-2 py-1.5">
+                                        ￥3,000,000
+                                    </td>
+                                    <td class="px-2 py-1.5">
+                                        ￥3,000,000
+                                    </td>
+                                    <td class="px-2 py-1.5">
+                                        ￥3,000,000
+                                    </td>
+                                    <td class="px-2 py-1.5">
+                                        ￥3,000,000
+                                    </td>
+                                    <td class="px-2 py-1.5">
+                                        ￥3,000,000
                                     </td>
                                 </tr>
                                 <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        Microsoft Surface Pro
+                                    <th scope="row" class="px-2 py-1.5 font-medium text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 whitespace-nowrap">
+                                        数量
                                     </th>
-                                    <td class="px-6 py-4">
-                                        White
+                                    <td class="px-2 py-1.5">
+                                        150
                                     </td>
-                                    <td class="px-6 py-4">
-                                        Laptop PC
+                                    <td class="px-2 py-1.5">
+                                        150
                                     </td>
-                                    <td class="px-6 py-4">
-                                        $1999
+                                    <td class="px-2 py-1.5">
+                                        150
                                     </td>
-                                </tr>
-                                <tr class="bg-white dark:bg-gray-800">
-                                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        Magic Mouse 2
-                                    </th>
-                                    <td class="px-6 py-4">
-                                        Black
+                                    <td class="px-2 py-1.5">
+                                        150
                                     </td>
-                                    <td class="px-6 py-4">
-                                        Accessories
+                                    <td class="px-2 py-1.5">
+                                        150
                                     </td>
-                                    <td class="px-6 py-4">
-                                        $99
+                                    <td class="px-2 py-1.5">
+                                        150
+                                    </td>
+                                    <td class="px-2 py-1.5">
+                                        150
+                                    </td>
+                                    <td class="px-2 py-1.5">
+                                        150
+                                    </td>
+                                    <td class="px-2 py-1.5">
+                                        150
+                                    </td>
+                                    <td class="px-2 py-1.5">
+                                        150
+                                    </td>
+                                    <td class="px-2 py-1.5">
+                                        150
+                                    </td>
+                                    <td class="px-2 py-1.5">
+                                        150
                                     </td>
                                 </tr>
                             </tbody>
@@ -322,6 +390,7 @@ function MoneySalesTrendsIndex() {
     return (
         <Routes>
             <Route path="" element={<Index />} />
+            <Route path="process-registration" element={<ProcessRegistrationIndex />} />
         </Routes>
     )
 }

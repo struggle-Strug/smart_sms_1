@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
+import ProcessRegistrationIndex from '../ProcessRegistration';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -91,7 +92,9 @@ function Index() {
                         </div>
                     </div>
                     <div className='flex'>
-                        <div className='border rounded-lg py-3 px-7 text-base font-bold bg-blue-600 text-white'>請求計算</div>
+                    <Link to={`process-registration/`}>
+                    <div className='border rounded-lg py-3 px-7 text-base font-bold bg-blue-600 text-white'>請求計算</div>
+                        </Link>
                     </div>
                 <div className='bg-gray-100 rounded-lg p-6 mt-8'>
                     <div className='pb-6 text-lg font-bold'>
@@ -160,6 +163,7 @@ function InvoiceProcessingsIndex() {
     return (
         <Routes>
             <Route path="" element={<Index />} />
+            <Route path="process-registration" element={<ProcessRegistrationIndex />} />
         </Routes>
     )
 }

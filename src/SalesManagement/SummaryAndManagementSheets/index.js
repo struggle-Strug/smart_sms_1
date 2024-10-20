@@ -14,6 +14,7 @@ function VoucherEntries() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const locatioIncomingPaymentSchedulen = useLocation();
+  const location = useLocation();
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
