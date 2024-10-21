@@ -11,7 +11,7 @@ function PurchaseInvoicesDetail() {
     const [invoice, setInvoice] = useState(null);
 
     useEffect(() => {
-        console.log(id)
+        
         ipcRenderer.send('get-purchase-invoice-detail', id);
         ipcRenderer.on('purchase-invoice-detail-data', (event, data) => {
             setInvoice(data);

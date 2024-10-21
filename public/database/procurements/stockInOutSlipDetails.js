@@ -5,13 +5,6 @@ const { app } = require('electron');
 const dbPath = path.join(app.getPath('userData'), 'database.db');
 const db = new sqlite3.Database(dbPath);
 
-// function loadStockInOutSlipDetails(callback) {
-//     const sql = `SELECT * FROM stock_in_out_slip_details`;
-//     db.all(sql, [], (err, rows) => {
-//         callback(err, rows);
-//     });
-// }
-
 function loadStockInOutSlipDetails(callback) {
     const sql = `
         SELECT siod.*, sio.*, p.*
@@ -40,36 +33,67 @@ function saveStockInOutSlipDetail(detailData, callback) {
         number,
         unit,
         price,
-        lot_number,
-        created,
-        updated
+        lot_number
     } = detailData;
 
     if (id) {
-        db.run(
-            `UPDATE stock_in_out_slip_details SET 
-                stock_in_out_slip_id = ?, 
-                product_id = ?, 
-                product_name = ?
-                number = ?, 
-                unit = ?, 
-                price = ?, 
-                lot_number = ?, 
-                updated = datetime('now') 
-            WHERE id = ?`,
-            [
-                stock_in_out_slip_id,
-                product_id,
-                product_name,
-                number,
-                unit,
-                price,
-                lot_number,
-                id
-            ],
-            callback
+        // IDが存在するかチェック
+        db.get(
+            `SELECT id FROM stock_in_out_slip_details WHERE id = ?`,
+            [id],
+            (err, row) => {
+                if (err) {
+                    return callback(err);
+                }
+
+                if (row) {
+                    // レコードが存在する場合はUPDATE
+                    db.run(
+                        `UPDATE stock_in_out_slip_details SET 
+                            stock_in_out_slip_id = ?, 
+                            product_id = ?, 
+                            product_name = ?,
+                            number = ?, 
+                            unit = ?, 
+                            price = ?, 
+                            lot_number = ?, 
+                            updated = datetime('now') 
+                        WHERE id = ?`,
+                        [
+                            stock_in_out_slip_id,
+                            product_id,
+                            product_name,
+                            number,
+                            unit,
+                            price,
+                            lot_number,
+                            id
+                        ],
+                        callback
+                    );
+                } else {
+                    // レコードが存在しない場合はINSERT
+                    db.run(
+                        `INSERT INTO stock_in_out_slip_details 
+                        (stock_in_out_slip_id, product_id, product_name, number, unit, price, lot_number, created, updated) 
+                        VALUES 
+                        (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+                        [
+                            stock_in_out_slip_id,
+                            product_id,
+                            product_name,
+                            number,
+                            unit,
+                            price,
+                            lot_number
+                        ],
+                        callback
+                    );
+                }
+            }
         );
     } else {
+        // IDが存在しない場合はINSERT
         db.run(
             `INSERT INTO stock_in_out_slip_details 
             (stock_in_out_slip_id, product_id, product_name, number, unit, price, lot_number, created, updated) 
@@ -88,6 +112,7 @@ function saveStockInOutSlipDetail(detailData, callback) {
         );
     }
 }
+
 
 function deleteStockInOutSlipDetailById(id, callback) {
     const sql = `DELETE FROM stock_in_out_slip_details WHERE id = ?`;
@@ -120,24 +145,6 @@ function initializeDatabase() {
     `;
     db.run(sql);
 }
-
-// function searchStockInOutSlipDetails(query, callback) {
-//     let sql;
-//     let params = [];
-
-//     if (query && query.trim() !== '') {
-//         sql = `
-//         SELECT * FROM stock_in_out_slip_details 
-//         WHERE product_id LIKE ? OR unit LIKE ? OR lot_number LIKE ?
-//         `;
-//         params = [`%${query}%`, `%${query}%`, `%${query}%`];
-//     } else {
-//         sql = `SELECT * FROM stock_in_out_slip_details`;
-//     }
-//     db.all(sql, params, (err, rows) => {
-//         callback(err, rows);
-//     });
-// }
 
 function searchStockInOutSlipDetails(conditions, callback) {
     let sql = `
@@ -187,13 +194,14 @@ function searchStockInOutSlipDetailsBySlipId(query, callback) {
     });
 }
 
-// stock_in_out_slip_details テーブルでの削除処理
 function deleteStockInOutSlipDetailsBySlipId(stockInOutSlipId, callback) {
+    console.log(stockInOutSlipId)
     const sql = `
         DELETE FROM stock_in_out_slip_details
         WHERE stock_in_out_slip_id = ?
     `;
-    db.run(sql, [stockInOutSlipId], (err) => {
+    db.run(sql, [stockInOutSlipId], (err, rows) => {
+        console.error('Error deleting stock in/out slip details:', err);
         callback(err);
     });
 }

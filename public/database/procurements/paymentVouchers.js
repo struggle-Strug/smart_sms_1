@@ -61,7 +61,13 @@ function savePaymentVoucher(voucherData, callback) {
                 remarks,
                 id
             ],
-            callback
+            function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                // 更新のため、IDをそのまま返す
+                callback(null, { lastID: id });
+            }
         );
     } else {
         db.run(
@@ -80,7 +86,13 @@ function savePaymentVoucher(voucherData, callback) {
                 purchase_voucher_id,
                 remarks
             ],
-            callback
+            function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                // 更新のため、IDをそのまま返す
+                callback(null, { lastID: this.lastID });
+            }
         );
     }
 }

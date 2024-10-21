@@ -33,17 +33,11 @@ ipcMain.on('get-payment-voucher-detail', (event, id) => {
 // 支払伝票を保存
 ipcMain.on('save-payment-voucher', (event, voucherData) => {
     console.log(voucherData)
-    savePaymentVoucher(voucherData, (err) => {
+    savePaymentVoucher(voucherData, (err,result) => {
         if (err) {
             console.error(err.message);
         } else {
-            loadPaymentVouchers((loadErr, rows) => {
-                if (loadErr) {
-                    console.error(loadErr.message);
-                } else {
-                    event.sender.send('load-payment-vouchers', rows);
-                }
-            });
+            event.sender.send('save-payment-voucher-result', { id: result.lastID });
         }
     });
 });

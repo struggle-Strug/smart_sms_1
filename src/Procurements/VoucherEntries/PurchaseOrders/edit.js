@@ -74,15 +74,13 @@ function PurchaseOrdersEdit() {
     useEffect(() => {
         ipcRenderer.send('get-purchase-order-detail', id);
         ipcRenderer.on('purchase-order-detail-data', (event, data) => {
-            console.log(data)
             setPurchaseOrder(data);
         });
 
         ipcRenderer.send('search-purchase-order-details-by-vender-id', id);
 
-        console.log(id)
+        
         ipcRenderer.on('search-purchase-order-details-by-vender-id-result', (event, data) => {
-            console.log(data)
             setPurchaseOrderDetails(data);
         });
 
@@ -159,7 +157,6 @@ function PurchaseOrdersEdit() {
 
     const handleInputChange = (index, e) => {
         const { name, value } = e.target;
-        console.log(name)
         if (name === "product_id") {
             ipcRenderer.send('search-id-products', value);
         }
@@ -281,7 +278,6 @@ function PurchaseOrdersEdit() {
     const handleDateChange = (date, name) => {
         // 日付をフォーマットしてpurchaseOrderにセット
         const formattedDate = date ? date.toISOString().split('T')[0] : '';
-        console.log(formattedDate)
         setPurchaseOrder({ ...purchaseOrder, [name]: formattedDate });
     };
 

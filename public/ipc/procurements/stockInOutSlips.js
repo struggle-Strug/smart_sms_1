@@ -20,24 +20,23 @@ ipcMain.on('load-stock-in-out-slips', (event) => {
 });
 
 // 在庫入出庫伝票の詳細を取得
-ipcMain.on('get-stock-in-out-slip-detail', (event, id) => {
+ipcMain.on('get-stock-in-out-slip-data', (event, id) => {
     getStockInOutSlipById(id, (err, row) => {
         if (err) {
             console.error(err.message);
         } else {
-            event.sender.send('stock-in-out-slip-detail-data', row);
+            event.sender.send('stock-in-out-slip-data-result', row);
         }
     });
 });
 
 // 在庫入出庫伝票を保存
 ipcMain.on('save-stock-in-out-slip', (event, slipData) => {
-    saveStockInOutSlip(slipData, (err) => {
-        console.log(slipData);
+    saveStockInOutSlip(slipData, (err, result) => {
         if (err) {
             console.error(err.message);
         } else {
-            event.sender.send('get-stock-in-out-slip-data-result', slipData);
+            event.sender.send('get-stock-in-out-slip-data-result',  { id: result.lastID });
         }
     });
 });
