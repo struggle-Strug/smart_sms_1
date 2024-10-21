@@ -172,6 +172,33 @@ function searchPurchaseOrders(query, callback) {
     });
 }
 
+function searchPurchaseOrdersOnPV(conditions, callback) {
+    let sql = `SELECT * FROM purchase_orders WHERE 1=1`; // 初期の条件
+    let params = [];
+
+    // 検索条件を動的に追加
+    if (conditions.po_start_date) {
+        sql += ` AND order_date >= ?`;
+        params.push(conditions.po_start_date);
+    }
+    if (conditions.po_end_date) {
+        sql += ` AND order_date <= ?`;
+        params.push(conditions.po_end_date);
+    }
+    if (conditions.po_code) {
+        sql += ` AND code LIKE ?`;
+        params.push(`%${conditions.po_code}%`);
+    }
+    if (conditions.po_name) {
+        sql += ` AND vender_name LIKE ?`;
+        params.push(`%${conditions.po_name}%`);
+    }
+
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
 
 module.exports = {
     loadPurchaseOrders,
@@ -180,5 +207,6 @@ module.exports = {
     deletePurchaseOrderById,
     editPurchaseOrder,
     initializeDatabase,
-    searchPurchaseOrders
+    searchPurchaseOrders,
+    searchPurchaseOrdersOnPV
 };

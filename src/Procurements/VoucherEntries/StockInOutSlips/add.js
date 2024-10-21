@@ -184,25 +184,35 @@ function StockInOutSlipsAdd() {
 
             ipcRenderer.send('save-stock-in-out-slip', stockInOutSlip);
             ipcRenderer.on('get-stock-in-out-slip-data-result', (event, data) => {
+                console.log("stockInOutSlipDetails",stockInOutSlipDetails)
                 for (let i = 0; i < stockInOutSlipDetails.length; i++) {
                     const stockInOutSlipDetailData = stockInOutSlipDetails[i];
                     stockInOutSlipDetailData.stock_in_out_slip_id = data.id;
+                    
                     ipcRenderer.send('save-stock-in-out-slip-detail', stockInOutSlipDetailData);
                 }
             });
             setStockInOutSlip({
-                code: '',
+                id: '',
                 stock_in_out_date: '',
-                vender_id: '',
-                vender_name: '',
-                honorific: '',
-                vender_contact_person: '',
+                processType: '',
+                warehouse_from: '',
+                warehouse_to: '',
+                contact_person: '',
                 remarks: '',
-                closing_date: '',
-                payment_due_date: '',
-                payment_method: '',
-                estimated_delivery_date: '',
             });
+            setStockInOutSlipDetails([
+                {
+                    id: '',
+                    stock_in_out_slip_id: '',
+                    product_id: '',
+                    product_name: '',
+                    number: '',
+                    unit: '',
+                    price: '',
+                    lot_number: '',
+                }
+            ])
             alert('新規登録が完了しました。');
         }
     };
@@ -265,7 +275,7 @@ function StockInOutSlipsAdd() {
         <div className='w-5/6 mb-20'>
             <div className=''>
                 <div className='pt-8 pb-6 flex border-b px-8 items-center'>
-                    <div className='text-2xl font-bold'>発注伝票</div>
+                    <div className='text-2xl font-bold'>入出庫伝票</div>
                     <div className='flex ml-auto'>
                         <Link to="/invoice-settings" className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
                             <div className='pr-1.5 pl-1 flex items-center'>
@@ -350,7 +360,6 @@ function StockInOutSlipsAdd() {
                             </a>
                         </div>
                         <div className="w-[480px] pb-1.5">
-                            {/* <CustomSelect placeholder={""} options={options} name={"warehouse_to"} data={stockInOutSlip} setData={setStockInOutSlip} /> */}
                             <div className="relative" ref={dropdownRef}>
                                 <div
                                     className="bg-white border rounded px-4 py-2.5 cursor-pointer flex justify-between items-center"
@@ -383,7 +392,6 @@ function StockInOutSlipsAdd() {
                                 )}
                             </div>
                         </div>
-                        {/* <CustomSelect /> */}
                     </div>
                     <div className='pb-2'>
                         <div className='flex items-center text-sm pb-1.5'>入庫先倉庫
@@ -425,7 +433,6 @@ function StockInOutSlipsAdd() {
                                     </div>
                                 )}
                             </div>
-                            {/* <CustomSelect placeholder={""} options={options} name={"warehouse_from"} data={stockInOutSlip} setData={setStockInOutSlip} /> */}
                         </div>
                     </div>
                     <div className='py-3'>

@@ -57,7 +57,7 @@ function Index() {
     }, []);
 
     const toggleDropdown = (id) => {
-        console.log(id)
+        
         if (!isOpen) setIsOpen(id);
         else setIsOpen(false);
     };

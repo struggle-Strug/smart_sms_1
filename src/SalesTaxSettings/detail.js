@@ -11,17 +11,12 @@ function SalesTaxSettingsDetail() {
         ipcRenderer.send('get-sales-tax-setting-detail', id);
         ipcRenderer.on('set-sales-tax-setting-detail-data', (event, salesTaxSettingData) => {
             setContactPerson(salesTaxSettingData);
-            console.log(contactPerson);
         });
         
         return () => {
             ipcRenderer.removeAllListeners('sales-tax-setting-detail-data');
         };
     }, [id]);
-
-    // if (!contactPerson) {
-    //     return <div>Loading...</div>;
-    // }
 
     return (
         <div className='mx-40'>

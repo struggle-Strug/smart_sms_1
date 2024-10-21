@@ -5,7 +5,9 @@ const {
     saveStockInOutSlipDetail, 
     deleteStockInOutSlipDetailById, 
     editStockInOutSlipDetail, 
-    searchStockInOutSlipDetails 
+    searchStockInOutSlipDetails ,
+    searchStockInOutSlipDetailsBySlipId,
+    deleteStockInOutSlipDetailsBySlipId
 } = require('../../database/procurements/stockInOutSlipDetails');
 
 // 在庫入出庫伝票明細のデータをロード

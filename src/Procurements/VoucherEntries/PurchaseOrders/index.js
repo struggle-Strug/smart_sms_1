@@ -18,7 +18,6 @@ function Index() {
     useEffect(() => {
         ipcRenderer.send('load-purchase-orders');
         ipcRenderer.on('load-purchase-orders', (event, data) => {
-            console.log(data)
             setPurchaseOrders(data);
         });
 
