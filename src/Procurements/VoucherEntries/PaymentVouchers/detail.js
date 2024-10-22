@@ -6,13 +6,89 @@ import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 const { ipcRenderer } = window.require('electron');
 
 function PaymentVouchersDetail() {
+    const { id } = useParams();
+
+    const [connectedPurchaseOrders, setConnectedPurchaseOrders] = useState([])
+
+
+    const [paymentVoucher, setPaymentVoucher] = useState(
+        {
+            code: '',
+            order_date: '',
+            vender_id: '',
+            vender_name: '',
+            honorific: '',
+            vender_contact_person: '',
+            contact_person: "",
+            purchase_voucher_id: '',
+            remarks: '',
+        }
+    );
+
+    const [paymentVoucherDetails, setPaymentVoucherDetails] = useState([
+        {
+            payment_voucher_id: '',
+            payment_method: '',
+            payment_price: '',
+            fees_and_charges: ''
+        }
+    ]);
+
+    const [vendors, setVendors] = useState([])
+    const [products, setProducts] = useState([])
+
+    useEffect(() => {
+        ipcRenderer.send('get-payment-voucher-data', id);
+        ipcRenderer.on('get-payment-voucher-data-result', (event, data) => {
+            setPaymentVoucher(data);
+        });
+
+        console.log(id)
+
+        ipcRenderer.send('search-payment-voucher-details-by-payment-voucher-id', id);
+
+        ipcRenderer.on('search-payment-voucher-details-by-payment-voucher-id-result', (event, data) => {
+            console.log(data)
+            setPaymentVoucherDetails(data);
+        });
+
+        ipcRenderer.send('search-pos-pvs-mappings-by-pvs-id', id.toString());
+
+        ipcRenderer.on('search-pos-pvs-mappings-by-pvs-id-result', (event, data) => {
+            let posIds = []
+            console.log(data)
+            for (let i = 0; i < data.length; i++) {
+                posIds.push(parseInt(data[i].pos_id));
+            }
+
+            console.log(posIds)
+            setConnectedPurchaseOrders(posIds);
+        });
+
+        return () => {
+            ipcRenderer.removeAllListeners('get-stock-in-out-slip-data');
+            ipcRenderer.removeAllListeners('search-stock-in-out-slip-details-by-slip-id');
+        };
+    }, [id]);
+
+    const handleSumPrice = () => {
+        let SumPrice = 0
+
+        for (let i = 0; i < paymentVoucherDetails.length; i++) {
+            SumPrice += parseInt(paymentVoucherDetails[i].payment_price) + parseInt(paymentVoucherDetails[i].fees_and_charges)
+        }
+
+        return { "subtotal": SumPrice, "consumptionTaxEight": SumPrice * 0.08, "consumptionTaxTen": 0, "totalConsumptionTax": SumPrice * 0.08, "Total": SumPrice * 1.08 }
+    }
+
+
     return (
         <div className='w-full'>
             <div className=''>
                 <div className='pt-8 pb-6 flex border-b px-8 items-center'>
                     <div className='text-2xl font-bold'>{'株式会社テスト'}</div>
                     <div className='flex ml-auto'>
-                        <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
+                        <Link to={`/procurement/voucher-entries/payment-vouchers/edit/${id}`} className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
                             <div className='pr-1.5 pl-1 flex items-center'>
                                 <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg" className=''>
                                     <path d="M0.391357 18.7308H4.14136L15.2014 7.67077L11.4514 3.92077L0.391357 14.9808V18.7308ZM2.39136 15.8108L11.4514 6.75077L12.3714 7.67077L3.31136 16.7308H2.39136V15.8108Z" fill="#1F2937" />
@@ -44,11 +120,11 @@ function PaymentVouchersDetail() {
                     <div className='py-2.5 font-bold text-xl'>伝票番号</div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>伝票番号</div>
-                        <div>PO-0000000001</div>
+                        <div>{paymentVoucher.code}</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>発注日付</div>
-                        <div>202-08-27</div>
+                        <div>{paymentVoucher.order_date}</div>
                     </div>
                     <div className='py-3'>
                         <hr className='' />
@@ -56,11 +132,11 @@ function PaymentVouchersDetail() {
                     <div className='py-2.5 font-bold text-xl'>取引先情報</div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>宛名</div>
-                        <div>株式会社御中</div>
+                        <div>{paymentVoucher.honorific}</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>仕入先コード</div>
-                        <div></div>
+                        <div>{paymentVoucher.vender_id}</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>郵便番号</div>
@@ -72,7 +148,7 @@ function PaymentVouchersDetail() {
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>担当者</div>
-                        <div></div>
+                        <div>{paymentVoucher.contact_person}</div>
                     </div>
                     <div className='py-3'>
                         <hr className='' />
@@ -97,54 +173,44 @@ function PaymentVouchersDetail() {
                     <table className="w-full mt-8 table-auto">
                         <thead className=''>
                             <tr className='border-b'>
-                                <th className='text-left py-2'>商品コード</th>
-                                <th className='text-left py-2 w-72'>商品名</th>
-                                <th className='text-left py-2'>数量</th>
-                                <th className='text-left py-2'>単位</th>
-                                <th className='text-left py-2'>発注残数</th>
-                                <th className='text-left py-2'>単価</th>
-                                <th className='text-left py-2'>税率</th>
-                                <th className='text-left py-2'>倉庫</th>
-                                <th className='text-left py-2'>金額</th>
-                                <th className='text-left py-2'>税額</th>
+                                <th className='text-left py-2'>支払方法</th>
+                                <th className='text-left py-2 w-72'>支払金額</th>
+                                <th className='text-left py-2'>手数料等</th>
+                                <th className='text-left py-2'>合計金額</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr className='border-b'>
-                                <td className='py-2'>1234</td>
-                                <td className='py-2'>商品名が入ります。商品名が入ります。商品名が入ります。商品名が入ります。入ります</td>
-                                <td className='py-2'>200</td>
-                                <td className='py-2'>200</td>
-                                <td className='py-2'>20</td>
-                                <td className='py-2'>200</td>
-                                <td className='py-2'>10個</td>
-                                <td className='py-2'>倉庫</td>
-                                <td className='py-2'>0円</td>
-                                <td className='py-2'>0円</td>
+                        {paymentVoucherDetails.map((paymentVoucherDetail, index) => (
+                            <tr className='border-b' key={index}>
+                                <td className='py-2'>{paymentVoucherDetail.payment_method}</td>
+                                <td className='py-2'>{paymentVoucherDetail.payment_price}</td>
+                                <td className='py-2'>{paymentVoucherDetail.fees_and_charges}</td>
+                                <td className='py-2'>{parseInt(paymentVoucherDetail.payment_price) + parseInt(paymentVoucherDetail.fees_and_charges)}</td>
                             </tr>
+                        ))}
                         </tbody>
                     </table>
                     <div className='py-6 flex'>
                         <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
                             <div className='flex pb-2'>
                                 <div className='w-40'>税抜合計</div>
-                                <div>5,000円</div>
+                                <div>{handleSumPrice().subtotal.toFixed(0).toLocaleString()}円</div>
                             </div>
                             <div className='flex pb-2'>
                                 <div className='w-40'>消費税(8%)</div>
-                                <div>5,000円</div>
+                                <div>{handleSumPrice().consumptionTaxEight.toFixed(0).toLocaleString()}円</div>
                             </div>
                             <div className='flex pb-2'>
                                 <div className='w-40'>消費税(10%)</div>
-                                <div>5,000円</div>
+                                <div>{handleSumPrice().consumptionTaxTen.toFixed(0).toLocaleString()}円</div>
                             </div>
                             <div className='flex pb-2'>
                                 <div className='w-40'>消費税合計</div>
-                                <div>5,000円</div>
+                                <div>{handleSumPrice().totalConsumptionTax.toFixed(0).toLocaleString()}円</div>
                             </div>
                             <div className='flex'>
                                 <div className='w-40'>税込合計</div>
-                                <div>5,000円</div>
+                                <div>{handleSumPrice().Total.toFixed(0).toLocaleString()}円</div>
                             </div>
                         </div>
                     </div>
@@ -153,35 +219,7 @@ function PaymentVouchersDetail() {
                     </div>
                     <div className='py-2.5 font-bold text-xl'>備考</div>
                     <div className='flex items-center pb-2'>
-                    恐れいりますが、振込手数料は貴社にてご負担ください。
-                    </div>
-                    <div className='py-3'>
-                        <hr className='' />
-                    </div>
-                    <div className='py-2.5 font-bold text-xl'>支払情報</div>
-                    <div className='flex items-center pb-2'>
-                        <div className='w-40'>締日</div>
-                        <div></div>
-                    </div>
-                    <div className='flex items-center pb-2'>
-                        <div className='w-40'>支払期日</div>
-                        <div></div>
-                    </div>
-                    <div className='flex items-center pb-2'>
-                        <div className='w-40'>支払方法</div>
-                        <div></div>
-                    </div>
-                    <div className='py-3'>
-                        <hr className='' />
-                    </div>
-                    <div className='py-2.5 font-bold text-xl'>納品情報</div>
-                    <div className='flex items-center pb-2'>
-                        <div className='w-40'>入荷予定日</div>
-                        <div></div>
-                    </div>
-                    <div className='flex items-center pb-2'>
-                        <div className='w-40'>ステータス</div>
-                        <div></div>
+                    {paymentVoucher.remarks} 
                     </div>
                 </div>
             </div>

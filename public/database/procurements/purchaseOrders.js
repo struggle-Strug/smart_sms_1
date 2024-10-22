@@ -150,19 +150,10 @@ function searchPurchaseOrders(query, callback) {
     if (query && query.trim() !== '') {
         sql = `
         SELECT * FROM purchase_orders 
-        WHERE code LINK ?
-        OR order_date LIKE ? 
-        OR vender_id LIKE ? 
+        WHERE code LIKE ?
         OR vender_name LIKE ? 
-        OR honorific LIKE ? 
-        OR vender_contact_person LIKE ? 
-        OR remarks LIKE ? 
-        OR closing_date LIKE ? 
-        OR payment_due_date LIKE ? 
-        OR payment_method LIKE ? 
-        OR estimated_delivery_date LIKE ?
         `;
-        params = Array(11).fill(`%${query}%`);
+        params = Array(2).fill(`%${query}%`);
     } else {
         sql = `SELECT * FROM purchase_orders`;
     }

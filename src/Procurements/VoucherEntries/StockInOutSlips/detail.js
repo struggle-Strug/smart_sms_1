@@ -5,31 +5,54 @@ const { ipcRenderer } = window.require('electron');
 
 function StockInOutSlipsDetail() {
     const { id } = useParams();
-    const [slip, setSlip] = useState(null);
+    const [stockInOutSlip, setStockInOutSlip] = useState({
+        id: '',
+        stock_in_out_date: '',
+        processType: '',
+        warehouse_from: '',
+        warehouse_to: '',
+        contact_person: '',
+        remarks: '',
+    });
+
+    const [stockInOutSlipDetails, setStockInOutSlipDetails] = useState([
+        {
+            id: '',
+            stock_in_out_slip_id: '',
+            product_id: '',
+            product_name: '',
+            number: '',
+            unit: '',
+            price: '',
+            lot_number: '',
+        }
+    ]);
 
     useEffect(() => {
-        // Request stock in/out slip details by ID
-        ipcRenderer.send('get-stock-in-out-slip-detail', id);
-        ipcRenderer.on('stock-in-out-slip-detail-data', (event, data) => {
-            setSlip(data);
+        ipcRenderer.send('get-stock-in-out-slip-data', id);
+        ipcRenderer.on('stock-in-out-slip-data-result', (event, data) => {
+            setStockInOutSlip(data);
+        });
+
+        ipcRenderer.send('search-stock-in-out-slip-details-by-slip-id', id);
+
+        ipcRenderer.on('search-stock-in-out-slip-details-by-slip-id-result', (event, data) => {
+            setStockInOutSlipDetails(data);
         });
 
         return () => {
-            ipcRenderer.removeAllListeners('stock-in-out-slip-detail-data');
+            ipcRenderer.removeAllListeners('get-stock-in-out-slip-data');
+            ipcRenderer.removeAllListeners('search-stock-in-out-slip-details-by-slip-id');
         };
     }, [id]);
-
-    if (!slip) {
-        return <div>Loading...</div>;
-    }
 
     return (
         <div className='w-full'>
             <div className=''>
                 <div className='pt-8 pb-6 flex border-b px-8 items-center'>
-                    <div className='text-2xl font-bold'>{slip.vender_name || '株式会社テスト'}</div>
+                    <div className='text-2xl font-bold'>{stockInOutSlip.vender_name || '株式会社テスト'}</div>
                     <div className='flex ml-auto'>
-                        <Link to={`/stock-in-out-slips/edit/${id}`} className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
+                        <Link to={`/procurement/voucher-entries/stock-in-out-slips/edit/` + id}  className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
                             <div className='pr-1.5 pl-1 flex items-center'>
                                 <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M0.391357 18.7308H4.14136L15.2014 7.67077L11.4514 3.92077L0.391357 14.9808V18.7308ZM2.39136 15.8108L11.4514 6.75077L12.3714 7.67077L3.31136 16.7308H2.39136V15.8108Z" fill="#1F2937" />
@@ -61,27 +84,27 @@ function StockInOutSlipsDetail() {
                     <div className='py-2.5 font-bold text-xl'>伝票番号</div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>伝票番号</div>
-                        <div>{slip.slip_number || "N/A"}</div>
+                        <div>{stockInOutSlip.code || "N/A"}</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>入出庫日付</div>
-                        <div>{slip.stock_in_out_date || "N/A"}</div>
+                        <div>{stockInOutSlip.stock_in_out_date || "N/A"}</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>処理種別</div>
-                        <div>{slip.process_type || "N/A"}</div>
+                        <div>{stockInOutSlip.processType || "N/A"}</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>出庫元倉庫</div>
-                        <div>{slip.warehouse_from || "N/A"}</div>
+                        <div>{stockInOutSlip.warehouse_from || "N/A"}</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>入庫先倉庫</div>
-                        <div>{slip.warehouse_to || "N/A"}</div>
+                        <div>{stockInOutSlip.warehouse_to || "N/A"}</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>担当者</div>
-                        <div>{slip.contact_person || "N/A"}</div>
+                        <div>{stockInOutSlip.contact_person || "N/A"}</div>
                     </div>
                     <div className='py-3'>
                         <hr className='' />
@@ -100,15 +123,15 @@ function StockInOutSlipsDetail() {
                             </tr>
                         </thead>
                         <tbody>
-                            {slip.details && slip.details.map((detail, index) => (
+                            {stockInOutSlipDetails.map((detail, index) => (
                                 <tr className='border-b' key={index}>
-                                    <td className='py-2'>{detail.product_code || "N/A"}</td>
+                                    <td className='py-2'>{detail.product_id || "N/A"}</td>
                                     <td className='py-2'>{detail.product_name || "N/A"}</td>
-                                    <td className='py-2'>{detail.quantity || 0}</td>
+                                    <td className='py-2'>{detail.number || 0}</td>
                                     <td className='py-2'>{detail.unit || "N/A"}</td>
                                     <td className='py-2'>{detail.lot_number || "N/A"}</td>
-                                    <td className='py-2'>{detail.unit_price || 0}円</td>
-                                    <td className='py-2'>{detail.total_price || 0}円</td>
+                                    <td className='py-2'>{detail.price || 0}円</td>
+                                    <td className='py-2'>{parseInt(detail.price) * parseInt(detail.number) || 0}円</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -118,7 +141,7 @@ function StockInOutSlipsDetail() {
                     </div>
                     <div className='py-2.5 font-bold text-xl'>備考</div>
                     <div className='flex items-center pb-2'>
-                        {slip.remarks || "N/A"}
+                        {stockInOutSlip.remarks || "N/A"}
                     </div>
                 </div>
             </div>

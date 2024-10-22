@@ -261,7 +261,6 @@ function StockInOutSlipsEdit() {
     }, []);
 
     const handleDateChange = (date, name) => {
-        // 日付をフォーマットしてstockInOutSlipにセット
         const formattedDate = date ? date.toISOString().split('T')[0] : '';
         setStockInOutSlip({ ...stockInOutSlip, [name]: formattedDate });
     };

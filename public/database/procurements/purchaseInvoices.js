@@ -151,19 +151,10 @@ function searchPurchaseInvoices(query, callback) {
     if (query && query.trim() !== '') {
         sql = `
         SELECT * FROM purchase_invoices 
-        WHERE order_date LIKE ? 
-        OR vender_id LIKE ? 
+        WHERE code LIKE ? 
         OR vender_name LIKE ? 
-        OR honorific LIKE ? 
-        OR vender_contact_person LIKE ? 
-        OR contact_person LIKE ?
-        OR purchase_order_id LIKE ?
-        OR remarks LIKE ? 
-        OR closing_date LIKE ? 
-        OR payment_due_date LIKE ? 
-        OR payment_method LIKE ?
         `;
-        params = Array(11).fill(`%${query}%`);
+        params = Array(2).fill(`%${query}%`);
     } else {
         sql = `SELECT * FROM purchase_invoices`;
     }

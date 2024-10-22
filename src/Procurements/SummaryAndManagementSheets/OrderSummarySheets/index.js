@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import CustomSelect from '../../../Components/CustomSelect';
+import DatePicker from 'react-datepicker';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -26,6 +27,8 @@ function Index() {
         "pod.storage_facility": "",
         "pod.status": "",
         "pod.lot_number": "",
+        "pod.created_start": "",
+        "pod.created_end": "",
         "v.classification1": "",
         "v.classification2": "",
     });
@@ -38,18 +41,134 @@ function Index() {
         }));
     };
 
+    const header = [
+        "日付",
+        "仕入先",
+        "商品名",
+        "カテゴリー",
+        "サブカテゴリー",
+        "担当者",
+        "区分１",
+        "区分２",
+        "倉庫",
+        "ステータス",
+        "ロット番号",
+        "発注数量",
+        "単価",
+        "発注金額",
+        "構成比"
+    ];
+
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+
+    const fileName = `発注集計表_${year}${month}${day}_${hours}${minutes}${seconds}`;
+
+    const [dataForExport, setDataForExport] = useState({
+        header: header,
+        data: [],
+        fileName: fileName
+    });
+
+
     useEffect(() => {
         ipcRenderer.send('load-purchase-order-details');
-        
-        const handleLoadDetails = (event, data) => setPurchaseOrderDetails(data);
-        const handleSearchResult = (event, data) => {
-            
+
+        const handleLoadDetails = (event, data) => {
             setPurchaseOrderDetails(data);
+            const arr = [];
+            let totalNumber = 0;
+            let totalAmount = 0;
+            for (let i = 0; i < data.length; i++) {
+                const value = [
+                    data[i].order_date,
+                    data[i].vender_name,
+                    data[i].product_name,
+                    data[i].classification_primary,
+                    data[i].classification_secondary,
+                    data[i].contact_person,
+                    data[i].classification1,
+                    data[i].classification2,
+                    data[i].storage_facility,
+                    data[i].status,
+                    data[i].lot_number,
+                    data[i].number,
+                    data[i].price,
+                    parseInt(data[i].number) * parseInt(data[i].price),
+                    "100%" // 構成比 (仮に固定値としておきますが、実際の構成比計算があればそのロジックを入れてください)
+                ];
+                arr.push(value);
+                totalNumber += parseInt(data[i].number);
+                totalAmount += parseInt(data[i].number) * parseInt(data[i].price);
+            }
+
+            arr.push([
+                '', '', '', '', '', '', '', '', '', '', '',
+                `合計数量: ${totalNumber}`,
+                '',
+                `合計金額: ${totalAmount}円`,
+                "構成比: 100%"
+            ]);
+
+            const dataForSet = {
+                header: header,
+                data: arr,
+                fileName: fileName
+            };
+            setDataForExport(dataForSet);
         };
-    
+        const handleSearchResult = (event, data) => {
+            setPurchaseOrderDetails(data);
+            const arr = [];
+            let totalNumber = 0;
+            let totalAmount = 0;
+            for (let i = 0; i < data.length; i++) {
+                const value = [
+                    data[i].order_date,
+                    data[i].vender_name,
+                    data[i].product_name,
+                    data[i].classification_primary,
+                    data[i].classification_secondary,
+                    data[i].contact_person,
+                    data[i].classification1,
+                    data[i].classification2,
+                    data[i].storage_facility,
+                    data[i].status,
+                    data[i].lot_number,
+                    data[i].number,
+                    data[i].price,
+                    parseInt(data[i].number) * parseInt(data[i].price),
+                    (parseInt(data[i].number) * parseInt(data[i].price)) / handlePurchaseOrderNumberPrice(data) // 構成比 (仮に固定値としておきますが、実際の構成比計算があればそのロジックを入れてください)
+                ];
+                arr.push(value);
+                totalNumber += parseInt(data[i].number);
+                totalAmount += parseInt(data[i].number) * parseInt(data[i].price);
+            }
+
+            arr.push([
+                '', '', '', '', '', '', '', '', '', '', '',
+                `合計数量: ${totalNumber}`,
+                '',
+                `合計金額: ${totalAmount}円`,
+                "構成比: 100%"
+            ]);
+
+            const dataForSet = {
+                header: header,
+                data: arr,
+                fileName: fileName
+            };
+            setDataForExport(dataForSet);
+        };
+
         ipcRenderer.on('load-purchase-order-details', handleLoadDetails);
         ipcRenderer.on('search-purchase-order-details-result', handleSearchResult);
-    
+
         return () => {
             ipcRenderer.removeListener('load-purchase-order-details', handleLoadDetails);
             ipcRenderer.removeListener('search-purchase-order-details-result', handleSearchResult);
@@ -57,7 +176,7 @@ function Index() {
     }, []);
 
     const toggleDropdown = (id) => {
-        
+
         if (!isOpen) setIsOpen(id);
         else setIsOpen(false);
     };
@@ -77,13 +196,17 @@ function Index() {
     const handleSearch = () => {
         const searchColums = {}
         setPurchaseOrderDetails([])
-        console.log(searchQueryList)
         for (let key in searchQueryList) {
             if (searchQueryList[key] !== "") {
                 searchColums[key] = searchQueryList[key]
             }
         }
         ipcRenderer.send('search-purchase-order-details', searchColums);
+    };
+
+    const handleDateChange = (date, name) => {
+        const formattedDate = date ? date.toISOString().split('T')[0] : '';
+        setSearchQueryList({ ...searchQueryList, [name]: formattedDate });
     };
 
     useEffect(() => {
@@ -108,17 +231,51 @@ function Index() {
         for (let i = 0; i < purchaseOrderDetails.length; i++) {
             sum += parseInt(purchaseOrderDetails[i].number);
         }
-        return sum.toLocaleString(); // カンマ区切りでフォーマット
+        return sum.toLocaleString();
     };
-    
+
     const handlePurchaseOrderNumberPrice = (purchaseOrderDetails) => {
         let purchaseOrderSumPrice = 0;
         for (let i = 0; i < purchaseOrderDetails.length; i++) {
             purchaseOrderSumPrice += parseInt(purchaseOrderDetails[i].number) * parseInt(purchaseOrderDetails[i].price);
         }
-        return purchaseOrderSumPrice.toLocaleString(); // カンマ区切りでフォーマット
+        return purchaseOrderSumPrice.toLocaleString();
     };
-    
+
+    const exportToCSV = () => {
+        console.log("click")
+        ipcRenderer.send('export-to-csv', dataForExport);
+    };
+
+    const exportToExcel = () => {
+        ipcRenderer.send('export-to-excel', dataForExport);
+    };
+
+    const exportPDF = () => {
+        ipcRenderer.send('export-to-pdf', dataForExport);
+    };
+
+    const [message, setMessage] = useState('');
+
+    useEffect(() => {
+        ipcRenderer.on('export-success', (event, successMessage) => {
+            setMessage(successMessage);
+            alert(successMessage);
+        });
+
+        ipcRenderer.on('export-failure', (event, errorMessage) => {
+            setMessage(errorMessage);
+            alert(errorMessage);
+        });
+
+        return () => {
+            ipcRenderer.removeAllListeners('export-success');
+            ipcRenderer.removeAllListeners('export-failure');
+        };
+    }, []);
+
+
+
     return (
         <div className='w-5/6'>
             <div className='p-8'>
@@ -132,7 +289,14 @@ function Index() {
                             <div className='flex items-center'>
                                 <div>
                                     <div className='text-sm pb-1.5'>期間指定 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
-                                    <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                                    {/* <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} /> */}
+                                    <DatePicker
+                                        selected={searchQueryList["pod.created_start"] ? new Date(searchQueryList["pod.created_start"]) : null}
+                                        onChange={(date) => handleDateChange(date, "pod.created_start")}
+                                        dateFormat="yyyy-MM-dd"
+                                        className='border rounded px-4 py-2.5 bg-white  w-full'
+                                        placeholderText='期間を選択'
+                                    />
                                 </div>
                                 <div>
                                     <div className='w-1'>&nbsp;</div>
@@ -141,7 +305,14 @@ function Index() {
 
                                 <div>
                                     <div className='text-sm pb-1.5 text-gray-100'>期間指定</div>
-                                    <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                                    {/* <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} /> */}
+                                    <DatePicker
+                                        selected={searchQueryList["pod.created_end"] ? new Date(searchQueryList["pod.created_end"]) : null}
+                                        onChange={(date) => handleDateChange(date, "pod.created_end")}
+                                        dateFormat="yyyy-MM-dd"
+                                        className='border rounded px-4 py-2.5 bg-white  w-full'
+                                        placeholderText='期間を選択'
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -261,7 +432,7 @@ function Index() {
                 </div>
             </div>
             <div className='flex px-8 justify-end'>
-                <div className='border rounded-lg py-3 px-7 text-base font-bold text-black'>
+                <div className='border rounded-lg py-3 px-7 text-base font-bold text-black' onClick={() => exportToCSV()}>
                     エクスポート
                 </div>
             </div>
@@ -287,26 +458,26 @@ function Index() {
                         </tr>
                     </thead>
                     <tbody className=''>
-                    {purchaseOrderDetails.map((purchaseOrderDetail) => (
-                                <tr className='border-b' key={purchaseOrderDetail.id}>
-                                    <td className='py-4'>{purchaseOrderDetail.order_date || <div className='border w-4'></div>}</td>
-                                    <td className='py-4'>{purchaseOrderDetail.order_date || <div className='border w-4'></div>}</td>
-                                    <td className='py-4'>{purchaseOrderDetail.order_date || <div className='border w-4'></div>}</td>
-                                    <td className='py-4'>{purchaseOrderDetail.product_id || <div className='border w-4'></div>}</td>
-                                    <td className='py-4'>{purchaseOrderDetail.product_name || <div className='border w-4'></div>}</td>
-                                    <td className='py-4'>{purchaseOrderDetail.classification_primary || <div className='border w-4'></div>}</td>
-                                    <td className='py-4'>{purchaseOrderDetail.classification_secondary || <div className='border w-4'></div>}</td>
-                                    <td className='py-4'>{purchaseOrderDetail.number || <div className='border w-4'></div>}</td>
-                                    <td className='py-4'>{purchaseOrderDetail.price || <div className='border w-4'></div>}</td>
-                                    <td className='py-4'>{parseInt(purchaseOrderDetail.number) * parseInt(purchaseOrderDetail.price) || <div className='border w-4'></div>}</td>
-                                    <td className='py-4'>{purchaseOrderDetail.lot_number || <div className='border w-4'></div>}</td>
-                                    <td className='py-4'>{purchaseOrderDetail.storage_facility || <div className='border w-4'></div>}</td>
-                                    <td className='py-4'>{purchaseOrderDetail.contact_person || <div className='border w-4'></div>}</td>
-                                    <td className='py-4'>{purchaseOrderDetail.classification1 || <div className='border w-4'></div>}</td>
-                                    <td className='py-4'>{purchaseOrderDetail.classification2 || <div className='border w-4'></div>}</td>
-                                    <td className='py-4'>{purchaseOrderDetail.status || <div className='border w-4'></div>}</td>
-                                </tr>
-                            ))}
+                        {purchaseOrderDetails.map((purchaseOrderDetail) => (
+                            <tr className='border-b' key={purchaseOrderDetail.id}>
+                                <td className='py-4'>{purchaseOrderDetail.order_date || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{purchaseOrderDetail.order_date || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{purchaseOrderDetail.order_date || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{purchaseOrderDetail.product_id || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{purchaseOrderDetail.product_name || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{purchaseOrderDetail.classification_primary || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{purchaseOrderDetail.classification_secondary || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{purchaseOrderDetail.number || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{purchaseOrderDetail.price || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{parseInt(purchaseOrderDetail.number) * parseInt(purchaseOrderDetail.price) || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{purchaseOrderDetail.lot_number || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{purchaseOrderDetail.storage_facility || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{purchaseOrderDetail.contact_person || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{purchaseOrderDetail.classification1 || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{purchaseOrderDetail.classification2 || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{(parseInt(purchaseOrderDetail.number) * parseInt(purchaseOrderDetail.price)) / handlePurchaseOrderNumberPrice(purchaseOrderDetails)*100 || <div className='border w-4'></div>}%</td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             </div>
@@ -316,7 +487,7 @@ function Index() {
                     <div className='py-1 font-bold'>{handlePurchaseOrderNumberSum(purchaseOrderDetails)}個</div>
                 </div>
                 <div className='grid grid-cols-2'>
-                    <div  className='font-bold py-1 pr-4'>発注金額（税別）</div>
+                    <div className='font-bold py-1 pr-4'>発注金額（税別）</div>
                     <div className='py-1 font-bold'>{handlePurchaseOrderNumberPrice(purchaseOrderDetails)}円</div>
                 </div>
                 <div className='grid grid-cols-2'>

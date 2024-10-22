@@ -14,7 +14,7 @@ const db = new sqlite3.Database(dbPath);
 
 function loadPaymentVoucherDetails(callback) {
     const sql = `
-        SELECT pvd.*, pv.*, v.*
+        SELECT pvd.*, pv.*, v.*, v.payment_method AS vendor_payment_method, pvd.payment_method AS detail_payment_method
         FROM payment_voucher_details pvd
         LEFT JOIN payment_vouchers pv ON pvd.payment_voucher_id = pv.id
         LEFT JOIN vendors v ON pv.vender_id = v.id
@@ -154,7 +154,7 @@ function initializeDatabase() {
 
 function searchPaymentVoucherDetails(conditions, callback) {
     let sql = `
-        SELECT pvd.*, pv.*, v.*
+        SELECT pvd.*, pv.*, v.*, v.payment_method AS vendor_payment_method, pvd.payment_method AS detail_payment_method
         FROM payment_voucher_details pvd
         LEFT JOIN payment_vouchers pv ON pvd.payment_voucher_id = pv.id
         LEFT JOIN vendors v ON pv.vender_id = v.id
@@ -166,8 +166,17 @@ function searchPaymentVoucherDetails(conditions, callback) {
     // 条件オブジェクトのキーと値を動的にWHERE句に追加
     if (conditions && Object.keys(conditions).length > 0) {
         for (const [column, value] of Object.entries(conditions)) {
-            whereClauses.push(`${column} LIKE ?`);
-            params.push(`%${value}%`);
+            // pod.created_start と pod.created_end の特別な扱い
+            if (column === 'pvd.created_start') {
+                whereClauses.push(`pvd.created >= ?`);
+                params.push(value); // created_startの日付をそのまま使用
+            } else if (column === 'pvd.created_end') {
+                whereClauses.push(`pvd.created <= ?`);
+                params.push(value); // created_endの日付をそのまま使用
+            } else {
+                whereClauses.push(`${column} LIKE ?`);
+                params.push(`%${value}%`);
+            }
         }
     }
 
@@ -187,7 +196,7 @@ function searchPaymentVouchersByPaymentVoucherId(query, callback) {
 
     if (query && query.trim() !== '') {
         sql = `
-        SELECT * FROM payment_vouchers
+        SELECT * FROM payment_voucher_details
         WHERE payment_voucher_id LIKE ?
         `;
         params = [`%${query}%`];

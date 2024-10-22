@@ -164,24 +164,6 @@ function initializeDatabase() {
     db.run(sql);
 }
 
-// function searchPurchaseInvoiceDetails(query, callback) {
-//     let sql;
-//     let params = [];
-
-//     if (query && query.trim() !== '') {
-//         sql = `
-//         SELECT * FROM purchase_invoice_details 
-//         WHERE product_id LIKE ? OR unit LIKE ? OR storage_facility LIKE ?
-//         `;
-//         params = [`%${query}%`, `%${query}%`, `%${query}%`];
-//     } else {
-//         sql = `SELECT * FROM purchase_invoice_details`;
-//     }
-//     db.all(sql, params, (err, rows) => {
-//         callback(err, rows);
-//     });
-// }
-
 
 function searchPurchaseInvoiceDetails(conditions, callback) {
     let sql = `
@@ -198,8 +180,17 @@ function searchPurchaseInvoiceDetails(conditions, callback) {
     // 条件オブジェクトのキーと値を動的にWHERE句に追加
     if (conditions && Object.keys(conditions).length > 0) {
         for (const [column, value] of Object.entries(conditions)) {
-            whereClauses.push(`${column} LIKE ?`);
-            params.push(`%${value}%`);
+            // pod.created_start と pod.created_end の特別な扱い
+            if (column === 'pid.created_start') {
+                whereClauses.push(`pid.created >= ?`);
+                params.push(value); // created_startの日付をそのまま使用
+            } else if (column === 'pid.created_end') {
+                whereClauses.push(`pid.created <= ?`);
+                params.push(value); // created_endの日付をそのまま使用
+            } else {
+                whereClauses.push(`${column} LIKE ?`);
+                params.push(`%${value}%`);
+            }
         }
     }
 

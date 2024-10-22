@@ -138,9 +138,9 @@ function searchPaymentVouchers(query, callback) {
     if (query && query.trim() !== '') {
         sql = `
         SELECT * FROM payment_vouchers 
-        WHERE order_date LIKE ? OR vender_id LIKE ? OR vender_name LIKE ? OR contact_person LIKE ? OR remarks LIKE ?
+        WHERE code LIKE ? OR vender_name LIKE ? 
         `;
-        params = [`%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`];
+        params = [`%${query}%`, `%${query}%`];
     } else {
         sql = `SELECT * FROM payment_vouchers`;
     }

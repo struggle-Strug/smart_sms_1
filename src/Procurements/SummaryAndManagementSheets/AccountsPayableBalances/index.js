@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
+import dayjs from 'dayjs';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -11,29 +12,176 @@ function Index() {
     const dropdownRef = useRef(null);
     const location = useLocation();
     const [searchQuery, setSearchQuery] = useState('');
+    const [paymentVoucherDetails, setPaymentVoucherDetails] = useState([]);
+    const [purchaseInvoiceDetails, setPurchaseInvoiceDetails] = useState([]);
+    const [pvAndPiMappings, setPvAndPiMappings] = useState([]);
+    const [aggregatedPvData, setAggregatedPvData] = useState([])
+    const [aggregatedPiData, setAggregatedPiData] = useState([])
 
     useEffect(() => {
-        ipcRenderer.send('get-customers');
-        ipcRenderer.on('customers-data', (event, data) => {
-            setCustomers(data);
-        });
+        ipcRenderer.send('load-payment-voucher-details');
+        ipcRenderer.send('load-purchase-invoice-details');
+        ipcRenderer.send('load-pos-pvs-mappings');
 
-        ipcRenderer.on('customer-deleted', (event, id) => {
-            setCustomers((prevCustomers) => prevCustomers.filter(customer => customer.id !== id));
-        });
+        const handleLoadPIDetails = (event, data) => {
+            setPurchaseInvoiceDetails(data);
+            setAggregatedPiData(handleCreateData(data))
+        }
 
-        ipcRenderer.on('search-customers-result', (event, data) => {
-            setCustomers(data);
-        });
+        const handleLoadPVDetails = (event, data) => {
+            setAggregatedPvData(handlePaymentCreateData(data))
+            setPaymentVoucherDetails(data);
+        }
+
+        const handleLoadMappingDetails = (event, data) => {
+
+            setPvAndPiMappings(data);
+        }
+        ipcRenderer.on('load-purchase-invoice-details', handleLoadPIDetails);
+        ipcRenderer.on('load-payment-voucher-details', handleLoadPVDetails);
+        ipcRenderer.on('load-pos-pvs-mappings', handleLoadMappingDetails);
 
         return () => {
-            ipcRenderer.removeAllListeners('customers-data');
-            ipcRenderer.removeAllListeners('search-customers-result');
+            ipcRenderer.removeListener('load-purchase-invoice-details', handleLoadPIDetails);
+            ipcRenderer.removeListener('load-payment-voucher-details', handleLoadPVDetails);
+            ipcRenderer.removeListener('load-pos-pvs-mappings', handleLoadMappingDetails);
         };
     }, []);
 
+    const getCurrentMonth = () => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, "0");
+        return `${year}-${month}`; // 例: "2024-10"
+    };
+
+
+    const handleCreateData = (data) => {
+
+        const result = data.reduce((acc, item) => {
+            const month = item.closing_date ? item.closing_date.slice(0, 7) : getCurrentMonth(); // 例: "2024-09"
+            const key = `${item.vender_name}-${month}`;
+
+            if (!acc[key]) {
+                acc[key] = {
+                    vender_name: item.vender_name,
+                    pi_id: item.purchase_invoice_id,
+                    month: month,
+                    totalSales: 0
+                };
+            }
+
+            acc[key].totalSales += item.price * item.number;
+
+            return acc;
+        }, {});
+
+        const resultArray = Object.values(result);
+
+        return resultArray;
+
+    }
+
+
+    const createDisplayData = () => {
+        const displayArray = []
+        const currentMonth = dayjs().format('YYYY-MM'); // 現在の年月
+        const previousMonth = dayjs().subtract(1, 'month').format('YYYY-MM');
+
+        for (let i = 0; i < aggregatedPvData.length; i++) {
+            let inputData = {
+                vender_name: aggregatedPvData[i].vender_name,
+                balance_of_last_month: 0,
+                purchase_current_month: 0,
+                payment_current_month: 0,
+                balance_of_current_month: 0,
+            }
+            if (aggregatedPvData[i].month === currentMonth) {
+                inputData.purchase_current_month += aggregatedPvData[i].totalSales;
+                inputData.balance_of_current_month += aggregatedPvData[i].totalSales;
+            } else if (aggregatedPvData[i].month === previousMonth) {
+                inputData.balance_of_last_month += aggregatedPvData[i].totalSales;
+            } else {
+                continue
+            }
+            displayArray.push(inputData)
+        }
+
+        for (let i = 0; i < displayArray.length; i++) {
+            for (let j = 0; j < aggregatedPiData.length; j++) {
+                if (displayArray[i].vender_name === aggregatedPiData[j].vender_name) {
+                    if (aggregatedPiData[i].month === currentMonth) {
+                        displayArray[i].balance_of_current_month -= aggregatedPiData[i].totalSales;
+                        displayArray[i].payment_current_month += aggregatedPiData[i].totalSales;
+                    } else if (aggregatedPiData[i].month === previousMonth) {
+                        displayArray[i].balance_of_last_month -= aggregatedPiData[i].totalSales;
+                    } else {
+                        continue
+                    }
+                }
+            }
+        }
+
+        return displayArray;
+    }
+
+    const createSumData = (data) => {
+        const inputData = {
+            balance_of_last_month: 0,
+            purchase_current_month: 0,
+            payment_current_month: 0,
+            balance_of_current_month: 0,
+        }
+
+        for (let i = 0; i < data.length; i++) {
+            inputData.balance_of_last_month += data[i].balance_of_last_month
+            inputData.purchase_current_month += data[i].purchase_current_month
+            inputData.payment_current_month += data[i].payment_current_month
+            inputData.balance_of_current_month += data[i].balance_of_current_month
+        }
+
+        return inputData
+    }
+
+
+
+    const handlePaymentCreateData = (data) => {
+
+        // 売上データを集計する
+        const result = data.reduce((acc, item) => {
+            // 日付から年月を取得
+            const month = (item.payment_date || item.payment_date !== "") ? item.payment_date.slice(0, 7) : getCurrentMonth(); // 例: "2024-09"
+            const key = `${item.vender_name}-${month}`;
+
+            // すでに同じvender_nameと月が存在するか確認
+            if (!acc[key]) {
+                acc[key] = {
+                    vender_name: item.vender_name,
+                    pv_id: item.payment_voucher_id,
+                    month: month,
+                    totalSales: 0
+                };
+            }
+
+            // 売上合計を計算
+            acc[key].totalSales += item.payment_price;
+
+            return acc;
+        }, {});
+
+        // 結果を配列形式に変換
+        const resultArray = Object.values(result);
+
+        return resultArray;
+
+    }
+
+    // const createDisplayData = () => {
+
+    // }
+
     const toggleDropdown = (id) => {
-        
+
         if (!isOpen) setIsOpen(id);
         else setIsOpen(false);
     };
@@ -176,13 +324,13 @@ function Index() {
                         </tr>
                     </thead>
                     <tbody className=''>
-                        {customers.map((customer) => (
-                            <tr className='border-b' key={customer.id}>
-                                <td className='py-4'>仕入先A</td>
-                                <td>100,000円</td>
-                                <td>500,000円</td>
-                                <td>400,000円</td>
-                                <td>200,000円</td>
+                        {createDisplayData().map((value) => (
+                            <tr className='border-b' key={value.vender_name}>
+                                <td className='py-4'>{value.vender_name}</td>
+                                <td>{value.balance_of_last_month.toLocaleString()}円</td>
+                                <td>{value.purchase_current_month.toLocaleString()}円</td>
+                                <td>{value.payment_current_month.toLocaleString()}円</td>
+                                <td>{value.balance_of_current_month.toLocaleString()}円</td>
                                 <td>2023-09-30</td>
                             </tr>
                         ))}
@@ -192,19 +340,19 @@ function Index() {
             <div className='flex justify-end items-center mb-16 text-lg'>
                 <div className='grid grid-cols-2'>
                     <div className='py-1 pr-4'>先月末残高</div>
-                    <div className='py-1 font-bold'>500,000円</div>
+                    <div className='py-1 font-bold'>{createSumData(createDisplayData()).balance_of_last_month}円</div>
                 </div>
                 <div className='grid grid-cols-2'>
                     <div className='py-1 pr-4'>当月仕入高</div>
-                    <div className='py-1 font-bold'>500,000円</div>
+                    <div className='py-1 font-bold'>{createSumData(createDisplayData()).purchase_current_month}円</div>
                 </div>
                 <div className='grid grid-cols-2'>
-                    <div  className='py-1 pr-4'>当月支払額</div>
-                    <div className='py-1 font-bold'>500,000円</div>
+                    <div className='py-1 pr-4'>当月支払額</div>
+                    <div className='py-1 font-bold'>{createSumData(createDisplayData()).payment_current_month}円</div>
                 </div>
                 <div className='grid grid-cols-2'>
                     <div className='py-1 pr-4'>当月末残高</div>
-                    <div className='py-1 font-bold'>500,000円</div>
+                    <div className='py-1 font-bold'>{createSumData(createDisplayData()).balance_of_current_month}円</div>
                 </div>
             </div>
         </div>

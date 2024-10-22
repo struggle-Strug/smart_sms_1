@@ -20,12 +20,12 @@ ipcMain.on('load-payment-vouchers', (event) => {
 });
 
 // 支払伝票の詳細を取得
-ipcMain.on('get-payment-voucher-detail', (event, id) => {
+ipcMain.on('get-payment-voucher-data', (event, id) => {
     getPaymentVoucherById(id, (err, row) => {
         if (err) {
             console.error(err.message);
         } else {
-            event.sender.send('payment-voucher-detail-data', row);
+            event.sender.send('get-payment-voucher-data-result', row);
         }
     });
 });
