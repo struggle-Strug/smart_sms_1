@@ -129,14 +129,11 @@ function searchStockInOutSlips(query, callback) {
     if (query && query.trim() !== '') {
         sql = `
         SELECT * FROM stock_in_out_slips 
-        WHERE stock_in_out_date LIKE ? 
-        OR processType LIKE ? 
+        WHERE code LIKE ? 
         OR warehouse_from LIKE ? 
         OR warehouse_to LIKE ? 
-        OR contact_person LIKE ? 
-        OR remarks LIKE ?
         `;
-        params = Array(6).fill(`%${query}%`);
+        params = Array(3).fill(`%${query}%`);
     } else {
         sql = `SELECT * FROM stock_in_out_slips`;
     }

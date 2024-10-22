@@ -17,6 +17,7 @@ function PurchaseInvoicesAdd() {
 
     const [isVendorIdFocused, setIsVendorIdFocused] = useState(false);
     const [isVendorNameFocused, setIsVendorNameFocused] = useState(false);
+    const [isPurchaseOrderFocused, setIsPurchaseOrderFocused] = useState(false);
     const [isProductIdFocused, setIsProductIdFocused] = useState(-1);
     const [isProductNameFocused, setIsProductNameFocused] = useState(-1);
     const [errors, setErrors] = useState({});
@@ -35,6 +36,14 @@ function PurchaseInvoicesAdd() {
 
     const handleVendorNameBlur = () => {
         setIsVendorNameFocused(false);
+    };
+
+    const handlePurchaseOrderFocus = () => {
+        setIsPurchaseOrderFocused(true);
+    };
+
+    const handlePurchaseOrderFBlur = () => {
+        setIsPurchaseOrderFocused(false);
     };
 
     const handleProductIdFocus = (index) => {
@@ -68,8 +77,26 @@ function PurchaseInvoicesAdd() {
         payment_method: '',
     });
 
+    const [purchaseInvoiceDetails, setPurchaseInvoiceDetails] = useState([
+        {
+            purchase_invoice_id: '',
+            product_id: '',
+            product_name: '',
+            number: '',
+            unit: '',
+            price: '',
+            tax_rate: '',
+            storage_facility: '',
+            stock: '',
+        }
+    ]);
+
+
+
     const [vendors, setVendors] = useState([])
     const [products, setProducts] = useState([])
+    const [purchaseOrders, setPurchaseOrders] = useState([])
+    const [purchaseOrderDetails, setPurchaseOrderDetails] = useState([])
 
     useEffect(() => {
         ipcRenderer.on('search-id-vendors-result', (event, data) => {
@@ -88,28 +115,43 @@ function PurchaseInvoicesAdd() {
             setProducts(data);
         });
 
+        ipcRenderer.on('search-purchase-orders-on-pv-result', (event, data) => {
+            setPurchaseOrders(data);
+        });
+
+        ipcRenderer.on('search-purchase-order-details-result', (event, data) => {
+            const arr = [];
+            for (let i = 0; i < data.length; i++) {
+                const detailTemplate = {
+                    purchase_invoice_id: '',
+                    product_id: '',
+                    product_name: '',
+                    number: '',
+                    unit: '',
+                    price: '',
+                    tax_rate: '',
+                    storage_facility: '',
+                    stock: '',
+                }
+                for (let key in detailTemplate) {
+                    detailTemplate[key] = data[i][key]
+                }
+                arr.push(detailTemplate)
+            }
+            setPurchaseInvoiceDetails(arr);
+            setPurchaseOrderDetails(data);
+        });
+
 
         return () => {
             ipcRenderer.removeAllListeners('search-id-vendors-result');
             ipcRenderer.removeAllListeners('search-name-vendors-result');
             ipcRenderer.removeAllListeners('search-id-products-result');
             ipcRenderer.removeAllListeners('search-name-products-result');
+            ipcRenderer.removeAllListeners('search-name-products-result');
+            ipcRenderer.removeAllListeners('search-purchase-orders-on-pv-result');
         };
     }, []);
-
-    const [purchaseInvoiceDetails, setPurchaseInvoiceDetails] = useState([
-        {
-            purchase_invoice_id: '',
-            product_id: '',
-            product_name: '',
-            number: '',
-            unit: '',
-            price: '',
-            tax_rate: '',
-            storage_facility: '',
-            stock: '',
-        }
-    ]);
 
     const addPurchaseInvoiceDetail = () => {
         setPurchaseInvoiceDetails([...purchaseInvoiceDetails, {
@@ -154,10 +196,17 @@ function PurchaseInvoicesAdd() {
         if (name === "vender_name") {
             ipcRenderer.send('search-name-vendors', value);
         }
+
+        if (name === "purchase_order_id") {
+            ipcRenderer.send('search-purchase-orders-on-pv', {"po_code": value});
+        }
         setPurchaseInvoice({ ...purchaseInvoice, [name]: value });
     };
 
     const handleOnClick = (name, value) => {
+        if (name === "purchase_order_id") {
+            ipcRenderer.send('search-purchase-order-details', {"po.code": value});
+        }
         setPurchaseInvoice({ ...purchaseInvoice, [name]: value });
     };
 
@@ -402,9 +451,26 @@ function PurchaseInvoicesAdd() {
                         <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="contact_person" value={purchaseInvoice.contact_person} onChange={handleChange} />
                     </div>
                     <div className='py-2.5 font-bold text-xl'>発注伝票</div>
-                    <div className='pb-2'>
+                    <div className='pb-2 relative'>
                         <div className='text-sm pb-1.5'>発注伝票番号</div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="purchase_order_id" value={purchaseInvoice.purchase_order_id} onChange={handleChange} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="purchase_order_id" value={purchaseInvoice.purchase_order_id} onChange={handleChange}  onFocus={handlePurchaseOrderFocus} onBlur={handlePurchaseOrderFBlur} />
+                        {
+                                    isPurchaseOrderFocused &&
+                                    <div className='absolute top-20 left-0 z-10' onMouseDown={(e) => e.preventDefault()}>
+                                        <div className="relative inline-block">
+                                            <div className="absolute left-5 -top-2 w-3 h-3 bg-white transform rotate-45 shadow-lg"></div>
+                                            <div className="bg-white shadow-lg rounded-lg p-4 w-60">
+                                                <div className="flex flex-col space-y-2">
+                                                    {
+                                                        purchaseOrders.map((value, index) => (
+                                                            <div className="p-2 hover:bg-gray-100 hover:cursor-pointer" onClick={(e) => handleOnClick("purchase_order_id", value.code)}>{value.code}</div>
+                                                        ))
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
                     </div>
                     <div className='py-3'>
                         <hr className='' />
