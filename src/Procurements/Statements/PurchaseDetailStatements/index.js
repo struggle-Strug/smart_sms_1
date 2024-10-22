@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import CustomSelect from '../../../Components/CustomSelect';
+import DatePicker from 'react-datepicker';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -25,6 +26,8 @@ function Index() {
         "p.classification_secondary": "",
         "pid.product_name": "",
         "pid.contact_person": "",
+        "pid.created_start": "",
+        "pid.created_end": "",
         "pid.storage_facility": "",
         "pid.status": "",
         "pid.lot_number": "",
@@ -32,7 +35,7 @@ function Index() {
         "v.classification2": "",
     });
 
-    
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setSearchQueryList((prev) => ({
@@ -41,13 +44,108 @@ function Index() {
         }));
     };
 
+    const header = [
+        "仕入日",
+        "仕入番号",
+        "仕入先",
+        "商品コード",
+        "商品名",
+        "カテゴリー",
+        "サブカテゴリー",
+        "数量",
+        "単価",
+        "金額",
+        "ロット番号",
+        "倉庫",
+        "担当者",
+        "区分１",
+        "区分２",
+        "ステータス"
+    ];
+
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // 月は0から始まるため+1し、2桁にする
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+
+    const fileName = `仕入明細表_${year}${month}${day}_${hours}${minutes}${seconds}`;
+    const [dataForExport, setDataForExport] = useState({
+        header: header,
+        data: [],
+        fileName: fileName
+    });
+
     useEffect(() => {
         ipcRenderer.send('load-purchase-invoice-details');
 
-        const handleLoadDetails = (event, data) => setPurchaseInvoiceDetails(data);
+        const handleLoadDetails = (event, data) => {
+            setPurchaseInvoiceDetails(data)
+            const arr = []
+            for (let i = 0; i < data.length; i++) {
+                const value = [
+                    data[i].order_date,
+                    data[i].purchase_order_id,
+                    data[i].vendor_name,
+                    data[i].product_id,
+                    data[i].product_name,
+                    data[i].classification_primary,
+                    data[i].classification_secondary,
+                    data[i].number,
+                    data[i].price,
+                    parseInt(data[i].number) * parseInt(data[i].price), // 金額は数量 × 単価
+                    data[i].lot_number,
+                    data[i].storage_facility,
+                    data[i].contact_person,
+                    data[i].classification1,
+                    data[i].classification2,
+                    data[i].status
+                ];
+                arr.push(value);
+            }
+            const dataForSet = {
+                header: header,
+                data: arr,
+                fileName: fileName
+            };
+            setDataForExport(dataForSet);
+        };
+
+        ipcRenderer.on('load-purchase-invoice-details', handleLoadDetails);
+
         const handleSearchResult = (event, data) => {
 
             setPurchaseInvoiceDetails(data);
+            const arr = []
+            for (let i = 0; i < data.length; i++) {
+                const value = [
+                    data[i].order_date,
+                    data[i].purchase_order_id,
+                    data[i].vendor_name,
+                    data[i].product_id,
+                    data[i].product_name,
+                    data[i].classification_primary,
+                    data[i].classification_secondary,
+                    data[i].number,
+                    data[i].price,
+                    parseInt(data[i].number) * parseInt(data[i].price), // 金額は数量 × 単価
+                    data[i].lot_number,
+                    data[i].storage_facility,
+                    data[i].contact_person,
+                    data[i].classification1,
+                    data[i].classification2,
+                    data[i].status
+                ];
+                arr.push(value);
+            }
+            const dataForSet = {
+                header: header,
+                data: arr,
+                fileName: fileName
+            };
+            setDataForExport(dataForSet);
         };
 
         ipcRenderer.on('load-purchase-invoice-details', handleLoadDetails);
@@ -90,7 +188,7 @@ function Index() {
     };
 
     const toggleDropdown = (id) => {
-        
+
         if (!isOpen) setIsOpen(id);
         else setIsOpen(false);
     };
@@ -126,6 +224,11 @@ function Index() {
         };
     }, []);
 
+    const handleDateChange = (date, name) => {
+        const formattedDate = date ? date.toISOString().split('T')[0] : '';
+        setSearchQueryList({ ...searchQueryList, [name]: formattedDate });
+    };
+
     const DropDown = (id) => {
         return (
             <div ref={dropdownRef} className='absolute right-0 origin-top-right mt-6 rounded shadow-lg z-50 bg-white p-3' style={{ top: "50px", width: "120px" }}>
@@ -144,6 +247,37 @@ function Index() {
     const handleCancelDelete = () => {
         setIsDialogOpen(false);
     };
+
+    const exportToCSV = () => {
+        ipcRenderer.send('export-to-csv', dataForExport);
+    };
+
+    const exportToExcel = () => {
+        ipcRenderer.send('export-to-excel', dataForExport);
+    };
+
+    const exportPDF = () => {
+        ipcRenderer.send('export-to-pdf', dataForExport);
+    };
+
+    const [message, setMessage] = useState('');
+
+    useEffect(() => {
+        ipcRenderer.on('export-success', (event, successMessage) => {
+            setMessage(successMessage);
+            alert(successMessage);
+        });
+
+        ipcRenderer.on('export-failure', (event, errorMessage) => {
+            setMessage(errorMessage);
+            alert(errorMessage);
+        });
+
+        return () => {
+            ipcRenderer.removeAllListeners('export-success');
+            ipcRenderer.removeAllListeners('export-failure');
+        };
+    }, []);
 
     return (
         <div className='w-5/6'>
@@ -167,15 +301,30 @@ function Index() {
                             <div className='flex items-center'>
                                 <div>
                                     <div className='text-sm pb-1.5'>期間指定 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
-                                    <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                                    {/* <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} /> */}
+                                    <DatePicker
+                                        selected={searchQueryList["pid.created_start"] ? new Date(searchQueryList["pid.created_start"]) : null}
+                                        onChange={(date) => handleDateChange(date, "pid.created_start")}
+                                        dateFormat="yyyy-MM-dd"
+                                        className='border rounded px-4 py-2.5 bg-white  w-full'
+                                        placeholderText='期間を選択'
+                                    />
                                 </div>
                                 <div>
                                     <div className='w-1'>&nbsp;</div>
                                     <div className='flex items-center px-2'>〜</div>
                                 </div>
+
                                 <div>
-                                    <div className='text-sm pb-1.5'></div>
-                                    <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                                    <div className='text-sm pb-1.5 text-gray-100'>期間指定</div>
+                                    {/* <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} /> */}
+                                    <DatePicker
+                                        selected={searchQueryList["pid.created_end"] ? new Date(searchQueryList["pid.created_end"]) : null}
+                                        onChange={(date) => handleDateChange(date, "pid.created_end")}
+                                        dateFormat="yyyy-MM-dd"
+                                        className='border rounded px-4 py-2.5 bg-white  w-full'
+                                        placeholderText='期間を選択'
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -294,11 +443,9 @@ function Index() {
                 </div>
                 <div className='flex justify-end'>
                     <div className='flex ml-auto pt-6'>
-                        <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold flex'>
-                            <div className='flex items-center'>
-                            </div>
+                        <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={() => exportToCSV()}>
                             エクスポート
-                        </Link>
+                        </div>
                     </div>
                 </div>
                 <div className='px-8 pb-8 overflow-x-scroll'>
@@ -324,7 +471,7 @@ function Index() {
                             </tr>
                         </thead>
                         <tbody>
-                        {purchaseInvoiceDetails.map((purchaseInvoiceDetail) => (
+                            {purchaseInvoiceDetails.map((purchaseInvoiceDetail) => (
                                 <tr className='border-b' key={purchaseInvoiceDetail.id}>
                                     <td className='py-4'>{purchaseInvoiceDetail.order_date || <div className='border w-4'></div>}</td>
                                     <td className='py-4'>{purchaseInvoiceDetail.order_date || <div className='border w-4'></div>}</td>

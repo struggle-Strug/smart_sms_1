@@ -8,22 +8,61 @@ const { ipcRenderer } = window.require('electron');
 function PurchaseInvoicesDetail() {
 
     const { id } = useParams();
-    const [invoice, setInvoice] = useState(null);
+    const [purchaseInvoice, setPurchaseInvoice] = useState({
+        code: '',
+        order_date: '',
+        vender_id: '',
+        vender_name: '',
+        honorific: '',
+        vender_contact_person: '',
+        contact_person: "",
+        purchase_order_id: "",
+        remarks: '',
+        closing_date: '',
+        payment_due_date: '',
+        payment_method: '',
+    });
+
+    const [purchaseInvoiceDetails, setPurchaseInvoiceDetails] = useState([
+        {
+            purchase_invoice_id: '',
+            product_id: '',
+            product_name: '',
+            number: '',
+            unit: '',
+            price: '',
+            tax_rate: '',
+            storage_facility: '',
+            stock: '',
+        }
+    ]);
 
     useEffect(() => {
-        
-        ipcRenderer.send('get-purchase-invoice-detail', id);
-        ipcRenderer.on('purchase-invoice-detail-data', (event, data) => {
-            setInvoice(data);
+        ipcRenderer.send('get-purchase-invoice-data', id);
+        ipcRenderer.on('get-purchase-invoice-data-result', (event, data) => {
+            setPurchaseInvoice(data);
+        });
+
+        ipcRenderer.send('search-purchase-invoice-details-by-purchase-invoice-id', id);
+
+        ipcRenderer.on('search-purchase-invoice-details-by-purchase-invoice-id-result', (event, data) => {
+            setPurchaseInvoiceDetails(data);
         });
 
         return () => {
-            ipcRenderer.removeAllListeners('purchase-invoice-detail-data');
+            ipcRenderer.removeAllListeners('purchase-order-data');
+            ipcRenderer.removeAllListeners('search-purchase-order-details-by-vender-id');
         };
     }, [id]);
 
-    if (!invoice) {
-        return <div>Loading...</div>;
+    const handleSumPrice = () => {
+        let SumPrice = 0
+
+        for (let i = 0; i < purchaseInvoiceDetails.length; i++) {
+            SumPrice += purchaseInvoiceDetails[i].price * purchaseInvoiceDetails[i].number;
+        }
+
+        return { "subtotal": SumPrice, "consumptionTaxEight": SumPrice * 0.08, "consumptionTaxTen": 0, "totalConsumptionTax": SumPrice * 0.08, "Total": SumPrice * 1.08 }
     }
 
 
@@ -33,7 +72,7 @@ function PurchaseInvoicesDetail() {
                 <div className='pt-8 pb-6 flex border-b px-8 items-center'>
                     <div className='text-2xl font-bold'>支払伝票</div>
                     <div className='flex ml-auto'>
-                        <Link to={`/purchase-invoices/edit/${id}`} className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
+                        <Link to={`/procurement/voucher-entries/purchase-invoices/edit/${id}`} className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
                             <div className='pr-1.5 pl-1 flex items-center'>
                                 <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M0.391357 18.7308H4.14136L15.2014 7.67077L11.4514 3.92077L0.391357 14.9808V18.7308ZM2.39136 15.8108L11.4514 6.75077L12.3714 7.67077L3.31136 16.7308H2.39136V15.8108Z" fill="#1F2937" />
@@ -65,11 +104,11 @@ function PurchaseInvoicesDetail() {
                     <div className='py-2.5 font-bold text-xl'>伝票番号</div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>伝票番号</div>
-                        <div>{invoice.id || "N/A"}</div>
+                        <div>{purchaseInvoice.id || "N/A"}</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>支払日付</div>
-                        <div>{invoice.order_date || "N/A"}</div>
+                        <div>{purchaseInvoice.order_date || "N/A"}</div>
                     </div>
                     <div className='py-3'>
                         <hr />
@@ -77,52 +116,121 @@ function PurchaseInvoicesDetail() {
                     <div className='py-2.5 font-bold text-xl'>取引先情報</div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>宛名</div>
-                        <div>{invoice.vender_name || "N/A"}</div>
+                        <div>{purchaseInvoice.vender_name || "N/A"}</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>仕入先コード</div>
-                        <div>{invoice.vender_id || "N/A"}</div>
+                        <div>{purchaseInvoice.vender_id || "N/A"}</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>郵便番号</div>
-                        <div>{invoice.postal_code || "N/A"}</div>
+                        <div>{purchaseInvoice.postal_code || "N/A"}</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>市区町村・番地</div>
-                        <div>{invoice.address || "N/A"}</div>
+                        <div>{purchaseInvoice.address || "N/A"}</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>担当者</div>
-                        <div>{invoice.contact_person || "N/A"}</div>
+                        <div>{purchaseInvoice.contact_person || "N/A"}</div>
                     </div>
                     <div className='py-3'>
                         <hr />
                     </div>
-                    <div className='py-2.5 font-bold text-xl'>支払方法</div>
+                    <div className='py-2.5 font-bold text-xl'>自社情報</div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>自社名（仮）</div>
+                        <div></div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>担当者名（仮）</div>
+                        <div></div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>電話番号</div>
+                        <div>088040760246（仮）</div>
+                    </div>
+                    <div className='py-3'>
+                        <hr className='' />
+                    </div>
+                    <div className='py-2.5 font-bold text-xl'>明細</div>
                     <table className="w-full mt-8 table-auto">
-                        <thead>
+                        <thead className=''>
                             <tr className='border-b'>
-                                <th className='text-left py-2'>支払方法</th>
-                                <th className='text-left py-2 w-72'>支払金額</th>
-                                <th className='text-left py-2'>手数料等</th>
-                                <th className='text-left py-2'>合計金額</th>
+                                <th className='text-left py-2'>商品コード</th>
+                                <th className='text-left py-2 w-72'>商品名</th>
+                                <th className='text-left py-2'>数量</th>
+                                <th className='text-left py-2'>単位</th>
+                                <th className='text-left py-2'>単価</th>
+                                <th className='text-left py-2'>税率</th>
+                                <th className='text-left py-2'>倉庫</th>
+                                <th className='text-left py-2'>金額</th>
+                                <th className='text-left py-2'>税額</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr className='border-b'>
-                                <td className='py-2'>{invoice.payment_method || "N/A"}</td>
-                                <td className='py-2'>{invoice.payment_amount || "0円"}</td>
-                                <td className='py-2'>{invoice.fees_and_charges || "0円"}</td>
-                                <td className='py-2'>{invoice.total_amount || "0円"}</td>
-                            </tr>
+                            {
+                                purchaseInvoiceDetails.map((purchaseInvoiceDetail, index) => (
+                                    <tr className='border-b' key={index}>
+                                        <td className='py-2'>{purchaseInvoiceDetail.product_id}</td>
+                                        <td className='py-2'>{purchaseInvoiceDetail.product_name}</td>
+                                        <td className='py-2'>{purchaseInvoiceDetail.number}</td>
+                                        <td className='py-2'>{purchaseInvoiceDetail.unit}</td>
+                                        <td className='py-2'>{purchaseInvoiceDetail.price}</td>
+                                        <td className='py-2'>{purchaseInvoiceDetail.tax_rate}%</td>
+                                        <td className='py-2'>{purchaseInvoiceDetail.storage_facility}</td>
+                                        <td className='py-2 font-bold'>{parseInt(purchaseInvoiceDetail.price) * parseInt(purchaseInvoiceDetail.number)}円</td>
+                                        <td className='py-2 font-bold'>{parseInt(purchaseInvoiceDetail.price) * parseInt(purchaseInvoiceDetail.number) * parseInt(purchaseInvoiceDetail.tax_rate)}円</td>
+                                    </tr>
+                                ))}
                         </tbody>
                     </table>
                     <div className='py-3'>
                         <hr />
                     </div>
+                    <div className='py-6 flex'>
+                        <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>税抜合計</div>
+                                <div>{handleSumPrice().subtotal.toFixed(0).toLocaleString()}円</div>
+                            </div>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>消費税(8%)</div>
+                                <div>{handleSumPrice().consumptionTaxEight.toFixed(0).toLocaleString()}円</div>
+                            </div>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>消費税(10%)</div>
+                                <div>{handleSumPrice().consumptionTaxTen.toFixed(0).toLocaleString()}円</div>
+                            </div>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>消費税合計</div>
+                                <div>{handleSumPrice().totalConsumptionTax.toFixed(0).toLocaleString()}円</div>
+                            </div>
+                            <div className='flex'>
+                                <div className='w-40'>税込合計</div>
+                                <div>{handleSumPrice().Total.toFixed(0).toLocaleString()}円</div>
+                            </div>
+                        </div>
+                    </div>
                     <div className='py-2.5 font-bold text-xl'>備考</div>
                     <div className='flex items-center pb-2'>
-                        {invoice.remarks || "N/A"}
+                        {purchaseInvoice.remarks || "N/A"}
+                    </div>
+                    <div className='py-3'>
+                        <hr className='' />
+                    </div>
+                    <div className='py-2.5 font-bold text-xl'>支払情報</div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>締日</div>
+                        <div>{purchaseInvoice.closing_date}</div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>支払期日</div>
+                        <div>{purchaseInvoice.payment_due_date}</div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>支払方法</div>
+                        <div>{purchaseInvoice.payment_method}</div>
                     </div>
                 </div>
             </div>

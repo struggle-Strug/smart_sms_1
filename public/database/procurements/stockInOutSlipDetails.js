@@ -160,8 +160,17 @@ function searchStockInOutSlipDetails(conditions, callback) {
     // 条件オブジェクトのキーと値を動的にWHERE句に追加
     if (conditions && Object.keys(conditions).length > 0) {
         for (const [column, value] of Object.entries(conditions)) {
-            whereClauses.push(`${column} LIKE ?`);
-            params.push(`%${value}%`);
+            // pod.created_start と pod.created_end の特別な扱い
+            if (column === 'siod.created_start') {
+                whereClauses.push(`siod.created >= ?`);
+                params.push(value); // created_startの日付をそのまま使用
+            } else if (column === 'siod.created_end') {
+                whereClauses.push(`siod.created <= ?`);
+                params.push(value); // created_endの日付をそのまま使用
+            } else {
+                whereClauses.push(`${column} LIKE ?`);
+                params.push(`%${value}%`);
+            }
         }
     }
 

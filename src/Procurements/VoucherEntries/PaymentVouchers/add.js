@@ -159,45 +159,6 @@ function PaymentVouchersAdd() {
 
     const validator = new Validator();
 
-    const handleSubmit = () => {
-        setErrors(null);
-        validator.required(paymentVoucher.code, 'code', '伝票番号');
-        validator.required(paymentVoucher.order_date, 'order_date', '発注日付');
-        validator.required(paymentVoucher.vender_id, 'vender_id', '仕入先コード');
-        validator.required(paymentVoucher.vender_name, 'vender_name', '仕入先名');
-        for (let i = 0; i < paymentVoucherDetails.length; i++) {
-            validator.required(paymentVoucherDetails[i].payment_method, 'payment_method' + i, '支払方法');
-            validator.required(paymentVoucherDetails[i].payment_price, 'payment_price' + i, '支払金額');
-        }
-        setErrors(validator.getErrors());
-
-        if (!validator.hasErrors()) {
-
-            ipcRenderer.send('save-payment-voucher', paymentVoucher);
-            ipcRenderer.on('save-payment-voucher-result', (event, data) => {
-                for (let i = 0; i < paymentVoucherDetails.length; i++) {
-                    const paymentVoucherDetailData = paymentVoucherDetails[i];
-                    paymentVoucherDetailData.payment_voucher_id = data.id;
-                    ipcRenderer.send('save-payment-voucher-detail', paymentVoucherDetailData);
-                }
-            });
-            setPaymentVoucher({
-                code: '',
-                order_date: '',
-                vender_id: '',
-                vender_name: '',
-                honorific: '',
-                vender_contact_person: '',
-                remarks: '',
-                closing_date: '',
-                payment_due_date: '',
-                payment_method: '',
-                estimated_delivery_date: '',
-            });
-            alert('新規登録が完了しました。');
-        }
-    };
-
 
     const handleSumPrice = () => {
         let SumPrice = 0
@@ -280,9 +241,66 @@ function PaymentVouchersAdd() {
 
     const [purchaseOrders, setPurchaseOrders] = useState([]);
 
+    const [connectedPurchaseOrders, setConnectedPurchaseOrders] = useState([])
+
+    const handleCheckboxChange = (id) => {
+        setConnectedPurchaseOrders(prevState => {
+            if (prevState.includes(id)) {
+                return prevState.filter(purchaseOrderId => purchaseOrderId !== id);
+            } else {
+                return [...prevState, id];
+            }
+        });
+    };
+
     ipcRenderer.on('search-purchase-orders-on-pv-result', (event, results) => {
         setPurchaseOrders(results);
     });
+
+    const handleSubmit = () => {
+        setErrors(null);
+        validator.required(paymentVoucher.code, 'code', '伝票番号');
+        validator.required(paymentVoucher.order_date, 'order_date', '発注日付');
+        validator.required(paymentVoucher.vender_id, 'vender_id', '仕入先コード');
+        validator.required(paymentVoucher.vender_name, 'vender_name', '仕入先名');
+        for (let i = 0; i < paymentVoucherDetails.length; i++) {
+            validator.required(paymentVoucherDetails[i].payment_method, 'payment_method' + i, '支払方法');
+            validator.required(paymentVoucherDetails[i].payment_price, 'payment_price' + i, '支払金額');
+        }
+        setErrors(validator.getErrors());
+
+        if (!validator.hasErrors()) {
+
+            ipcRenderer.send('save-payment-voucher', paymentVoucher);
+            ipcRenderer.on('save-payment-voucher-result', (event, data) => {
+                for (let i = 0; i < paymentVoucherDetails.length; i++) {
+                    const paymentVoucherDetailData = paymentVoucherDetails[i];
+                    paymentVoucherDetailData.payment_voucher_id = data.id;
+                    ipcRenderer.send('save-payment-voucher-detail', paymentVoucherDetailData);
+                }
+
+                for (let i = 0; i < connectedPurchaseOrders.length; i++) {
+                    const pos_id = connectedPurchaseOrders[i];
+                    const pvs_id = data.id;
+                    ipcRenderer.send('save-pos-pvs-mapping', { pos_id, pvs_id });
+                }
+            });
+            setPaymentVoucher({
+                code: '',
+                order_date: '',
+                vender_id: '',
+                vender_name: '',
+                honorific: '',
+                vender_contact_person: '',
+                remarks: '',
+                closing_date: '',
+                payment_due_date: '',
+                payment_method: '',
+                estimated_delivery_date: '',
+            });
+            alert('新規登録が完了しました。');
+        }
+    };
 
     return (
         <div className='w-full mb-20'>
@@ -466,21 +484,26 @@ function PaymentVouchersAdd() {
                             </tr>
                         </thead>
                         <tbody>
-                        {purchaseOrders.map((voucher) => (
-                            <tr className='border-b' key={voucher.id}>
-                                <td><input type="checkbox" /></td>
-                                <td className='py-4'>{voucher.order_date || <div className='border w-4'></div>}</td>
-                                <td>{voucher.code || <div className='border w-4'></div>}</td>
-                                <td>{voucher.vender_name || <div className='border w-4'></div>}</td>
-                                <td>{voucher.vender_id || <div className='border w-4'></div>}</td>
-                                <td>なし</td>
-                            </tr>
-                        ))}
-                    </tbody>
+                            {purchaseOrders.map((voucher) => (
+                                <tr className='border-b' key={voucher.id}>
+                                    <td>
+                                        <input
+                                            type="checkbox"
+                                            checked={connectedPurchaseOrders.includes(voucher.id)}
+                                            onChange={() => handleCheckboxChange(voucher.id)}
+                                        /></td>
+                                    <td className='py-4'>{voucher.order_date || <div className='border w-4'></div>}</td>
+                                    <td>{voucher.code || <div className='border w-4'></div>}</td>
+                                    <td>{voucher.vender_name || <div className='border w-4'></div>}</td>
+                                    <td>{voucher.vender_id || <div className='border w-4'></div>}</td>
+                                    <td>なし</td>
+                                </tr>
+                            ))}
+                        </tbody>
                     </table>
-                    <div className='flex my-6'>
-                        <div className='border rounded-lg py-3 px-4 text-base font-bold bg-blue-600 text-white'><Link to="add" className={``}>紐付ける</Link></div>
-                    </div>
+                    {/* <div className='flex my-6'>
+                        <div className='border rounded-lg py-3 px-4 text-base font-bold bg-blue-600 text-white'>紐付ける</div>
+                    </div> */}
                     <div className='py-3'>
                         <hr className='' />
                     </div>

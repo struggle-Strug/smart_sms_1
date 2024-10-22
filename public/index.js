@@ -17,6 +17,8 @@ require('./ipc/masters/primarySections');
 require('./ipc/masters/secondarySections');
 require('./ipc/masters/shops');
 require('./ipc/masters/setProducts'); // 追加
+
+//ダッシュボード
 require('./ipc/dashboard/salesTaxSettings'); // 追加
 
 //仕入管理
@@ -29,6 +31,10 @@ require('./ipc/procurements/purchaseInvoiceDetails');
 require('./ipc/procurements/stockInOutSlipDetails');
 require('./ipc/procurements/paymentVoucherDetails');
 require('./ipc/procurements/statementSettings');
+require('./ipc/procurements/posPvsMappings');
+
+//ツール
+require('./ipc/utilis/export');
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -98,6 +104,8 @@ function createWindow() {
   paymentVoucherDetailsDB.initializeDatabase();
   const statementSettingsDB = require('./database/procurements/statementSettings');
   statementSettingsDB.initializeDatabase();
+  const posPvsMappingsDB = require('./database/procurements/posPvsMappings');
+  posPvsMappingsDB.initializeDatabase();
 
   //集計管理
 }

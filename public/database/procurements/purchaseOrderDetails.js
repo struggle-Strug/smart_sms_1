@@ -172,8 +172,17 @@ function searchPurchaseOrderDetails(conditions, callback) {
     // 条件オブジェクトのキーと値を動的にWHERE句に追加
     if (conditions && Object.keys(conditions).length > 0) {
         for (const [column, value] of Object.entries(conditions)) {
-            whereClauses.push(`${column} LIKE ?`);
-            params.push(`%${value}%`);
+            // pod.created_start と pod.created_end の特別な扱い
+            if (column === 'pod.created_start') {
+                whereClauses.push(`pod.created >= ?`);
+                params.push(value); // created_startの日付をそのまま使用
+            } else if (column === 'pod.created_end') {
+                whereClauses.push(`pod.created <= ?`);
+                params.push(value); // created_endの日付をそのまま使用
+            } else {
+                whereClauses.push(`${column} LIKE ?`);
+                params.push(`%${value}%`);
+            }
         }
     }
 

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import CustomSelect from '../../../Components/CustomSelect';
+import DatePicker from 'react-datepicker';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -10,28 +11,6 @@ function Index() {
         { value: '御中', label: '御中' },
         { value: '貴社', label: '貴社' },
     ];
-
-    // const [customer, setCustomer] = useState({
-    //     id: '',
-    //     name_primary: '',
-    //     name_secondary: '',
-    //     name_kana: '',
-    //     honorific: '',
-    //     phone_number: '',
-    //     fax_number: '',
-    //     zip_code: '',
-    //     address: '',
-    //     email: '',
-    //     remarks: '',
-    //     billing_code: '',
-    //     billing_information: '',
-    //     monthly_sales_target: ''
-    // });
-    // const [customers, setCustomers] = useState([]);
-    // const [isOpen, setIsOpen] = useState(false);
-    // const dropdownRef = useRef(null);
-    // const location = useLocation();
-    // const [searchQuery, setSearchQuery] = useState('');
 
     const [paymentVoucherDetails, setPaymentVoucherDetails] = useState([]);
     const [paymentVoucherDetail, setPaymentVoucherDetail] = useState([]);
@@ -44,9 +23,38 @@ function Index() {
         "pvd.payment_method": "",
         "pvd.vender_name": "",
         "pvd.contact_person": "",
+        "pvd.created_start": "",
+        "pvd.created_end": "",
         "v.classification1": "",
         "v.classification2": "",
     });
+
+    const header = [
+        "支払伝票番号",
+        "仕入先",
+        "支払方法",
+        "仕入金額税別",
+        "支払金額税込",
+        "担当者",
+        "区分１",
+        "区分２",
+        "仕入伝票番号"
+    ];
+
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // 月は0から始まるため+1し、2桁にする
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+
+    const fileName = `支払明細表_${year}${month}${day}_${hours}${minutes}${seconds}`;
+    const [dataForExport, setDataForExport] = useState({
+        header: header,
+        data: [],
+        fileName: fileName
+    })
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -56,13 +64,61 @@ function Index() {
         }));
     };
 
+    const handleDateChange = (date, name) => {
+        const formattedDate = date ? date.toISOString().split('T')[0] : '';
+        setSearchQueryList({ ...searchQueryList, [name]: formattedDate });
+    };
+
     useEffect(() => {
         ipcRenderer.send('load-payment-voucher-details');
 
-        const handleLoadDetails = (event, data) => setPaymentVoucherDetails(data);
+        const handleLoadDetails = (event, data) => {
+            setPaymentVoucherDetails(data)
+            const arr = []
+            for (let i = 0; i < data.length; i++) {
+                const value = [
+                    data[i].payment_voucher_id,
+                    data[i].vender_name,
+                    data[i].payment_method,
+                    data[i].payment_price,
+                    data[i].payment_price, // 支払金額税込と同じ値
+                    data[i].contact_person,
+                    data[i].classification1,
+                    data[i].classification2,
+                    data[i].status
+                ];
+                arr.push(value)
+            }
+            const dataForSet = {
+                header: header,
+                data: arr,
+                fileName: fileName
+            }
+            setDataForExport(dataForSet)
+        };
         const handleSearchResult = (event, data) => {
-
             setPaymentVoucherDetails(data);
+            const arr = []
+            for (let i = 0; i < data.length; i++) {
+                const value = [
+                    data[i].payment_voucher_id,
+                    data[i].vender_name,
+                    data[i].payment_method,
+                    data[i].payment_price,
+                    data[i].payment_price, // 支払金額税込と同じ値
+                    data[i].contact_person,
+                    data[i].classification1,
+                    data[i].classification2,
+                    data[i].status
+                ];
+                arr.push(value)
+            }
+            const dataForSet = {
+                header: header,
+                data: arr,
+                fileName: fileName
+            }
+            setDataForExport(dataForSet)
         };
 
         ipcRenderer.on('load-payment-voucher-details', handleLoadDetails);
@@ -73,26 +129,6 @@ function Index() {
             ipcRenderer.removeListener('search-payment-voucher-details-result', handleSearchResult);
         };
     }, []);
-
-    // useEffect(() => {
-    //     ipcRenderer.send('get-customers');
-    //     ipcRenderer.on('customers-data', (event, data) => {
-    //         setCustomers(data);
-    //     });
-
-    //     ipcRenderer.on('customer-deleted', (event, id) => {
-    //         setCustomers((prevCustomers) => prevCustomers.filter(customer => customer.id !== id));
-    //     });
-
-    //     ipcRenderer.on('search-customers-result', (event, data) => {
-    //         setCustomers(data);
-    //     });
-
-    //     return () => {
-    //         ipcRenderer.removeAllListeners('customers-data');
-    //         ipcRenderer.removeAllListeners('search-customers-result');
-    //     };
-    // }, []);
 
     const [outputFormat, setOutputFormat] = useState('csv');
     const [remarks, setRemarks] = useState('');
@@ -110,6 +146,25 @@ function Index() {
         }
     }, [settingId]);
 
+    const [message, setMessage] = useState('');
+
+    useEffect(() => {
+        ipcRenderer.on('export-success', (event, successMessage) => {
+            setMessage(successMessage);
+            alert(successMessage);
+        });
+
+        ipcRenderer.on('export-failure', (event, errorMessage) => {
+            setMessage(errorMessage);
+            alert(errorMessage);
+        });
+
+        return () => {
+            ipcRenderer.removeAllListeners('export-success');
+            ipcRenderer.removeAllListeners('export-failure');
+        };
+    }, []);
+
     const handleSave = () => {
         const settingData = {
             id: settingId,
@@ -119,13 +174,13 @@ function Index() {
 
         ipcRenderer.send('save-statement-setting', settingData);
         ipcRenderer.once('load-statement-settings', (event, data) => {
-            handleConfirmDelete(data); // 更新されたデータを返す
+            handleConfirmDelete(data);
         });
     };
 
 
     const toggleDropdown = (id) => {
-        
+
         if (!isOpen) setIsOpen(id);
         else setIsOpen(false);
     };
@@ -154,16 +209,6 @@ function Index() {
         ipcRenderer.send('search-payment-voucher-details', searchColums);
     };
 
-    // const handleSearch = () => {
-    //     ipcRenderer.send('search-customers', searchQuery);
-    // };
-
-    // const handleKeyDown = (event) => {
-    //     if (event.key === 'Enter') {
-    //         handleSearch();
-    //     }
-    // };
-
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
@@ -190,6 +235,21 @@ function Index() {
         setIsDialogOpen(false);
     };
 
+
+
+    const exportToCSV = () => {
+        ipcRenderer.send('export-to-csv', dataForExport);
+    };
+
+    const exportToExcel = () => {
+        ipcRenderer.send('export-to-excel', dataForExport);
+    };
+
+    const exportPDF = () => {
+        ipcRenderer.send('export-to-pdf', dataForExport);
+    };
+
+
     return (
         <div className='w-5/6'>
             <div className='p-8'>
@@ -207,12 +267,34 @@ function Index() {
                     </div>
                     <div className='grid grid-cols-2 gap-6 pb-6'>
                         <div className='pl-0'>
-                            <div className='text-sm pb-1.5'>期間指定 <span className='text-xs ml-1 font-bold text-red-600'>必須</span>
-                            </div> {/* ボックスと波線の間隔を調整 */}
                             <div className='flex items-center'>
-                                <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/2' placeholder='' name="" value={""} />
-                                <div className='flex items-center px-2'>〜</div> {/* 波線 */}
-                                <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/2' placeholder='' name="" value={""} />
+                                <div>
+                                    <div className='text-sm pb-1.5'>期間指定 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
+                                    {/* <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} /> */}
+                                    <DatePicker
+                                        selected={searchQueryList["pvd.created_start"] ? new Date(searchQueryList["pvd.created_start"]) : null}
+                                        onChange={(date) => handleDateChange(date, "pvd.created_start")}
+                                        dateFormat="yyyy-MM-dd"
+                                        className='border rounded px-4 py-2.5 bg-white  w-full'
+                                        placeholderText='期間を選択'
+                                    />
+                                </div>
+                                <div>
+                                    <div className='w-1'>&nbsp;</div>
+                                    <div className='flex items-center px-2'>〜</div>
+                                </div>
+
+                                <div>
+                                    <div className='text-sm pb-1.5 text-gray-100'>期間指定</div>
+                                    {/* <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} /> */}
+                                    <DatePicker
+                                        selected={searchQueryList["pvd.created_end"] ? new Date(searchQueryList["pvd.created_end"]) : null}
+                                        onChange={(date) => handleDateChange(date, "pvd.created_end")}
+                                        dateFormat="yyyy-MM-dd"
+                                        className='border rounded px-4 py-2.5 bg-white  w-full'
+                                        placeholderText='期間を選択'
+                                    />
+                                </div>
                             </div>
                         </div>
                         <div>
@@ -283,9 +365,9 @@ function Index() {
                     </div>
                 </div>
                 <div className='flex justify-end pt-6'>
-                    <Link to={`/master/purchase-order-details/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold flex'>
+                    <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={() => exportToCSV()}>
                         エクスポート
-                    </Link>
+                    </div>
                 </div>
                 <div className='px-8 pb-8 overflow-x-scroll'>
                     <table className="w-full mt-8 table-auto" style={{ width: "2000px" }}>
