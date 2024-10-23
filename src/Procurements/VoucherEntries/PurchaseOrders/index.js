@@ -124,7 +124,7 @@ function Index() {
                         {purchaseOrders.map((order) => (
                             <tr className='border-b' key={order.id}>
                                 <td>{order.order_date || <div className='border w-4'></div>}</td>
-                                <td>{order.id || <div className='border w-4'></div>}</td>
+                                <td>{order.code || <div className='border w-4'></div>}</td>
                                 <td>{order.vender_name || <div className='border w-4'></div>}</td>
                                 <td>{order.vender_id || <div className='border w-4'></div>}</td>
                                 <td>{order.remarks || <div className='border w-4'></div>}</td>
