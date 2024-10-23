@@ -162,12 +162,19 @@ function PaymentVouchersAdd() {
 
     const handleSumPrice = () => {
         let SumPrice = 0
+        let consumptionTaxEight = 0
+        let consumptionTaxTen = 0
 
         for (let i = 0; i < paymentVoucherDetails.length; i++) {
-            SumPrice += paymentVoucherDetails[i].price * paymentVoucherDetails[i].number;
+            SumPrice += paymentVoucherDetails[i].price * paymentVoucherDetails[i].number + (paymentVoucherDetails[i].tax_rate * 0.01 + 1)
+            if (paymentVoucherDetails[i].tax_rate === 8) {
+                consumptionTaxEight += paymentVoucherDetails[i].price * paymentVoucherDetails[i].number * 0.08;
+            } else if (paymentVoucherDetails[i].tax_rate === 10) {
+                consumptionTaxTen += paymentVoucherDetails[i].price * paymentVoucherDetails[i].number * 0.1;
+            }
         }
 
-        return { "subtotal": SumPrice, "consumptionTaxEight": SumPrice * 0.08, "consumptionTaxTen": 0, "totalConsumptionTax": SumPrice * 0.08, "Total": SumPrice * 1.08 }
+        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxTen, "Total": SumPrice}
     }
 
     const [isOpen, setIsOpen] = useState(null);
@@ -283,6 +290,7 @@ function PaymentVouchersAdd() {
                     const pos_id = connectedPurchaseOrders[i];
                     const pvs_id = data.id;
                     ipcRenderer.send('save-pos-pvs-mapping', { pos_id, pvs_id });
+                    ipcRenderer.send('update-purchase-invoice-status', { id: pos_id, status: "支払済" });
                 }
             });
             setPaymentVoucher({
@@ -496,7 +504,7 @@ function PaymentVouchersAdd() {
                                     <td>{voucher.code || <div className='border w-4'></div>}</td>
                                     <td>{voucher.vender_name || <div className='border w-4'></div>}</td>
                                     <td>{voucher.vender_id || <div className='border w-4'></div>}</td>
-                                    <td>なし</td>
+                                    <td>{voucher.status || <div className='border w-4'></div>}</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -544,9 +552,9 @@ function PaymentVouchersAdd() {
                                 <div className='flex items-center justify-end'>
                                     <div className='flex items-center'>
                                         <div className='mr-4'>消費税額</div>
-                                        <div className='mr-4'>{(paymentVoucherDetails[index].price * paymentVoucherDetails[index].number * 0.08).toFixed(0)}円</div>
+                                        <div className='mr-4'>{(paymentVoucherDetails[index].price * paymentVoucherDetails[index].number * paymentVoucherDetails[index].tax_rate*0.01).toFixed(0)}円</div>
                                         <div className='mr-4'>金額</div>
-                                        <div className='text-lg font-bold'>{(paymentVoucherDetails[index].price * paymentVoucherDetails[index].number * 1.08).toFixed(0)}円</div>
+                                        <div className='text-lg font-bold'>{(paymentVoucherDetails[index].price * paymentVoucherDetails[index].number * (paymentVoucherDetails[index].tax_rate*0.01 + 1)).toFixed(0)}円</div>
                                     </div>
                                 </div>
                                 <hr className='py-3' />

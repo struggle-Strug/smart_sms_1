@@ -137,12 +137,25 @@ function initializeDatabase() {
         closing_date VARCHAR(255),
         payment_due_date VARCHAR(255),
         payment_method VARCHAR(255),
+        status VARCHAR(255) DEFAULT '未処理',
         created DATE DEFAULT CURRENT_DATE,
         updated DATE DEFAULT CURRENT_DATE
     )
     `;
     db.run(sql);
 }
+
+function updatePurchaseInvoiceStatus(query, callback) {
+    const sql = `UPDATE purchase_invoices SET status = ?, updated = datetime('now') WHERE id = ?`;
+    db.run(sql, [query.status, query.id], function (err) {
+        if (err) {
+            return callback(err);
+        }
+        callback(null, { lastID: query.id });
+    });
+}
+
+
 
 function searchPurchaseInvoices(query, callback) {
     let sql;
@@ -171,5 +184,6 @@ module.exports = {
     deletePurchaseInvoiceById,
     editPurchaseInvoice,
     initializeDatabase,
-    searchPurchaseInvoices
+    searchPurchaseInvoices,
+    updatePurchaseInvoiceStatus
 };

@@ -69,12 +69,15 @@ function PurchaseOrdersEdit() {
         estimated_delivery_date: '',
     });
 
+    const [purchaseInvoiceDetails, setPurchaseInvoiceDetails] = useState([])
+
     const { id } = useParams();
 
     useEffect(() => {
         ipcRenderer.send('get-purchase-order-detail', id);
         ipcRenderer.on('purchase-order-detail-data', (event, data) => {
             setPurchaseOrder(data);
+            ipcRenderer.send('search-purchase-invoice-details', {"pi.purchase_order_id": data.code});
         });
 
         ipcRenderer.send('search-purchase-order-details-by-vender-id', id);
@@ -83,6 +86,10 @@ function PurchaseOrdersEdit() {
         ipcRenderer.on('search-purchase-order-details-by-vender-id-result', (event, data) => {
             setPurchaseOrderDetails(data);
         });
+
+        ipcRenderer.on('search-purchase-invoice-details-result', (event, data) => {
+            setPurchaseInvoiceDetails(data)
+        })
 
         return () => {
             ipcRenderer.removeAllListeners('purchase-order-data');
@@ -148,6 +155,33 @@ function PurchaseOrdersEdit() {
             storage_facility: '',
             stock: '',
         }]);
+    }
+
+    const createStatus = ()  => {
+        let data = {}
+        for (let i = 0; i < purchaseOrderDetails.length; i++) {
+            if (data["product_id_" + purchaseOrderDetails[i].product_id]) {
+                data["product_id_" + purchaseOrderDetails[i].product_id] += purchaseOrderDetails[i].number;
+            } else {
+                data["product_id_" + purchaseOrderDetails[i].product_id] = purchaseOrderDetails[i].number;
+            }
+        }
+
+        for (let i = 0; i < purchaseInvoiceDetails.length; i++) {
+            if (data["product_id_" + purchaseInvoiceDetails[i].product_id]) {
+                data["product_id_" + purchaseInvoiceDetails[i].product_id] -= purchaseInvoiceDetails[i].number;
+            }
+        }
+
+        if (purchaseInvoiceDetails.length === 0) return "未処理"
+        let flag = true
+        for (let key in data) {
+            if (data[key] !== 0) {
+                flag = false;
+            }
+        }
+        if (flag) return "発注済"
+        else return "一部処理"
     }
 
     const removePurchaseOrderDetail = (index) => {
@@ -227,15 +261,21 @@ function PurchaseOrdersEdit() {
         }
     };
 
-
     const handleSumPrice = () => {
         let SumPrice = 0
+        let consumptionTaxEight = 0
+        let consumptionTaxTen = 0
 
         for (let i = 0; i < purchaseOrderDetails.length; i++) {
-            SumPrice += purchaseOrderDetails[i].price * purchaseOrderDetails[i].number;
+            SumPrice += purchaseOrderDetails[i].price * purchaseOrderDetails[i].number + (purchaseOrderDetails[i].tax_rate * 0.01 + 1);
+            if (purchaseOrderDetails[i].tax_rate === 8) {
+                consumptionTaxEight += purchaseOrderDetails[i].price * purchaseOrderDetails[i].number * 0.08;
+            } else if (purchaseOrderDetails[i].tax_rate === 10) {
+                consumptionTaxTen += purchaseOrderDetails[i].price * purchaseOrderDetails[i].number * 0.1;
+            }
         }
 
-        return { "subtotal": SumPrice, "consumptionTaxEight": SumPrice * 0.08, "consumptionTaxTen": 0, "totalConsumptionTax": SumPrice * 0.08, "Total": SumPrice * 1.08 }
+        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxEight + consumptionTaxTen, "Total": SumPrice }
     }
 
     const [isOpen, setIsOpen] = useState(null);
@@ -595,9 +635,9 @@ function PurchaseOrdersEdit() {
                                 <div className='flex items-center justify-end'>
                                     <div className='flex items-center'>
                                         <div className='mr-4'>消費税額</div>
-                                        <div className='mr-4'>{(purchaseOrderDetails[index].price * purchaseOrderDetails[index].number * 0.08).toFixed(0)}円</div>
+                                        <div className='mr-4'>{(purchaseOrderDetails[index].price * purchaseOrderDetails[index].number * purchaseOrderDetails[index].tax_rate*0.01).toFixed(0)}円</div>
                                         <div className='mr-4'>金額</div>
-                                        <div className='text-lg font-bold'>{(purchaseOrderDetails[index].price * purchaseOrderDetails[index].number * 1.08).toFixed(0)}円</div>
+                                        <div className='text-lg font-bold'>{(purchaseOrderDetails[index].price * purchaseOrderDetails[index].number * (purchaseOrderDetails[index].tax_rate*0.01 + 1)).toFixed(0)}円</div>
                                     </div>
                                 </div>
                                 <hr className='py-3' />
@@ -699,6 +739,11 @@ function PurchaseOrdersEdit() {
                             style={{ width: "480px" }}
                             placeholderText='入荷予定日を選択'
                         />
+                        {errors.estimated_delivery_date && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.estimated_delivery_date}</div>}
+                    </div>
+                    <div className='pb-2'>
+                        <div className='w-40 text-sm pb-1.5'>ステータス</div>
+                        <div>{purchaseOrder.status}</div>
                         {errors.estimated_delivery_date && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.estimated_delivery_date}</div>}
                     </div>
                 </div>

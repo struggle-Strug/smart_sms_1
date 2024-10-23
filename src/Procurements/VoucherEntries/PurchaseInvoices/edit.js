@@ -68,6 +68,8 @@ function PurchaseInvoicesEdit() {
         payment_method: '',
     });
 
+    const [purchaseOrderDetails, setPurchaseOrderDetails] = useState([])
+
     const { id } = useParams();
 
     useEffect(() => {
@@ -80,6 +82,10 @@ function PurchaseInvoicesEdit() {
 
         ipcRenderer.on('search-purchase-invoice-details-by-purchase-invoice-id-result', (event, data) => {
             setPurchaseInvoiceDetails(data);
+        });
+
+        ipcRenderer.on('search-purchase-order-details-by-vender-id-result', (event, data) => {
+            setPurchaseOrderDetails(data);
         });
 
         return () => {
@@ -213,12 +219,17 @@ function PurchaseInvoicesEdit() {
             ipcRenderer.send('save-purchase-invoice', purchaseInvoice);
             ipcRenderer.on('save-purchase-invoice-result', (event, data) => {
                 for (let i = 0; i < purchaseInvoiceDetails.length; i++) {
-                    console.log("add!", data)
                     const purchaseInvoiceDetailData = purchaseInvoiceDetails[i];
                     purchaseInvoiceDetailData.purchase_invoice_id = data.id;
                     ipcRenderer.send('save-purchase-invoice-detail', purchaseInvoiceDetailData);
                 }
             });
+            ipcRenderer.send('search-purchase-order-details', {"po.id": purchaseInvoice.purchase_order_id});
+            ipcRenderer.on('search-purchase-order-details-result', (event, data) => {
+                const status = createStatus(data);
+                console.log(status)
+                ipcRenderer.send('update-purchase-order-status', {"status": status, "code": purchaseInvoice.purchase_order_id});
+            })
             setPurchaseInvoice({
                 code: '',
                 order_date: '',
@@ -239,12 +250,19 @@ function PurchaseInvoicesEdit() {
 
     const handleSumPrice = () => {
         let SumPrice = 0
+        let consumptionTaxEight = 0
+        let consumptionTaxTen = 0
 
         for (let i = 0; i < purchaseInvoiceDetails.length; i++) {
-            SumPrice += purchaseInvoiceDetails[i].price * purchaseInvoiceDetails[i].number;
+            SumPrice += purchaseInvoiceDetails[i].price * purchaseInvoiceDetails[i].number + (purchaseInvoiceDetails[i].tax_rate * 0.01 + 1)
+            if (purchaseInvoiceDetails[i].tax_rate === 8) {
+                consumptionTaxEight += purchaseInvoiceDetails[i].price * purchaseInvoiceDetails[i].number * 0.08;
+            } else if (purchaseInvoiceDetails[i].tax_rate === 10) {
+                consumptionTaxTen += purchaseInvoiceDetails[i].price * purchaseInvoiceDetails[i].number * 0.1;
+            }
         }
 
-        return { "subtotal": SumPrice, "consumptionTaxEight": SumPrice * 0.08, "consumptionTaxTen": 0, "totalConsumptionTax": SumPrice * 0.08, "Total": SumPrice * 1.08 }
+        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxEight + consumptionTaxTen, "Total": SumPrice }
     }
 
     const [isOpen, setIsOpen] = useState(null);
@@ -288,6 +306,33 @@ function PurchaseInvoicesEdit() {
         const formattedDate = date ? date.toISOString().split('T')[0] : '';
         setPurchaseInvoice({ ...purchaseInvoice, [name]: formattedDate });
     };
+
+    const createStatus = (purchaseOrderDetails)  => {
+        let data = {}
+        for (let i = 0; i < purchaseOrderDetails.length; i++) {
+            if (data["product_id_" + purchaseOrderDetails[i].product_id]) {
+                data["product_id_" + purchaseOrderDetails[i].product_id] += purchaseOrderDetails[i].number;
+            } else {
+                data["product_id_" + purchaseOrderDetails[i].product_id] = purchaseOrderDetails[i].number;
+            }
+        }
+
+        for (let i = 0; i < purchaseInvoiceDetails.length; i++) {
+            if (data["product_id_" + purchaseInvoiceDetails[i].product_id]) {
+                data["product_id_" + purchaseInvoiceDetails[i].product_id] -= purchaseInvoiceDetails[i].number;
+            }
+        }
+
+        if (purchaseInvoiceDetails.length === 0) return "未処理"
+        let flag = true
+        for (let key in data) {
+            if (data[key] !== 0) {
+                flag = false;
+            }
+        }
+        if (flag) return "発注済"
+        else return "一部処理"
+    }
 
 
     return (
@@ -613,10 +658,10 @@ function PurchaseInvoicesEdit() {
                                 </div>
                                 <div className='flex items-center justify-end'>
                                     <div className='flex items-center'>
-                                        <div className='mr-4'>消費税額</div>
-                                        <div className='mr-4'>{(purchaseInvoiceDetails[index].price * purchaseInvoiceDetails[index].number * 0.08).toFixed(0)}円</div>
+                                    <div className='mr-4'>消費税額</div>
+                                        <div className='mr-4'>{(purchaseInvoiceDetails[index].price * purchaseInvoiceDetails[index].number * purchaseInvoiceDetails[index].tax_rate*0.01).toFixed(0)}円</div>
                                         <div className='mr-4'>金額</div>
-                                        <div className='text-lg font-bold'>{(purchaseInvoiceDetails[index].price * purchaseInvoiceDetails[index].number * 1.08).toFixed(0)}円</div>
+                                        <div className='text-lg font-bold'>{(purchaseInvoiceDetails[index].price * purchaseInvoiceDetails[index].number * ( purchaseInvoiceDetails[index].tax_rate*0.01 + 1)).toFixed(0)}円</div>
                                     </div>
                                 </div>
                                 <hr className='py-3' />

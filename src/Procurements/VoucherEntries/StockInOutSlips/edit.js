@@ -215,12 +215,19 @@ function StockInOutSlipsEdit() {
 
     const handleSumPrice = () => {
         let SumPrice = 0
+        let consumptionTaxEight = 0
+        let consumptionTaxTen = 0
 
         for (let i = 0; i < stockInOutSlipDetails.length; i++) {
-            SumPrice += stockInOutSlipDetails[i].price * stockInOutSlipDetails[i].number;
+            SumPrice += stockInOutSlipDetails[i].price * stockInOutSlipDetails[i].number + (stockInOutSlipDetails[i].tax_rate * 0.01 + 1)
+            if (stockInOutSlipDetails[i].tax_rate === 8) {
+                consumptionTaxEight += stockInOutSlipDetails[i].price * stockInOutSlipDetails[i].number * 0.08;
+            } else if (stockInOutSlipDetails[i].tax_rate === 10) {
+                consumptionTaxTen += stockInOutSlipDetails[i].price * stockInOutSlipDetails[i].number * 0.1;
+            }
         }
 
-        return { "subtotal": SumPrice, "consumptionTaxEight": SumPrice * 0.08, "consumptionTaxTen": 0, "totalConsumptionTax": SumPrice * 0.08, "Total": SumPrice * 1.08 }
+        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxEight + consumptionTaxTen, "Total": SumPrice }
     }
 
     const [isOpen, setIsOpen] = useState(null);
@@ -548,9 +555,9 @@ function StockInOutSlipsEdit() {
                                 <div className='flex items-center justify-end'>
                                     <div className='flex items-center'>
                                         <div className='mr-4'>消費税額</div>
-                                        <div className='mr-4'>{(stockInOutSlipDetails[index].price * stockInOutSlipDetails[index].number * 0.08).toFixed(0)}円</div>
+                                        <div className='mr-4'>{(stockInOutSlipDetails[index].price * stockInOutSlipDetails[index].number * (stockInOutSlipDetails[index].tax_rate * 0.01)).toFixed(0)}円</div>
                                         <div className='mr-4'>金額</div>
-                                        <div className='text-lg font-bold'>{(stockInOutSlipDetails[index].price * stockInOutSlipDetails[index].number * 1.08).toFixed(0)}円</div>
+                                        <div className='text-lg font-bold'>{(stockInOutSlipDetails[index].price * stockInOutSlipDetails[index].number * (stockInOutSlipDetails[index].tax_rate * 0.01 + 1)).toFixed(0)}円</div>
                                     </div>
                                 </div>
                                 <hr className='py-3' />

@@ -7,7 +7,7 @@ const {
     editPaymentVoucherDetail, 
     searchPaymentVoucherDetails ,
     searchPaymentVouchersByPaymentVoucherId,
-    deletePaymentVoucherDetailsByPvId
+    deletePaymentVoucherDetailsByPvId,
 } = require('../../database/procurements/paymentVoucherDetails');
 
 // 支払伝票明細のデータをロード

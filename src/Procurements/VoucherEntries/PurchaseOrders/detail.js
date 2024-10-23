@@ -21,27 +21,6 @@ function PurchaseOrdersDetail() {
         estimated_delivery_date: '',
     });
 
-    const { id } = useParams();
-
-    useEffect(() => {
-        ipcRenderer.send('get-purchase-order-detail', id);
-        ipcRenderer.on('purchase-order-detail-data', (event, data) => {
-            setPurchaseOrder(data);
-        });
-
-        ipcRenderer.send('search-purchase-order-details-by-vender-id', id);
-
-
-        ipcRenderer.on('search-purchase-order-details-by-vender-id-result', (event, data) => {
-            setPurchaseOrderDetails(data);
-        });
-
-        return () => {
-            ipcRenderer.removeAllListeners('purchase-order-data');
-            ipcRenderer.removeAllListeners('search-purchase-order-details-by-vender-id');
-        };
-    }, [id]);
-
     const [purchaseOrderDetails, setPurchaseOrderDetails] = useState([
         {
             id: '',
@@ -58,14 +37,78 @@ function PurchaseOrdersDetail() {
         }
     ]);
 
+    const [purchaseInvoiceDetails, setPurchaseInvoiceDetails] = useState([])
+
+    const { id } = useParams();
+
+    useEffect(() => {
+        ipcRenderer.send('get-purchase-order-detail', id);
+        ipcRenderer.on('purchase-order-detail-data', (event, data) => {
+            setPurchaseOrder(data);
+            ipcRenderer.send('search-purchase-invoice-details', {"pi.purchase_order_id": data.code});
+        });
+
+
+
+        ipcRenderer.send('search-purchase-order-details-by-vender-id', id);
+
+        ipcRenderer.on('search-purchase-order-details-by-vender-id-result', (event, data) => {
+            setPurchaseOrderDetails(data);
+        });
+
+        ipcRenderer.on('search-purchase-invoice-details-result', (event, data) => {
+            setPurchaseInvoiceDetails(data)
+        })
+
+        return () => {
+            ipcRenderer.removeAllListeners('purchase-order-data');
+            ipcRenderer.removeAllListeners('search-purchase-order-details-by-vender-id');
+        };
+    }, [id]);
+
     const handleSumPrice = () => {
         let SumPrice = 0
+        let consumptionTaxEight = 0
+        let consumptionTaxTen = 0
 
         for (let i = 0; i < purchaseOrderDetails.length; i++) {
-            SumPrice += purchaseOrderDetails[i].price * purchaseOrderDetails[i].number;
+            SumPrice += purchaseOrderDetails[i].price * purchaseOrderDetails[i].number + (purchaseOrderDetails[i].tax_rate * 0.01 + 1);
+            if (purchaseOrderDetails[i].tax_rate === 8) {
+                consumptionTaxEight += purchaseOrderDetails[i].price * purchaseOrderDetails[i].number * 0.08;
+            } else if (purchaseOrderDetails[i].tax_rate === 10) {
+                consumptionTaxTen += purchaseOrderDetails[i].price * purchaseOrderDetails[i].number * 0.1;
+            }
         }
 
-        return { "subtotal": SumPrice, "consumptionTaxEight": SumPrice * 0.08, "consumptionTaxTen": 0, "totalConsumptionTax": SumPrice * 0.08, "Total": SumPrice * 1.08 }
+        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxEight + consumptionTaxTen, "Total": SumPrice }
+    }
+
+
+    const createStatus = ()  => {
+        let data = {}
+        for (let i = 0; i < purchaseOrderDetails.length; i++) {
+            if (data["product_id_" + purchaseOrderDetails[i].product_id]) {
+                data["product_id_" + purchaseOrderDetails[i].product_id] += purchaseOrderDetails[i].number;
+            } else {
+                data["product_id_" + purchaseOrderDetails[i].product_id] = purchaseOrderDetails[i].number;
+            }
+        }
+
+        for (let i = 0; i < purchaseInvoiceDetails.length; i++) {
+            if (data["product_id_" + purchaseInvoiceDetails[i].product_id]) {
+                data["product_id_" + purchaseInvoiceDetails[i].product_id] -= purchaseInvoiceDetails[i].number;
+            }
+        }
+
+        if (purchaseInvoiceDetails.length === 0) return "未処理"
+        let flag = true
+        for (let key in data) {
+            if (data[key] !== 0) {
+                flag = false;
+            }
+        }
+        if (flag) return "発注済"
+        else return "一部処理"
     }
 
 

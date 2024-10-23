@@ -73,12 +73,19 @@ function PaymentVouchersDetail() {
 
     const handleSumPrice = () => {
         let SumPrice = 0
+        let consumptionTaxEight = 0
+        let consumptionTaxTen = 0
 
         for (let i = 0; i < paymentVoucherDetails.length; i++) {
-            SumPrice += parseInt(paymentVoucherDetails[i].payment_price) + parseInt(paymentVoucherDetails[i].fees_and_charges)
+            SumPrice += paymentVoucherDetails[i].price * paymentVoucherDetails[i].number + (paymentVoucherDetails[i].tax_rate * 0.01 + 1)
+            if (paymentVoucherDetails[i].tax_rate === 8) {
+                consumptionTaxEight += paymentVoucherDetails[i].price * paymentVoucherDetails[i].number * 0.08;
+            } else if (paymentVoucherDetails[i].tax_rate === 10) {
+                consumptionTaxTen += paymentVoucherDetails[i].price * paymentVoucherDetails[i].number * 0.1;
+            }
         }
 
-        return { "subtotal": SumPrice, "consumptionTaxEight": SumPrice * 0.08, "consumptionTaxTen": 0, "totalConsumptionTax": SumPrice * 0.08, "Total": SumPrice * 1.08 }
+        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxEight + consumptionTaxTen, "Total": SumPrice}
     }
 
 

@@ -37,16 +37,27 @@ function PurchaseInvoicesDetail() {
         }
     ]);
 
+    const [purchaseInvoiceStatus, setPurchaseInvoiceStatus] = useState("未処理");
+
     useEffect(() => {
         ipcRenderer.send('get-purchase-invoice-data', id);
         ipcRenderer.on('get-purchase-invoice-data-result', (event, data) => {
             setPurchaseInvoice(data);
         });
 
+        ipcRenderer.send('search-payment-voucher-details-by-purchase-order-id', id);
+
         ipcRenderer.send('search-purchase-invoice-details-by-purchase-invoice-id', id);
 
         ipcRenderer.on('search-purchase-invoice-details-by-purchase-invoice-id-result', (event, data) => {
             setPurchaseInvoiceDetails(data);
+        });
+
+        ipcRenderer.on('search-payment-voucher-details-by-purchase-order-id-result', (event, data) => {
+            // setPurchaseInvoiceDetails(data);
+            if (data.length > 0) {
+                setPurchaseInvoiceStatus("支払済");
+            }
         });
 
         return () => {
@@ -57,12 +68,19 @@ function PurchaseInvoicesDetail() {
 
     const handleSumPrice = () => {
         let SumPrice = 0
+        let consumptionTaxEight = 0
+        let consumptionTaxTen = 0
 
         for (let i = 0; i < purchaseInvoiceDetails.length; i++) {
-            SumPrice += purchaseInvoiceDetails[i].price * purchaseInvoiceDetails[i].number;
+            SumPrice += purchaseInvoiceDetails[i].price * purchaseInvoiceDetails[i].number + (purchaseInvoiceDetails[i].tax_rate * 0.01 + 1)
+            if (purchaseInvoiceDetails[i].tax_rate === 8) {
+                consumptionTaxEight += purchaseInvoiceDetails[i].price * purchaseInvoiceDetails[i].number * 0.08;
+            } else if (purchaseInvoiceDetails[i].tax_rate === 10) {
+                consumptionTaxTen += purchaseInvoiceDetails[i].price * purchaseInvoiceDetails[i].number * 0.1;
+            }
         }
 
-        return { "subtotal": SumPrice, "consumptionTaxEight": SumPrice * 0.08, "consumptionTaxTen": 0, "totalConsumptionTax": SumPrice * 0.08, "Total": SumPrice * 1.08 }
+        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax":consumptionTaxEight + consumptionTaxTen, "Total": SumPrice }
     }
 
 
@@ -220,6 +238,10 @@ function PurchaseInvoicesDetail() {
                         <hr className='' />
                     </div>
                     <div className='py-2.5 font-bold text-xl'>支払情報</div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>ステータス</div>
+                        <div>{purchaseInvoice.status}</div>
+                    </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>締日</div>
                         <div>{purchaseInvoice.closing_date}</div>
