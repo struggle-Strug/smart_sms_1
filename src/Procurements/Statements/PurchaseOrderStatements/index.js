@@ -88,7 +88,7 @@ function Index() {
                 const value = [
                     data[i].order_date,
                     data[i].purchase_order_id,
-                    data[i].vendor_name,
+                    data[i].vender_name,
                     data[i].product_id,
                     data[i].product_name,
                     data[i].classification_primary,
@@ -119,7 +119,7 @@ function Index() {
                 const value = [
                     data[i].order_date,
                     data[i].purchase_order_id,
-                    data[i].vendor_name,
+                    data[i].vender_name,
                     data[i].product_id,
                     data[i].product_name,
                     data[i].classification_primary,
@@ -171,16 +171,16 @@ function Index() {
     }, [settingId]);
 
     const handleSave = () => {
-        const settingData = {
-            id: settingId,
-            output_format: outputFormat,
-            remarks: remarks,
-        };
-
-        ipcRenderer.send('save-statement-setting', settingData);
-        ipcRenderer.once('load-statement-settings', (event, data) => {
-            handleConfirmDelete(data); // 更新されたデータを返す
-        });
+        if (outputFormat === 'print') {
+            
+        } else if (outputFormat === 'csv') {
+            exportToCSV();
+        } else if (outputFormat === 'Excel') {
+            exportToExcel();
+        } else if (outputFormat === 'PDF') {
+            exportPDF();
+        }
+        setIsDialogOpen(false);
     };
 
 
@@ -276,35 +276,13 @@ function Index() {
         };
     }, []);
 
-    // const [isOpen, setIsOpen] = useState(null);
     const [selectedOption, setSelectedOption] = useState(null);
-    // const dropdownRef = useRef(null);
-
-    // const toggleDropdown = (name) => {
-    //     if (isOpen === name) return setIsOpen(null)
-    //     setIsOpen(name);
-    // };
-
-    // const selectOption = (option, name, index) => {
-    //     setSelectedOption(option);
-    //     const updatedDetails = purchaseInvoiceDetails.map((detail, i) =>
-    //         i === index ? { ...detail, [name]: option.value } : detail
-    //     );
-    //     setPurchaseInvoiceDetails(updatedDetails);
-    //     setIsOpen(name);
-    // };
 
     const selectOption = (option, name) => {
         setSelectedOption(option);
         setSearchQueryList({ ...searchQueryList, [name]: option.value });
         setIsOpen(name);
     };
-
-    // const handleClickOutside = (event) => {
-    //     // if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-    //     //     setIsOpen(null);
-    //     // }
-    // };
 
 
 
@@ -315,7 +293,7 @@ function Index() {
                     <div className='text-2xl font-bold'>発注明細表</div>
                     <div className='flex ml-auto'>
                         <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={(e) => setIsDialogOpen(true)}>
-                            明細表設定
+                            エクスポート
                         </div>
                     </div>
                 </div>
@@ -494,13 +472,6 @@ function Index() {
                         <div className='border rounded-lg py-3 px-7 text-base font-bold bg-blue-600 text-white' onClick={(e) => handleSearch()}>適用して表示</div>
                     </div>
                 </div>
-                <div className='flex justify-end'>
-                    <div className='flex ml-auto pt-6'>
-                        <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={() => exportToCSV()}>
-                            エクスポート
-                        </div>
-                    </div>
-                </div>
                 <div className='px-8 pb-8 overflow-x-scroll'>
                     <table className="w-full mt-8 table-auto" style={{ width: "2000px" }}>
                         <thead className=''>
@@ -528,7 +499,7 @@ function Index() {
                                 <tr className='border-b' key={purchaseOrderDetail.id}>
                                     <td className='py-4'>{purchaseOrderDetail.order_date || <div className='border w-4'></div>}</td>
                                     <td className='py-4'>{purchaseOrderDetail.code || <div className='border w-4'></div>}</td>
-                                    <td className='py-4'>{purchaseOrderDetail.vendor_name || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseOrderDetail.vender_name || <div className='border w-4'></div>}</td>
                                     <td className='py-4'>{purchaseOrderDetail.product_id || <div className='border w-4'></div>}</td>
                                     <td className='py-4'>{purchaseOrderDetail.product_name || <div className='border w-4'></div>}</td>
                                     <td className='py-4'>{purchaseOrderDetail.classification_primary || <div className='border w-4'></div>}</td>
@@ -552,7 +523,7 @@ function Index() {
                 isDialogOpen &&
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="container mx-auto sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl bg-white rounded-2xl shadow-md">
-                        <p className='text-2xl font-bold px-6 py-4'>明細表設定</p>
+                        <p className='text-2xl font-bold px-6 py-4'>エクスポート設定</p>
                         <hr />
                         <div className='flex-col px-6 pt-4'>
                             <div className=''>出力形式選択</div>
@@ -597,19 +568,6 @@ function Index() {
                                         className='mr-2'
                                     />印刷
                                 </label>
-                            </div>
-                        </div>
-                        <div className='px-6 pb-4'>
-                            <div className='py-2.5 text-xl'>備考</div>
-                            <div className='pb-2'>
-                                <textarea
-                                    className='border rounded px-4 py-2.5 bg-white w-full resize-none'
-                                    placeholder=''
-                                    rows={5}
-                                    name="remarks"
-                                    value={remarks}
-                                    onChange={(e) => setRemarks(e.target.value)}
-                                ></textarea>
                             </div>
                         </div>
                         <hr />

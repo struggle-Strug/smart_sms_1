@@ -78,7 +78,7 @@ function MastersIndex() {
               <div className='font-bold'>配送方法</div>
               <div><img src='/Icon.png' width={24} /></div>
             </Link>
-            <Link to={"/master/customers"} className='flex items-center py-3 px-4 border rounded ml-5'>
+            <Link to={"/master/shops"} className='flex items-center py-3 px-4 border rounded ml-5'>
               <div className='font-bold'>店舗</div>
               <div><img src='/Icon.png' width={24} /></div>
             </Link>

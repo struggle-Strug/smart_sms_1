@@ -36,7 +36,6 @@ function VendorEdit() {
     useEffect(() => {
         ipcRenderer.send('edit-vendor', id);
         ipcRenderer.on('edit-vendor', (event, vendorData) => {
-            console.log(vendorData);
             setVendor(vendorData);
         });
         return () => {
@@ -65,7 +64,7 @@ function VendorEdit() {
     return (
         <div className='w-full'>
             <div className='p-8 mb-16'>
-                <div className='text-2xl font-bold mb-8'>新しい仕入先を追加</div>
+                <div className='text-2xl font-bold mb-8'>{vendor.name_primary}</div>
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
                         <div className='p-4'>仕入先名1 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>

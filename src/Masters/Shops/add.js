@@ -54,7 +54,7 @@ function ShopAdd() {
     return (
         <div className='w-full'>
             <div className='p-8'>
-                <div className='text-2xl font-bold mb-8'>店舗の新規登録</div>
+                <div className='text-2xl font-bold mb-8'>新規登録</div>
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
                         <div className='p-4'>店舗名 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>

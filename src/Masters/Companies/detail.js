@@ -26,7 +26,7 @@ function CompanyDetail() {
         <div className='w-full'>
             <div className='p-8'>
                 <div className=' mb-8 flex'>
-                    <div className='text-2xl font-bold'>{company.name || '会社詳細'}</div>
+                    <div className='text-2xl font-bold'>{company.name || '自社詳細'}</div>
                     <Link to={`/master/companies/edit/${company.id}`} className='ml-auto py-3 px-4 border rounded-lg text-base font-bold'>編集する</Link>
                 </div>
                 <div className="flex bg-gray-100">

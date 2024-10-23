@@ -78,7 +78,7 @@ function CompanyAdd() {
     return (
         <div className='w-full'>
             <div className='p-8 mb-16'>
-                <div className='text-2xl font-bold mb-8'>会社情報の新規登録</div>
+                <div className='text-2xl font-bold mb-8'>自社の新規登録</div>
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
                         <div className='p-4'>会社名 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>

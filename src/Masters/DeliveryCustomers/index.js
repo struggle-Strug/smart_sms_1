@@ -95,7 +95,7 @@ function Index() {
     return (
         <div className='w-full'>
             <div className='p-8'>
-                <div className='pb-6 text-2xl font-bold'>納品先</div>
+                <div className='pb-6 text-2xl font-bold'>納品先一覧</div>
                 <div className='flex'>
                 <div className='border rounded-lg py-3 px-7 mb-8 text-base font-bold bg-blue-600 text-white'><Link to="add" className={``}>新規登録</Link></div>
                 </div>

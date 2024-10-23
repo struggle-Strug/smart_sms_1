@@ -47,7 +47,7 @@ function DeliveryCustomersDetail() {
     return (
         <div className='w-full'>
             <div className='p-8'>
-                <div className='text-2xl font-bold mb-8'>{customer.name_primary || '株式会社テスト'}</div>
+                <div className='text-2xl font-bold mb-8'>{customer.name_primary || '納品先詳細'}</div>
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
                         <div className='p-4'>納品先名1 </div>

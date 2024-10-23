@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import dayjs from 'dayjs';
+import DatePicker from 'react-datepicker';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -17,6 +18,15 @@ function Index() {
     const [pvAndPiMappings, setPvAndPiMappings] = useState([]);
     const [aggregatedPvData, setAggregatedPvData] = useState([])
     const [aggregatedPiData, setAggregatedPiData] = useState([])
+
+    const [searchQueryList, setSearchQueryList] = useState({
+
+    });
+
+    const handleDateChange = (date, name) => {
+        const formattedDate = date ? date.toISOString().split('T')[0] : '';
+        setSearchQueryList({ ...searchQueryList, [name]: formattedDate });
+    };
 
     useEffect(() => {
         ipcRenderer.send('load-payment-voucher-details');
@@ -241,7 +251,13 @@ function Index() {
                             <div className='flex items-center'>
                                 <div>
                                     <div className='text-sm pb-1.5'>日付 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                    <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                                    <DatePicker
+                                        selected={searchQueryList["pod.created_end"] ? new Date(searchQueryList["pod.created_end"]) : null}
+                                        onChange={(date) => handleDateChange(date, "pod.created_end")}
+                                        dateFormat="yyyy-MM-dd"
+                                        className='border rounded px-4 py-2.5 bg-white  w-full'
+                                        placeholderText='期間を選択'
+                                    />
                                 </div>
                                 <div>
                                     <div className='w-1'>&nbsp;</div>
@@ -249,13 +265,25 @@ function Index() {
                                 </div>
                                 <div>
                                     <div className='text-sm pb-1.5'>&nbsp;</div>
-                                    <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                                    <DatePicker
+                                        selected={searchQueryList["pod.created_end"] ? new Date(searchQueryList["pod.created_end"]) : null}
+                                        onChange={(date) => handleDateChange(date, "pod.created_end")}
+                                        dateFormat="yyyy-MM-dd"
+                                        className='border rounded px-4 py-2.5 bg-white  w-full'
+                                        placeholderText='期間を選択'
+                                    />
                                 </div>
                             </div>
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>支払予定日</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <DatePicker
+                                selected={searchQueryList["pod.created_end"] ? new Date(searchQueryList["pod.created_end"]) : null}
+                                onChange={(date) => handleDateChange(date, "pod.created_end")}
+                                dateFormat="yyyy-MM-dd"
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholderText='期間を選択'
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>仕入先</div>
@@ -330,10 +358,10 @@ function Index() {
                         {createDisplayData().map((value) => (
                             <tr className='border-b' key={value.vender_name}>
                                 <td className='py-4'>{value.vender_name}</td>
-                                <td>{value.balance_of_last_month.toLocaleString()}円</td>
-                                <td>{value.purchase_current_month.toLocaleString()}円</td>
-                                <td>{value.payment_current_month.toLocaleString()}円</td>
-                                <td>{value.balance_of_current_month.toLocaleString()}円</td>
+                                <td className='py-4'>{value.balance_of_last_month.toLocaleString()}円</td>
+                                <td className='py-4'>{value.purchase_current_month.toLocaleString()}円</td>
+                                <td className='py-4'>{value.payment_current_month.toLocaleString()}円</td>
+                                <td className='py-4'>{value.balance_of_current_month.toLocaleString()}円</td>
                                 <td>2023-09-30</td>
                             </tr>
                         ))}

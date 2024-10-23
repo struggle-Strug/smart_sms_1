@@ -79,7 +79,7 @@ function VendorAdd() {
     return (
         <div className='w-full'>
             <div className='p-8 mb-16'>
-                <div className='text-2xl font-bold mb-8'>新しい仕入先を追加</div>
+                <div className='text-2xl font-bold mb-8'>新規追加</div>
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
                         <div className='p-4'>仕入先名1 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
@@ -142,7 +142,7 @@ function VendorAdd() {
                         <input
                             type='text'
                             className='border rounded px-4 py-2.5 bg白 w-2/3'
-                            placeholder='仕入れ先コードを入力'
+                            placeholder='仕入先コードを入力'
                             name="code"
                             value={vendor.code}
                             onChange={handleChange}
