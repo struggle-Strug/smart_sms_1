@@ -1,5 +1,5 @@
 import logo from './logo.svg';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import './App.css';
 import Contact from './Contact'
@@ -12,8 +12,12 @@ import InvoiceSettings from './Components/InvoiceSettings/InvoiceSettings';
 import StockInOutputInvoiceSettings from './Components/InvoiceSettings/StockInOutputInvoiceSettings';
 import SalesMagement from './SalesManagement';
 
+
+const { ipcRenderer } = window.require('electron');
+
 function App() {
   const location = useLocation();
+  const [companyName, setCompanyName] = useState("自社名");
 
   const [isHovered, setIsHovered] = useState(false);
 
@@ -24,6 +28,16 @@ function App() {
   const handleMouseLeave = () => {
     setIsHovered(false);
   };
+
+  useEffect(() => {
+    ipcRenderer.send('load-companies');
+    ipcRenderer.on('load-companies', (event, data) => {
+      setCompanyName(data[0].name);
+    });
+    return () => {
+      ipcRenderer.removeAllListeners('load-companies');
+    };
+  })
 
   return (
     <div className="App">
@@ -67,12 +81,12 @@ function App() {
                       <div className='border w-full'></div>
                     </div>
                     <div className='grid grid-cols-2 text-gray-600'>
-                    <Link to="/procurement/statements/purchase-order-statement">発注明細表</Link>
-                    <Link to="/procurement/statements/purchase-detail-statement">仕入明細表</Link>
+                      <Link to="/procurement/statements/purchase-order-statement">発注明細表</Link>
+                      <Link to="/procurement/statements/purchase-detail-statement">仕入明細表</Link>
                     </div>
                     <div className='grid grid-cols-2 text-gray-600'>
-                    <Link to="/procurement/statements/stock-in-out-statement">入出庫明細表</Link>
-                    <Link to="/procurement/statements/payment-statement">支払明細表</Link>
+                      <Link to="/procurement/statements/stock-in-out-statement">入出庫明細表</Link>
+                      <Link to="/procurement/statements/payment-statement">支払明細表</Link>
                     </div>
                   </div>
                   <div className='px-3 pb-4'>
@@ -81,16 +95,16 @@ function App() {
                       <div className='border w-full'></div>
                     </div>
                     <div className='grid grid-cols-2 text-gray-600'>
-                    <Link to="/procurement/summary-and-management-sheets/order-summary-sheet">発注集計表</Link>
-                    <Link to="/procurement/summary-and-management-sheets/purchase-summary-sheet">仕入集計表</Link>
+                      <Link to="/procurement/summary-and-management-sheets/order-summary-sheet">発注集計表</Link>
+                      <Link to="/procurement/summary-and-management-sheets/purchase-summary-sheet">仕入集計表</Link>
                     </div>
                     <div className='grid grid-cols-2 text-gray-600'>
-                    <Link to="/procurement/summary-and-management-sheets/inventory-in-out-summary-sheet">入出庫集計表</Link>
-                    <Link to="/procurement/summary-and-management-sheets/payment-summary-sheet">支払集計表</Link>
+                      <Link to="/procurement/summary-and-management-sheets/inventory-in-out-summary-sheet">入出庫集計表</Link>
+                      <Link to="/procurement/summary-and-management-sheets/payment-summary-sheet">支払集計表</Link>
                     </div>
                     <div className='grid grid-cols-2 text-gray-600'>
-                    <Link to="/procurement/summary-and-management-sheets/account-payment-balance">買掛金残高</Link>
-                    <Link to="/procurement/summary-and-management-sheets/inventory-sheet">在庫表</Link>
+                      <Link to="/procurement/summary-and-management-sheets/account-payment-balance">買掛金残高</Link>
+                      <Link to="/procurement/summary-and-management-sheets/inventory-sheet">在庫表</Link>
                     </div>
                   </div>
                 </div>
@@ -99,10 +113,10 @@ function App() {
           </Link>
           <Link to="/master" className={`py-6 px-4 mx-2  ${location.pathname.includes("/master") && "font-bold border-b-4 border-blue-600"}`} activeClassName=''>マスタ管理</Link>
         </div>
-        <div className='ml-auto text-xl py-3 pr-10'>国際キャリア事業協同組合</div>
+        <div className='ml-auto text-xl py-3 pr-10'>{companyName}</div>
       </div>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/*" element={<Home />} />
         <Route path="/sales-management/*" element={<SalesManagement />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/master/*" element={<Master />} />

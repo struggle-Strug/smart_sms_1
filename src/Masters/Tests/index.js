@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import StorageFacilityDetail from './detail';
 import StorageFacilityEdit from './edit';
 import StorageFacilityAdd from './add';
+import ConfirmDialog from '../../Components/ConfirmDialog';
 
 const { ipcRenderer } = window.require('electron');
 

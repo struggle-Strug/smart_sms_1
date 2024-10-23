@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import SetProductDetail from './detail';
 import SetProductEdit from './edit';
 import SetProductAdd from './add';
+import ConfirmDialog from '../../Components/ConfirmDialog';
 
 const { ipcRenderer } = window.require('electron');
 
