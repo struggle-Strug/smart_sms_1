@@ -125,7 +125,7 @@ function Index() {
                         {purchaseInvoices.map((purchaseInvoice) => (
                             <tr className='border-b' key={purchaseInvoice.id}>
                                 <td>{purchaseInvoice.order_date || <div className='border w-4'></div>}</td>
-                                <td>{purchaseInvoice.id || <div className='border w-4'></div>}</td>
+                                <td>{purchaseInvoice.code || <div className='border w-4'></div>}</td>
                                 <td>{purchaseInvoice.vender_name || <div className='border w-4'></div>}</td>
                                 <td>{purchaseInvoice.vender_id || <div className='border w-4'></div>}</td>
                                 <td>{purchaseInvoice.remarks}</td>

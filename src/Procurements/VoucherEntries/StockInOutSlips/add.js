@@ -19,6 +19,7 @@ function StockInOutSlipsAdd() {
     const [isVendorNameFocused, setIsVendorNameFocused] = useState(false);
     const [isProductIdFocused, setIsProductIdFocused] = useState(-1);
     const [isProductNameFocused, setIsProductNameFocused] = useState(-1);
+    const [storageFacilitiesList, setStorageFacilitiesList] = useState([]);
     const [errors, setErrors] = useState({});
 
     const handleFocus = () => {
@@ -81,6 +82,19 @@ function StockInOutSlipsAdd() {
 
         ipcRenderer.on('search-name-products-result', (event, data) => {
             setProducts(data);
+        });
+
+        ipcRenderer.send('load-storage-facilities');
+        ipcRenderer.on('load-storage-facilities', (event, data) => {
+            let arr = [];
+            for (let i = 0; i < data.length; i++) {
+                const storageFacilitiesTemplate = {
+                    value: data[i].name,
+                    label: data[i].name,
+                }
+                arr.push(storageFacilitiesTemplate)
+            }
+            setStorageFacilitiesList(arr);
         });
 
 
@@ -385,7 +399,7 @@ function StockInOutSlipsAdd() {
 
                                 {isOpen === "warehouse_to" && (
                                     <div className="absolute z-10 mt-1 w-full bg-white border  rounded-md shadow-lg max-h-60 overflow-auto">
-                                        {[{ label: "倉庫A", value: "倉庫A" }, { label: "倉庫B", value: "倉庫B" }].map((option) => (
+                                        {storageFacilitiesList.map((option) => (
                                             <div
                                                 key={option.value}
                                                 className="cursor-pointer p-2 hover:bg-gray-100"
@@ -427,7 +441,7 @@ function StockInOutSlipsAdd() {
 
                                 {isOpen === "warehouse_from" && (
                                     <div className="absolute z-10 mt-1 w-full bg-white border  rounded-md shadow-lg max-h-60 overflow-auto">
-                                        {[{ label: "倉庫A", value: "倉庫A" }, { label: "倉庫B", value: "倉庫B" }].map((option) => (
+                                        {storageFacilitiesList.map((option) => (
                                             <div
                                                 key={option.value}
                                                 className="cursor-pointer p-2 hover:bg-gray-100"

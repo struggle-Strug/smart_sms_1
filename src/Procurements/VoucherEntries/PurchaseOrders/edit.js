@@ -20,6 +20,8 @@ function PurchaseOrdersEdit() {
     const [isVendorNameFocused, setIsVendorNameFocused] = useState(false);
     const [isProductIdFocused, setIsProductIdFocused] = useState(-1);
     const [isProductNameFocused, setIsProductNameFocused] = useState(-1);
+    const [taxRateList, setTaxRateList] = useState([]);
+    const [storageFacilitiesList, setStorageFacilitiesList] = useState([]);
     const [errors, setErrors] = useState({});
 
     const handleFocus = () => {
@@ -90,6 +92,32 @@ function PurchaseOrdersEdit() {
         ipcRenderer.on('search-purchase-invoice-details-result', (event, data) => {
             setPurchaseInvoiceDetails(data)
         })
+        ipcRenderer.send('load-sales-tax-settings');
+        ipcRenderer.on('sales-tax-settings-data', (event, data) => {
+            console.log(data)
+            let arr = [];
+            for (let i = 0; i < data.length; i++) {
+                const taxRateTemplate = {
+                    value: data[i].tax_rate,
+                    label: data[i].tax_rate,
+                }
+                arr.push(taxRateTemplate)
+            }
+            setTaxRateList(arr);
+        });
+
+        ipcRenderer.send('load-storage-facilities');
+        ipcRenderer.on('load-storage-facilities', (event, data) => {
+            let arr = [];
+            for (let i = 0; i < data.length; i++) {
+                const storageFacilitiesTemplate = {
+                    value: data[i].name,
+                    label: data[i].name,
+                }
+                arr.push(storageFacilitiesTemplate)
+            }
+            setStorageFacilitiesList(arr);
+        });
 
         return () => {
             ipcRenderer.removeAllListeners('purchase-order-data');
@@ -569,7 +597,7 @@ function PurchaseOrdersEdit() {
 
                                                     {isOpen === "tax_rate" + index && (
                                                         <div className="absolute z-10 mt-1 w-full bg-white border  rounded-md shadow-lg max-h-60 overflow-auto">
-                                                            {[{ label: "8%", value: 8 }, { label: "10%", value: 10 }].map((option) => (
+                                                            {taxRateList.map((option) => (
                                                                 <div
                                                                     key={option.value}
                                                                     className="cursor-pointer p-2 hover:bg-gray-100"
@@ -603,7 +631,7 @@ function PurchaseOrdersEdit() {
 
                                                     {isOpen === "storage_facility" + index && (
                                                         <div className="absolute z-10 mt-1 w-full bg-white border  rounded-md shadow-lg max-h-60 overflow-auto">
-                                                            {[{ label: "倉庫A", value: "倉庫A" }, { label: "倉庫B", value: "倉庫B" }].map((option) => (
+                                                            {storageFacilitiesList.map((option) => (
                                                                 <div
                                                                     key={option.value}
                                                                     className="cursor-pointer p-2 hover:bg-gray-100"

@@ -120,7 +120,7 @@ function Index() {
                         {slips.map((slip) => (
                             <tr className='border-b' key={slip.id}>
                                 <td>{slip.stock_in_out_date || <div className='border w-4'></div>}</td>
-                                <td>{slip.id || <div className='border w-4'></div>}</td>
+                                <td>{slip.code || <div className='border w-4'></div>}</td>
                                 <td>{slip.vender_name || <div className='border w-4'></div>}</td>
                                 <td>{slip.vender_code || <div className='border w-4'></div>}</td>
                                 <td>{slip.remarks || "N/A"}</td>

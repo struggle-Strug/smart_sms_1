@@ -15,6 +15,7 @@ function PaymentVouchersAdd() {
     const [isVendorNameFocused, setIsVendorNameFocused] = useState(false);
     const [isProductIdFocused, setIsProductIdFocused] = useState(-1);
     const [isProductNameFocused, setIsProductNameFocused] = useState(-1);
+    const [taxRateList, setTaxRateList] = useState([]);
     const [errors, setErrors] = useState({});
 
     const handleFocus = () => {
@@ -81,6 +82,20 @@ function PaymentVouchersAdd() {
 
         ipcRenderer.on('search-name-products-result', (event, data) => {
             setProducts(data);
+        });
+
+        ipcRenderer.send('load-sales-tax-settings');
+        ipcRenderer.on('sales-tax-settings-data', (event, data) => {
+            console.log(data)
+            let arr = [];
+            for (let i = 0; i < data.length; i++) {
+                const taxRateTemplate = {
+                    value: data[i].tax_rate,
+                    label: data[i].tax_rate,
+                }
+                arr.push(taxRateTemplate)
+            }
+            setTaxRateList(arr);
         });
 
 
