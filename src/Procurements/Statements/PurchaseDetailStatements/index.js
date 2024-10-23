@@ -279,6 +279,14 @@ function Index() {
         };
     }, []);
 
+    const [selectedOption, setSelectedOption] = useState(null);
+
+    const selectOption = (option, name) => {
+        setSelectedOption(option);
+        setSearchQueryList({ ...searchQueryList, [name]: option.value });
+        setIsOpen(name);
+    };
+
     return (
         <div className='w-5/6'>
             <div className='p-8'>
@@ -395,13 +403,38 @@ function Index() {
                             />
                         </div>
                         <div>
-                            <div className='text-sm pb-1.5'>ステータス</div>
-                            <CustomSelect
-                                options={options}
-                                name="pid.status"
-                                data={searchQueryList["pid.status"]}
-                                onChange={(value) => handleInputChange({ target: { name: "pid.status", value } })}
-                            />
+                            <div className='text-sm pb-1.5 w-40'>ステータス</div>
+                            <div className="relative" ref={dropdownRef}>
+                                <div
+                                    className="bg-white border rounded px-4 py-2.5 cursor-pointer flex justify-between items-center"
+                                    onClick={() => toggleDropdown("po.status")}
+                                >
+                                    <span>{searchQueryList["po.status"] ? searchQueryList["po.status"] : "ステータス"}</span>
+                                    <svg
+                                        className={`w-4 h-4 transform transition-transform ${isOpen === "po.status" ? 'rotate-180' : ''}`}
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+
+                                {isOpen === "po.status" && (
+                                    <div className="absolute z-10 mt-1 w-full bg-white border  rounded-md shadow-lg max-h-60 overflow-auto">
+                                        {[{ value: "未処理", label: "未処理" }, { value: "支払済", label: "支払済" }].map((option) => (
+                                            <div
+                                                key={option.value}
+                                                className="cursor-pointer p-2 hover:bg-gray-100"
+                                                onClick={() => selectOption(option, "po.status")}
+                                            >
+                                                {option.label}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>ロット番号</div>

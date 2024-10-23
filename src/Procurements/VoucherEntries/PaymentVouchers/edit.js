@@ -201,19 +201,13 @@ function PaymentVouchersEdit() {
 
     const handleSumPrice = () => {
         let SumPrice = 0
-        let consumptionTaxEight = 0
-        let consumptionTaxTen = 0
-
+        let feesAndCharges = 0
         for (let i = 0; i < paymentVoucherDetails.length; i++) {
-            SumPrice += paymentVoucherDetails[i].price * paymentVoucherDetails[i].number + (paymentVoucherDetails[i].tax_rate * 0.01 + 1)
-            if (paymentVoucherDetails[i].tax_rate === 8) {
-                consumptionTaxEight += paymentVoucherDetails[i].price * paymentVoucherDetails[i].number * 0.08;
-            } else if (paymentVoucherDetails[i].tax_rate === 10) {
-                consumptionTaxTen += paymentVoucherDetails[i].price * paymentVoucherDetails[i].number * 0.1;
-            }
+            SumPrice += parseInt(paymentVoucherDetails[i].payment_price)
+            feesAndCharges += parseInt(paymentVoucherDetails[i].fees_and_charges)
         }
 
-        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxEight + consumptionTaxTen, "Total": SumPrice}
+        return { "feesAndCharges": feesAndCharges, "Total": SumPrice}
     }
 
     const [isOpen, setIsOpen] = useState(null);
@@ -549,9 +543,6 @@ function PaymentVouchersEdit() {
                             ))}
                         </tbody>
                     </table>
-                    {/* <div className='flex my-6'>
-                        <div className='border rounded-lg py-3 px-4 text-base font-bold bg-blue-600 text-white'>紐付ける</div>
-                    </div> */}
                     <div className='py-3'>
                         <hr className='' />
                     </div>
@@ -591,10 +582,8 @@ function PaymentVouchersEdit() {
                                 {errors["payment_price" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["payment_price" + index]}</div>}
                                 <div className='flex items-center justify-end'>
                                     <div className='flex items-center'>
-                                        <div className='mr-4'>消費税額</div>
-                                        <div className='mr-4'>{(paymentVoucherDetails[index].price * paymentVoucherDetails[index].number * paymentVoucherDetails[index].tax_rate*0.01).toFixed(0)}円</div>
                                         <div className='mr-4'>金額</div>
-                                        <div className='text-lg font-bold'>{(paymentVoucherDetails[index].price * paymentVoucherDetails[index].number * (paymentVoucherDetails[index].tax_rate*0.01 + 1)).toFixed(0)}円</div>
+                                        <div className='text-lg font-bold'>{parseInt(paymentVoucherDetails[index].payment_price) + parseInt(paymentVoucherDetails[index].fees_and_charges)}円</div>
                                     </div>
                                 </div>
                                 <hr className='py-3' />
@@ -607,23 +596,11 @@ function PaymentVouchersEdit() {
                     <div className='py-6 flex'>
                         <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
                             <div className='flex pb-2'>
-                                <div className='w-40'>税抜合計</div>
-                                <div>{handleSumPrice().subtotal.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税(8%)</div>
-                                <div>{handleSumPrice().consumptionTaxEight.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税(10%)</div>
-                                <div>{handleSumPrice().consumptionTaxTen.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税合計</div>
-                                <div>{handleSumPrice().totalConsumptionTax.toFixed(0).toLocaleString()}円</div>
+                                <div className='w-40'>手数料合計</div>
+                                <div>{handleSumPrice().feesAndCharges.toFixed(0).toLocaleString()}円</div>
                             </div>
                             <div className='flex'>
-                                <div className='w-40'>税込合計</div>
+                                <div className='w-40'>合計</div>
                                 <div>{handleSumPrice().Total.toFixed(0).toLocaleString()}円</div>
                             </div>
                         </div>

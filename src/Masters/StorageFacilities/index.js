@@ -135,7 +135,7 @@ function StorageFacilityList() {
                         {facilities.map((facility) => (
                             <tr className='border-b' key={facility.id}>
                                 <td>{facility.name || <div className='border w-4'></div>}</td>
-                                <td>{facility.id || <div className='border w-4'></div>}</td>
+                                <td>{facility.code || <div className='border w-4'></div>}</td>
                                 <td>{facility.contact_person || <div className='border w-4'></div>}</td>
                                 <td>{facility.phone_number || <div className='border w-4'></div>}</td>
                                 <td>{facility.email || <div className='border w-4'></div>}</td>

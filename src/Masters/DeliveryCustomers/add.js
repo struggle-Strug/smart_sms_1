@@ -16,6 +16,7 @@ function DeliveryCustomersAdd() {
 
     const [deliveryCustomer, setDeliveryCustomer] = useState({
         id: '',
+        code: '',
         name_primary: '',
         name_secondary: '',
         honorific: '',
@@ -54,7 +55,7 @@ function DeliveryCustomersAdd() {
 
     const handleSubmit = () => {
         validator.required(deliveryCustomer.name_primary, 'name_primary', '納品先名1');
-        validator.required(deliveryCustomer.billing_code, 'billing_code', '納品先コード');
+        validator.required(deliveryCustomer.code, 'code', '納品先コード');
         validator.required(deliveryCustomer.phone_number, 'phone_number', '電話番号');
         validator.required(deliveryCustomer.fax_number, 'fax_number', 'Fax');
         validator.required(deliveryCustomer.address, 'address', '住所');
@@ -64,6 +65,7 @@ function DeliveryCustomersAdd() {
             ipcRenderer.send('save-delivery-customer', deliveryCustomer);
             setDeliveryCustomer({
                 id: '',
+                code: '',
                 name_primary: '',
                 name_secondary: '',
                 honorific: '',
@@ -125,10 +127,10 @@ function DeliveryCustomersAdd() {
                         <div className='p-4'>納品先コード <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='株式会社テスト' name="billing_code" value={deliveryCustomer.billing_code} onChange={handleChange} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='株式会社テスト' name="code" value={deliveryCustomer.code} onChange={handleChange} />
                     </div>
                 </div>
-                {errors.billing_code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.billing_code}</div>}
+                {errors.code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.code}</div>}
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
                         <div className='p-4'>電話番号 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>

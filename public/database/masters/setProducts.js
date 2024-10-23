@@ -12,6 +12,7 @@ function initializeDatabase() {
         CREATE TABLE IF NOT EXISTS set_products (
             id INTEGER PRIMARY KEY AUTOINCREMENT, -- カラム1: セット商品名 id
             set_product_name VARCHAR(255) NOT NULL, -- カラム2: セット商品コード
+            code VARCHAR(255), -- カラム2: セット商品コード
             category VARCHAR(255), -- カラム3: カテゴリー
             sub_category VARCHAR(255), -- カラム4: サブカテゴリー
             jan_code VARCHAR(255), -- カラム5: JANコード
@@ -35,18 +36,18 @@ function getSetProductById(id, callback) {
 }
 
 function saveSetProduct(productData, callback) {
-  const { id, set_product_name, category, sub_category, jan_code, tax_rate, warning_threshold, product_search, set_product_contents, set_product_price } = productData;
+  const { id, set_product_name, category, code, sub_category, jan_code, tax_rate, warning_threshold, product_search, set_product_contents, set_product_price } = productData;
 
   if (id) {
       db.run(
-          `UPDATE set_products SET set_product_name = ?, category = ?, sub_category = ?, jan_code = ?, tax_rate = ?, warning_threshold = ?, product_search = ?, set_product_contents = ?, set_product_price = ?, updated = datetime('now') WHERE id = ?`,
-          [set_product_name, category, sub_category, jan_code, tax_rate, warning_threshold, product_search, set_product_contents, set_product_price, id],
+          `UPDATE set_products SET set_product_name = ?, category = ?, code = ?, sub_category = ?, jan_code = ?, tax_rate = ?, warning_threshold = ?, product_search = ?, set_product_contents = ?, set_product_price = ?, updated = datetime('now') WHERE id = ?`,
+          [set_product_name, category, code, sub_category, jan_code, tax_rate, warning_threshold, product_search, set_product_contents, set_product_price, id],
           callback
       );
   } else {
       db.run(
-          `INSERT INTO set_products (set_product_name, category, sub_category, jan_code, tax_rate, warning_threshold, product_search, set_product_contents, set_product_price, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
-          [set_product_name, category, sub_category, jan_code, tax_rate, warning_threshold, product_search, set_product_contents, set_product_price],
+          `INSERT INTO set_products (set_product_name, category, code, sub_category, jan_code, tax_rate, warning_threshold, product_search, set_product_contents, set_product_price, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+          [set_product_name, category, code, sub_category, jan_code, tax_rate, warning_threshold, product_search, set_product_contents, set_product_price],
           callback
       );
   }

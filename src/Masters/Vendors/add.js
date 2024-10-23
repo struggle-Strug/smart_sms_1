@@ -10,6 +10,7 @@ function VendorAdd() {
     const [vendor, setVendor] = useState({
         name_primary: '',
         name_secondary: '',
+        code: '',
         name_kana: '',
         phone_number: '',
         fax_number: '',
@@ -54,6 +55,7 @@ function VendorAdd() {
             setVendor({
                 name_primary: '',
                 name_secondary: '',
+                code: '',
                 name_kana: '',
                 phone_number: '',
                 fax_number: '',
@@ -134,15 +136,15 @@ function VendorAdd() {
                 </div>
                 <div className="flex bg白">
                     <div className="w-1/5">
-                        <div className='p-4'>仕入れ先コード <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
+                        <div className='p-4'>仕入先コード <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
                         <input
                             type='text'
                             className='border rounded px-4 py-2.5 bg白 w-2/3'
                             placeholder='仕入れ先コードを入力'
-                            name="id"
-                            value={vendor.id}
+                            name="code"
+                            value={vendor.code}
                             onChange={handleChange}
                         />
                     </div>
@@ -265,7 +267,7 @@ function VendorAdd() {
                 </div>
                 <div className="flex bg-white">
                     <div className="w-1/5">
-                        <div className='p-4'>消費税設定</div>
+                        <div className='p-4'>消費税計算</div>
                     </div>
                     <div className="w-4/5 py-1.5">
                         <CustomSelect options={options} placeholder={"1つ選んでください"} name={"tax_calculation"} data={vendor} setData={setVendor} />

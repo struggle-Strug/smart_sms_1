@@ -12,6 +12,7 @@ function initializeDatabase() {
         CREATE TABLE IF NOT EXISTS products (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name VARCHAR(255) NOT NULL,
+            code VARCHAR(255) DEFAULT NULL,
             classification_primary VARCHAR(255) NOT NULL,
             classification_secondary VARCHAR(255) DEFAULT NULL,
             jan_code VARCHAR(255) NOT NULL,
@@ -39,18 +40,18 @@ function getProductById(id, callback) {
 }
 
 function saveProduct(productData, callback) {
-    const { id, name, classification_primary, classification_secondary, jan_code, standard_retail_price, procurement_cost, manufacturer_name, specification, unit, country_of_origin, storage_location, storage_method, threshold } = productData;
+    const { id, name, code, classification_primary, classification_secondary, jan_code, standard_retail_price, procurement_cost, manufacturer_name, specification, unit, country_of_origin, storage_location, storage_method, threshold } = productData;
 
     if (id) {
         db.run(
-            `UPDATE products SET name = ?, classification_primary = ?, classification_secondary = ?, jan_code = ?, standard_retail_price = ?, procurement_cost = ?, manufacturer_name = ?, specification = ?, unit = ?, country_of_origin = ?, storage_location = ?, storage_method = ?, threshold = ?, updated = datetime('now') WHERE id = ?`,
-            [name, classification_primary, classification_secondary, jan_code, standard_retail_price, procurement_cost, manufacturer_name, specification, unit, country_of_origin, storage_location, storage_method, threshold, id],
+            `UPDATE products SET name = ?, code = ?, classification_primary = ?, classification_secondary = ?, jan_code = ?, standard_retail_price = ?, procurement_cost = ?, manufacturer_name = ?, specification = ?, unit = ?, country_of_origin = ?, storage_location = ?, storage_method = ?, threshold = ?, updated = datetime('now') WHERE id = ?`,
+            [name, code, classification_primary, classification_secondary, jan_code, standard_retail_price, procurement_cost, manufacturer_name, specification, unit, country_of_origin, storage_location, storage_method, threshold, id],
             callback
         );
     } else {
         db.run(
-            `INSERT INTO products (name, classification_primary, classification_secondary, jan_code, standard_retail_price, procurement_cost, manufacturer_name, specification, unit, country_of_origin, storage_location, storage_method, threshold, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
-            [name, classification_primary, classification_secondary, jan_code, standard_retail_price, procurement_cost, manufacturer_name, specification, unit, country_of_origin, storage_location, storage_method, threshold],
+            `INSERT INTO products (name, code, classification_primary, classification_secondary, jan_code, standard_retail_price, procurement_cost, manufacturer_name, specification, unit, country_of_origin, storage_location, storage_method, threshold, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+            [name, code,  classification_primary, classification_secondary, jan_code, standard_retail_price, procurement_cost, manufacturer_name, specification, unit, country_of_origin, storage_location, storage_method, threshold],
             callback
         );
     }

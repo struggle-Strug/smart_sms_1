@@ -7,6 +7,7 @@ const { ipcRenderer } = window.require('electron');
 function PrimarySectionAdd() {
     const [primarySection, setPrimarySection] = useState({
         name: '',
+        code: '',
         remarks: ''
     });
 
@@ -22,7 +23,7 @@ function PrimarySectionAdd() {
     const handleSubmit = () => {
         // バリデーションを実行
         validator.required(primarySection.name, 'name', '区分名');
-        validator.required(primarySection.id, 'id', '区分コード');
+        validator.required(primarySection.code, 'code', '区分コード');
 
         setErrors(validator.getErrors()); // エラーを設定
 
@@ -32,6 +33,7 @@ function PrimarySectionAdd() {
             // フォームのリセット
             setPrimarySection({
                 name: '',
+                code: '',
                 remarks: ''
             });
             alert('新規登録が完了しました。');
@@ -68,8 +70,8 @@ function PrimarySectionAdd() {
                             type='text' 
                             className='border rounded px-4 py-2.5 bg-white w-2/3' 
                             placeholder='区分コードを入力' 
-                            name="id" 
-                            value={primarySection.id} 
+                            name="code" 
+                            value={primarySection.code} 
                             onChange={handleChange} 
                         />
                     </div>

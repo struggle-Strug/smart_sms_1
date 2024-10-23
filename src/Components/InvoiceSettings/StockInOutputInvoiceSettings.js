@@ -4,12 +4,15 @@ import { Link } from 'react-router-dom';
 import CustomSelect from '../CustomSelect';
 import { Tooltip } from 'react-tooltip'
 import Switch from '@mui/material/Switch';
+import { useNavigate } from 'react-router-dom';
 
 function StockInOutputInvoiceSettings() {
   const options = [
     { value: '御中', label: '御中' },
     { value: '貴社', label: '貴社' },
   ];
+
+  const navigate = useNavigate();
 
   const [customer, setCustomer] = useState({
     id: '',
@@ -35,7 +38,7 @@ function StockInOutputInvoiceSettings() {
       <div className='flex mx-40 mt-10 mb-12'>
         <div className='flex-col max-w-[420px]'>
           <div className='flex mr-auto'>
-            <Link to="/invoice-settings" className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
+            <div className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex' onClick={() => navigate(-1)}>
               <div className='pr-1.5 pl-1 flex items-center'>
               <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -47,7 +50,7 @@ function StockInOutputInvoiceSettings() {
         </svg>
               </div>
               戻る
-            </Link>
+            </div>
           </div>
           <div className='mt-6'>
             <div className='text-3xl font-bold text-black'>伝票設定</div>

@@ -85,7 +85,7 @@ function DeliveryCustomersDetail() {
                         <div className='p-4'>取引先コード </div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{customer.billing_code || ''}</div>
+                        <div className='px-4 py-2.5'>{customer.code || ''}</div>
                     </div>
                 </div>
                 <div className="flex bg-gray-100">

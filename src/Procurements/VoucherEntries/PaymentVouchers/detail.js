@@ -3,12 +3,21 @@ import { useParams } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip'
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import ConfirmDialog from '../../../Components/ConfirmDialog';
+import { useNavigate } from 'react-router-dom';
+
+
 const { ipcRenderer } = window.require('electron');
 
 function PaymentVouchersDetail() {
     const { id } = useParams();
 
     const [connectedPurchaseOrders, setConnectedPurchaseOrders] = useState([])
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [customerIdToDelete, setCustomerIdToDelete] = useState(null);
+    const [messageToDelete, setMessageToDelete] = useState('');
+
+    const navigate = useNavigate();
 
 
     const [paymentVoucher, setPaymentVoucher] = useState(
@@ -36,6 +45,8 @@ function PaymentVouchersDetail() {
 
     const [vendors, setVendors] = useState([])
     const [products, setProducts] = useState([])
+    const [company, setCompany] = useState({});
+    const [vendor, setVendor] = useState({});
 
     useEffect(() => {
         ipcRenderer.send('get-payment-voucher-data', id);
@@ -43,26 +54,32 @@ function PaymentVouchersDetail() {
             setPaymentVoucher(data);
         });
 
-        console.log(id)
-
         ipcRenderer.send('search-payment-voucher-details-by-payment-voucher-id', id);
 
         ipcRenderer.on('search-payment-voucher-details-by-payment-voucher-id-result', (event, data) => {
             console.log(data)
             setPaymentVoucherDetails(data);
+            ipcRenderer.send('search-id-vendors', data.vender_id);
+        });
+
+        ipcRenderer.send('load-companies');
+        ipcRenderer.on('load-companies', (event, data) => {
+            if (data.length === 0) return;
+            setCompany(data[0]);
         });
 
         ipcRenderer.send('search-pos-pvs-mappings-by-pvs-id', id.toString());
 
         ipcRenderer.on('search-pos-pvs-mappings-by-pvs-id-result', (event, data) => {
             let posIds = []
-            console.log(data)
             for (let i = 0; i < data.length; i++) {
                 posIds.push(parseInt(data[i].pos_id));
             }
-
-            console.log(posIds)
             setConnectedPurchaseOrders(posIds);
+        });
+
+        ipcRenderer.on('search-id-vendors-result', (event, data) => {
+            setVendor(data[0]);
         });
 
         return () => {
@@ -73,20 +90,32 @@ function PaymentVouchersDetail() {
 
     const handleSumPrice = () => {
         let SumPrice = 0
-        let consumptionTaxEight = 0
-        let consumptionTaxTen = 0
+        let feesAndCharges = 0
 
         for (let i = 0; i < paymentVoucherDetails.length; i++) {
-            SumPrice += paymentVoucherDetails[i].price * paymentVoucherDetails[i].number + (paymentVoucherDetails[i].tax_rate * 0.01 + 1)
-            if (paymentVoucherDetails[i].tax_rate === 8) {
-                consumptionTaxEight += paymentVoucherDetails[i].price * paymentVoucherDetails[i].number * 0.08;
-            } else if (paymentVoucherDetails[i].tax_rate === 10) {
-                consumptionTaxTen += paymentVoucherDetails[i].price * paymentVoucherDetails[i].number * 0.1;
-            }
+            feesAndCharges += parseInt(paymentVoucherDetails[i].fees_and_charges)
+            SumPrice += parseInt(paymentVoucherDetails[i].payment_price)
         }
 
-        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxEight + consumptionTaxTen, "Total": SumPrice}
+        return { "feesAndCharges": feesAndCharges, "Total": SumPrice }
     }
+
+    const handleDelete = (id, name) => {
+        setCustomerIdToDelete(id);
+        setMessageToDelete(name);
+        setIsDialogOpen(true);
+    };
+
+    const handleConfirmDelete = () => {
+        ipcRenderer.send('delete-payment-voucher', customerIdToDelete);
+
+        setIsDialogOpen(false);
+        navigate("/procurement/voucher-entries/payment-vouchers");
+    };
+
+    const handleCancelDelete = () => {
+        setIsDialogOpen(false);
+    };
 
 
     return (
@@ -113,14 +142,14 @@ function PaymentVouchersDetail() {
                             </div>
                             印刷
                         </Link>
-                        <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold flex'>
+                        <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={() => handleDelete(paymentVoucher.id, paymentVoucher.code)}>
                             <div className='pr-1.5 pl-1 flex items-center'>
                                 <svg width="15" height="19" viewBox="0 0 15 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M11.3926 6.72949V16.7295H3.39258V6.72949H11.3926ZM9.89258 0.729492H4.89258L3.89258 1.72949H0.392578V3.72949H14.3926V1.72949H10.8926L9.89258 0.729492ZM13.3926 4.72949H1.39258V16.7295C1.39258 17.8295 2.29258 18.7295 3.39258 18.7295H11.3926C12.4926 18.7295 13.3926 17.8295 13.3926 16.7295V4.72949Z" fill="#1F2937" />
                                 </svg>
                             </div>
                             削除
-                        </Link>
+                        </div>
                     </div>
                 </div>
                 <div className='px-8 py-6'>
@@ -143,15 +172,15 @@ function PaymentVouchersDetail() {
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>仕入先コード</div>
-                        <div>{paymentVoucher.vender_id}</div>
+                        <div>{vendor.code}</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>郵便番号</div>
-                        <div>1040031</div>
+                        <div>{vendor.zip_code}</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>市区町村・番地</div>
-                        <div>東京都中央区銀座6丁目10-1建物名・部屋番号などGINZA SIX 13階</div>
+                        <div>{vendor.address}</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>担当者</div>
@@ -163,15 +192,15 @@ function PaymentVouchersDetail() {
                     <div className='py-2.5 font-bold text-xl'>自社情報</div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>自社名</div>
-                        <div></div>
+                        <div>{company.name}</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>担当者名</div>
-                        <div></div>
+                        <div>{company.contact_person}</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>電話番号</div>
-                        <div>088040760246</div>
+                        <div>{company.zip_code}</div>
                     </div>
                     <div className='py-3'>
                         <hr className='' />
@@ -200,20 +229,8 @@ function PaymentVouchersDetail() {
                     <div className='py-6 flex'>
                         <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
                             <div className='flex pb-2'>
-                                <div className='w-40'>税抜合計</div>
-                                <div>{handleSumPrice().subtotal.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税(8%)</div>
-                                <div>{handleSumPrice().consumptionTaxEight.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税(10%)</div>
-                                <div>{handleSumPrice().consumptionTaxTen.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税合計</div>
-                                <div>{handleSumPrice().totalConsumptionTax.toFixed(0).toLocaleString()}円</div>
+                                <div className='w-40'>手数料合計</div>
+                                <div>{handleSumPrice().feesAndCharges.toFixed(0).toLocaleString()}円</div>
                             </div>
                             <div className='flex'>
                                 <div className='w-40'>税込合計</div>
@@ -230,6 +247,18 @@ function PaymentVouchersDetail() {
                     </div>
                 </div>
             </div>
+            <ConfirmDialog
+                isOpen={isDialogOpen}
+                message={messageToDelete + "を削除しますか？"}
+                additionalMessage={
+                    <>
+                       この操作は取り消しできません。<br />
+                       確認し、問題ない場合は削除ボタンを押してください。
+                    </>
+                }
+                onConfirm={handleConfirmDelete}
+                onCancel={handleCancelDelete}
+            />
         </div>
     );
 }

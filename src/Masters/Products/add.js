@@ -21,6 +21,7 @@ function ProductAdd() {
     const validator = new Validator();
 
     const [product, setProduct] = useState({
+        code: '',
         name: '',
         classification_primary: '',
         classification_secondary: '',
@@ -54,6 +55,7 @@ function ProductAdd() {
             // フォームのリセット
             setProduct({
                 name: '',
+                code: '',
                 classification_primary: '',
                 classification_secondary: '',
                 jan_code: '',
@@ -100,8 +102,8 @@ function ProductAdd() {
                             type='text' 
                             className='border rounded px-4 py-2.5 bg-white w-2/3' 
                             placeholder='商品名を入力' 
-                            name="classification_primary" 
-                            value={product.classification_primary} 
+                            name="code" 
+                            value={product.code} 
                             onChange={handleChange} 
                         />
                     </div>

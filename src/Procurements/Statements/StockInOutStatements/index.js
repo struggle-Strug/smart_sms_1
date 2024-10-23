@@ -370,18 +370,7 @@ function Index() {
                             />
                         </div>
                     </div>
-                    <div className='grid grid-cols-4 gap-6 py-6'>
-                        <div>
-                            <div className='text-sm pb-1.5'>ステータス</div>
-                            <input
-                                type='text'
-                                className='border rounded px-4 py-2.5 bg-white w-full'
-                                placeholder=''
-                                name="siod.status"
-                                value={searchQueryList["siod.status"]}
-                                onChange={handleInputChange}
-                            />
-                        </div>
+                    <div className='grid grid-cols-3 gap-6 py-6'>
                         <div>
                             <div className='text-sm pb-1.5'>ロット番号</div>
                             <input

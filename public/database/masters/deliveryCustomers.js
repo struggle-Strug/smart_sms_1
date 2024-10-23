@@ -11,6 +11,7 @@ function initializeDatabase() {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name_primary VARCHAR(255) NOT NULL,
             name_secondary VARCHAR(255) DEFAULT NULL,
+            code VARCHAR(255) DEFAULT NULL,
             honorific VARCHAR(255) DEFAULT NULL,
             phone_number INTEGER NOT NULL,
             fax_number INTEGER DEFAULT NULL,
@@ -36,18 +37,18 @@ function getDeliveryCustomerById(id, callback) {
 }
 
 function saveDeliveryCustomer(customerData, callback) {
-    const { id, name_primary, name_secondary, honorific, phone_number, fax_number, zip_code, address, email, remarks, billing_code, billing_information, monthly_sales_target } = customerData;
+    const { id, name_primary, name_secondary, code, honorific, phone_number, fax_number, zip_code, address, email, remarks, billing_code, billing_information, monthly_sales_target } = customerData;
 
     if (id) {
         db.run(
-            `UPDATE delivery_customers SET name_primary = ?, name_secondary = ?, honorific = ?, phone_number = ?, fax_number = ?, zip_code = ?, address = ?, email = ?, remarks = ?, billing_code = ?, billing_information = ?, monthly_sales_target = ?, updated = datetime('now') WHERE id = ?`,
-            [name_primary, name_secondary, honorific, phone_number, fax_number, zip_code, address, email, remarks, billing_code, billing_information, monthly_sales_target, id],
+            `UPDATE delivery_customers SET name_primary = ?, name_secondary = ?, code = ?, honorific = ?, phone_number = ?, fax_number = ?, zip_code = ?, address = ?, email = ?, remarks = ?, billing_code = ?, billing_information = ?, monthly_sales_target = ?, updated = datetime('now') WHERE id = ?`,
+            [name_primary, name_secondary, code, honorific, phone_number, fax_number, zip_code, address, email, remarks, billing_code, billing_information, monthly_sales_target, id],
             callback
         );
     } else {
         db.run(
-            `INSERT INTO delivery_customers (name_primary, name_secondary, honorific, phone_number, fax_number, zip_code, address, email, remarks, billing_code, billing_information, monthly_sales_target, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
-            [name_primary, name_secondary, honorific, phone_number, fax_number, zip_code, address, email, remarks, billing_code, billing_information, monthly_sales_target],
+            `INSERT INTO delivery_customers (name_primary, name_secondary, code, honorific, phone_number, fax_number, zip_code, address, email, remarks, billing_code, billing_information, monthly_sales_target, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+            [name_primary, name_secondary, code, honorific, phone_number, fax_number, zip_code, address, email, remarks, billing_code, billing_information, monthly_sales_target],
             callback
         );
     }

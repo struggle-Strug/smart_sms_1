@@ -276,6 +276,37 @@ function Index() {
         };
     }, []);
 
+    // const [isOpen, setIsOpen] = useState(null);
+    const [selectedOption, setSelectedOption] = useState(null);
+    // const dropdownRef = useRef(null);
+
+    // const toggleDropdown = (name) => {
+    //     if (isOpen === name) return setIsOpen(null)
+    //     setIsOpen(name);
+    // };
+
+    // const selectOption = (option, name, index) => {
+    //     setSelectedOption(option);
+    //     const updatedDetails = purchaseInvoiceDetails.map((detail, i) =>
+    //         i === index ? { ...detail, [name]: option.value } : detail
+    //     );
+    //     setPurchaseInvoiceDetails(updatedDetails);
+    //     setIsOpen(name);
+    // };
+
+    const selectOption = (option, name) => {
+        setSelectedOption(option);
+        setSearchQueryList({ ...searchQueryList, [name]: option.value });
+        setIsOpen(name);
+    };
+
+    // const handleClickOutside = (event) => {
+    //     // if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    //     //     setIsOpen(null);
+    //     // }
+    // };
+
+
 
     return (
         <div className='w-5/6'>
@@ -391,13 +422,38 @@ function Index() {
                             />
                         </div>
                         <div>
-                            <div className='text-sm pb-1.5'>ステータス</div>
-                            <CustomSelect
-                                options={options}
-                                name="pod.status"
-                                data={searchQueryList["pod.status"]}
-                                onChange={(value) => handleInputChange({ target: { name: "pod.status", value } })}
-                            />
+                            <div className='text-sm pb-1.5 w-40'>ステータス</div>
+                            <div className="relative" ref={dropdownRef}>
+                                <div
+                                    className="bg-white border rounded px-4 py-2.5 cursor-pointer flex justify-between items-center"
+                                    onClick={() => toggleDropdown("po.status")}
+                                >
+                                    <span>{searchQueryList["po.status"] ? searchQueryList["po.status"] : "ステータス"}</span>
+                                    <svg
+                                        className={`w-4 h-4 transform transition-transform ${isOpen === "po.status" ? 'rotate-180' : ''}`}
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+
+                                {isOpen === "po.status" && (
+                                    <div className="absolute z-10 mt-1 w-full bg-white border  rounded-md shadow-lg max-h-60 overflow-auto">
+                                        {[{ value: "未処理", label: "未処理" }, { value: "一部処理", label: "一部処理" }, { value: "仕入済", label: "仕入済" }].map((option) => (
+                                            <div
+                                                key={option.value}
+                                                className="cursor-pointer p-2 hover:bg-gray-100"
+                                                onClick={() => selectOption(option, "po.status")}
+                                            >
+                                                {option.label}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>ロット番号</div>
@@ -471,8 +527,8 @@ function Index() {
                             {purchaseOrderDetails.map((purchaseOrderDetail) => (
                                 <tr className='border-b' key={purchaseOrderDetail.id}>
                                     <td className='py-4'>{purchaseOrderDetail.order_date || <div className='border w-4'></div>}</td>
-                                    <td className='py-4'>{purchaseOrderDetail.order_date || <div className='border w-4'></div>}</td>
-                                    <td className='py-4'>{purchaseOrderDetail.order_date || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseOrderDetail.code || <div className='border w-4'></div>}</td>
+                                    <td className='py-4'>{purchaseOrderDetail.vendor_name || <div className='border w-4'></div>}</td>
                                     <td className='py-4'>{purchaseOrderDetail.product_id || <div className='border w-4'></div>}</td>
                                     <td className='py-4'>{purchaseOrderDetail.product_name || <div className='border w-4'></div>}</td>
                                     <td className='py-4'>{purchaseOrderDetail.classification_primary || <div className='border w-4'></div>}</td>

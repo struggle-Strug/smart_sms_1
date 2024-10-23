@@ -9,8 +9,9 @@ const { ipcRenderer } = window.require('electron');
 function ProductEdit() {
     const { id } = useParams(); // URLから商品のIDを取得
     const [product, setProduct] = useState({
-        // id: id, //追加
+        id: id, //追加
         name: '',
+        code: '',
         classification_primary: '',
         classification_secondary: '',
         jan_code: '',
@@ -100,8 +101,8 @@ function ProductEdit() {
                             type='text' 
                             className='border rounded px-4 py-2.5 bg-white w-2/3' 
                             placeholder='商品コードを入力' 
-                            name="classification_primary" 
-                            value={product.classification_primary} 
+                            name="code" 
+                            value={product.code} 
                             onChange={handleChange} 
                         />
                     </div>

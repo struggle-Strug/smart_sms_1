@@ -10,6 +10,7 @@ function initializeDatabase() {
         CREATE TABLE IF NOT EXISTS payment_methods (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(255) NOT NULL,
+    code VARCHAR(255) DEFAULT NULL,
     remarks VARCHAR(255),
     created DATE DEFAULT (datetime('now','localtime')),
     updated DATE DEFAULT (datetime('now','localtime'))
@@ -30,11 +31,11 @@ function getPaymentMethodById(id, callback) {
 }
 
 function savePaymentMethod(paymentMethod, callback) {
-    const { id, name, remarks } = paymentMethod;
+    const { id, name, code, remarks } = paymentMethod;
     if (id) {
-        db.run('UPDATE payment_methods SET name = ?, remarks = ?, updated = datetime("now", "localtime") WHERE id = ?', [name, remarks, id], callback);
+        db.run('UPDATE payment_methods SET name = ?, code = ?, remarks = ?, updated = datetime("now", "localtime") WHERE id = ?', [name, code, remarks, id], callback);
     } else {
-        db.run('INSERT INTO payment_methods (name, remarks, created, updated) VALUES (?, ?, datetime("now", "localtime"), datetime("now", "localtime"))', [name, remarks], callback);
+        db.run('INSERT INTO payment_methods (name, code, remarks, created, updated) VALUES (?, ?, ?, datetime("now", "localtime"), datetime("now", "localtime"))', [name, code, remarks], callback);
     }
 }
 

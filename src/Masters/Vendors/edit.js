@@ -12,6 +12,7 @@ function VendorEdit() {
     const [vendor, setVendor] = useState({
         name_primary: '',
         name_secondary: '',
+        code: '',
         name_kana: '',
         phone_number: '',
         fax_number: '',
@@ -128,8 +129,8 @@ function VendorEdit() {
                             type='text' 
                             className='border rounded px-4 py-2.5 bg-white w-2/3' 
                             placeholder='仕入れ先コードを入力' 
-                            name="id" 
-                            value={vendor.id} 
+                            name="code" 
+                            value={vendor.code} 
                             onChange={handleChange} 
                         />
                     </div>

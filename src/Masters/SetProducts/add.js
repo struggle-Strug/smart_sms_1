@@ -22,6 +22,7 @@ function SetProductAdd() {
 
     const [product, setProduct] = useState({
         set_product_name: '',
+        code: '',
         category: '',
         sub_category: '',
         jan_code: '',
@@ -53,6 +54,7 @@ function SetProductAdd() {
             // フォームのリセット
             setProduct({
                 set_product_name: '',
+                code: '',
                 category: '',
                 sub_category: '',
                 jan_code: '',
@@ -85,7 +87,22 @@ function SetProductAdd() {
                         />
                     </div>
                 </div>
-                {errors.set_product_name && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.set_product_name}</div>}
+                <div className="flex bg-gray-100">
+                    <div className="w-1/5">
+                        <div className='p-4'>セット商品コード<span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
+                    </div>
+                    <div className="w-4/5 py-1.5">
+                        <input 
+                            type='text' 
+                            className='border rounded px-4 py-2.5 bg-white w-2/3' 
+                            placeholder='セット商品コードを入力' 
+                            name="code" 
+                            value={product.code} 
+                            onChange={handleChange} 
+                        />
+                    </div>
+                </div>
+                {errors.code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.code}</div>}
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
                         <div className='p-4'>カテゴリー <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>

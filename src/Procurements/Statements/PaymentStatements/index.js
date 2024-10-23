@@ -27,6 +27,7 @@ function Index() {
         "pvd.created_end": "",
         "v.classification1": "",
         "v.classification2": "",
+        "detail_payment_method": ""
     });
 
     const header = [
@@ -265,7 +266,7 @@ function Index() {
                     <div className='pb-6 text-lg font-bold'>
                         表示条件指定
                     </div>
-                    <div className='grid grid-cols-2 gap-6 pb-6'>
+                    <div className='grid grid-cols-3 gap-6 pb-6'>
                         <div className='pl-0'>
                             <div className='flex items-center'>
                                 <div>
@@ -299,11 +300,15 @@ function Index() {
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>支払方法</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="pvd."
+                                value={searchQueryList["detail_payment_method"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
-                    </div>
-
-                    <div className='grid grid-cols-3 gap-6'>
                         <div>
                             <div className='text-sm pb-1.5'>仕入先</div>
                             <input
@@ -315,17 +320,9 @@ function Index() {
                                 onChange={handleInputChange}
                             />
                         </div>
-                        <div>
-                            <div className='text-sm pb-1.5'>支払方法</div>
-                            <input
-                                type='text'
-                                className='border rounded px-4 py-2.5 bg-white w-full'
-                                placeholder=''
-                                name="pvd.payment_method"
-                                value={searchQueryList["pvd.payment_method"]}
-                                onChange={handleInputChange}
-                            />
-                        </div>
+                    </div>
+
+                    <div className='grid grid-cols-3 gap-6'>
                         <div>
                             <div className='text-sm pb-1.5'>担当者</div>
                             <input

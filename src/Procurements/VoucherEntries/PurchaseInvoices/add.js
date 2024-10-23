@@ -307,7 +307,7 @@ function PurchaseInvoicesAdd() {
         let consumptionTaxTen = 0
 
         for (let i = 0; i < purchaseInvoiceDetails.length; i++) {
-            SumPrice += purchaseInvoiceDetails[i].price * purchaseInvoiceDetails[i].number + (purchaseInvoiceDetails[i].tax_rate * 0.01 + 1)
+            SumPrice += purchaseInvoiceDetails[i].price * purchaseInvoiceDetails[i].number;
             if (purchaseInvoiceDetails[i].tax_rate === 8) {
                 consumptionTaxEight += purchaseInvoiceDetails[i].price * purchaseInvoiceDetails[i].number * 0.08;
             } else if (purchaseInvoiceDetails[i].tax_rate === 10) {
@@ -315,7 +315,7 @@ function PurchaseInvoicesAdd() {
             }
         }
 
-        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax":consumptionTaxEight + consumptionTaxTen, "Total": SumPrice }
+        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax":consumptionTaxEight + consumptionTaxTen, "Total": SumPrice + consumptionTaxEight + consumptionTaxTen }
     }
 
     const [isOpen, setIsOpen] = useState(null);

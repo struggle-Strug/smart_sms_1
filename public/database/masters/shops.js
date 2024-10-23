@@ -11,7 +11,8 @@ function initializeDatabase() {
             CREATE TABLE IF NOT EXISTS shops (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name VARCHAR(255),
-                adress VARCHAR(255),
+                code VARCHAR(255) DEFAULT NULL,
+                address VARCHAR(255),
                 phone_number VARCHAR(255),
                 fax_number VARCHAR(255),
                 contact_person VARCHAR(255),
@@ -37,19 +38,19 @@ function getShopById(id, callback) {
 }
 
 function saveShop(data, callback) {
-    const { id, name, adress, phone_number, fax_number, contact_person, email, remarks } = data;
+    const { id, name, code, address, phone_number, fax_number, contact_person, email, remarks } = data;
     if (id) {
         db.run(
-            `UPDATE shops SET name = ?, adress = ?, phone_number = ?, fax_number = ?, contact_person = ?, email = ?, remarks = ?, updated = datetime('now') WHERE id = ?`,
-            [name, adress, phone_number, fax_number, contact_person, email, remarks, id],
+            `UPDATE shops SET name = ?, code = ?, address = ?, phone_number = ?, fax_number = ?, contact_person = ?, email = ?, remarks = ?, updated = datetime('now') WHERE id = ?`,
+            [name, code, address, phone_number, fax_number, contact_person, email, remarks, id],
             (err) => {
                 callback(err);
             }
         );
     } else {
         db.run(
-            `INSERT INTO shops (name, adress, phone_number, fax_number, contact_person, email, remarks, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
-            [name, adress, phone_number, fax_number, contact_person, email, remarks],
+            `INSERT INTO shops (name, code, address, phone_number, fax_number, contact_person, email, remarks, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+            [name, code, address, phone_number, fax_number, contact_person, email, remarks],
             (err) => {
                 callback(err);
             }

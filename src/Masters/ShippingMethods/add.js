@@ -7,6 +7,7 @@ const { ipcRenderer } = window.require('electron');
 function ShippingMethodAdd() {
     const [shippingMethod, setShippingMethod] = useState({
         name: '',
+        code: '',
         remarks: ''
     });
 
@@ -22,7 +23,7 @@ function ShippingMethodAdd() {
     const handleSubmit = () => {
         // バリデーションを実行
         validator.required(shippingMethod.name, 'name', '配送方法名');
-        validator.required(shippingMethod.id, 'id', '配送方法コード');
+        validator.required(shippingMethod.code, 'code', '配送方法コード');
 
         setErrors(validator.getErrors()); // エラーを設定
 
@@ -31,6 +32,7 @@ function ShippingMethodAdd() {
             ipcRenderer.send('save-shipping-method', shippingMethod);
             setShippingMethod({
                 name: '',
+                code: '',
                 remarks: ''
             });
             alert('新規登録が完了しました。');
@@ -67,13 +69,13 @@ function ShippingMethodAdd() {
                             type='text'
                             className='border rounded px-4 py-2.5 bg-white w-2/3'
                             placeholder='配送方法コードを入力'
-                            name="id"
-                            value={shippingMethod.id}
+                            name="code"
+                            value={shippingMethod.code}
                             onChange={handleChange}
                         />
                     </div>
                 </div>
-                {errors.id && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.id}</div>}
+                {errors.code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.code}</div>}
 
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">

@@ -229,19 +229,10 @@ function StockInOutSlipsEdit() {
 
     const handleSumPrice = () => {
         let SumPrice = 0
-        let consumptionTaxEight = 0
-        let consumptionTaxTen = 0
-
         for (let i = 0; i < stockInOutSlipDetails.length; i++) {
-            SumPrice += stockInOutSlipDetails[i].price * stockInOutSlipDetails[i].number + (stockInOutSlipDetails[i].tax_rate * 0.01 + 1)
-            if (stockInOutSlipDetails[i].tax_rate === 8) {
-                consumptionTaxEight += stockInOutSlipDetails[i].price * stockInOutSlipDetails[i].number * 0.08;
-            } else if (stockInOutSlipDetails[i].tax_rate === 10) {
-                consumptionTaxTen += stockInOutSlipDetails[i].price * stockInOutSlipDetails[i].number * 0.1;
-            }
+            SumPrice += stockInOutSlipDetails[i].price * stockInOutSlipDetails[i].number;
         }
-
-        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxEight + consumptionTaxTen, "Total": SumPrice }
+        return {"Total": SumPrice }
     }
 
     const [isOpen, setIsOpen] = useState(null);
@@ -338,6 +329,7 @@ function StockInOutSlipsEdit() {
                                 value="type1"
                                 className='mr-2'
                                 onChange={handleChange}
+                                checked={stockInOutSlip.processType === "type1"}
                             />
                             出庫
                         </label>
@@ -348,6 +340,7 @@ function StockInOutSlipsEdit() {
                                 value="type2"
                                 className='mr-2'
                                 onChange={handleChange}
+                                checked={stockInOutSlip.processType === "type2"}
                             />
                             入庫
                         </label>
@@ -358,6 +351,7 @@ function StockInOutSlipsEdit() {
                                 value="type3"
                                 className='mr-2'
                                 onChange={handleChange}
+                                checked={stockInOutSlip.processType === "type3"}
                             />
                             振替
                         </label>
@@ -568,10 +562,8 @@ function StockInOutSlipsEdit() {
                                 </div>
                                 <div className='flex items-center justify-end'>
                                     <div className='flex items-center'>
-                                        <div className='mr-4'>消費税額</div>
-                                        <div className='mr-4'>{(stockInOutSlipDetails[index].price * stockInOutSlipDetails[index].number * (stockInOutSlipDetails[index].tax_rate * 0.01)).toFixed(0)}円</div>
                                         <div className='mr-4'>金額</div>
-                                        <div className='text-lg font-bold'>{(stockInOutSlipDetails[index].price * stockInOutSlipDetails[index].number * (stockInOutSlipDetails[index].tax_rate * 0.01 + 1)).toFixed(0)}円</div>
+                                        <div className='text-lg font-bold'>{stockInOutSlipDetails[index].price * stockInOutSlipDetails[index].number}円</div>
                                     </div>
                                 </div>
                                 <hr className='py-3' />
@@ -583,24 +575,8 @@ function StockInOutSlipsEdit() {
                     </div>
                     <div className='py-6 flex'>
                         <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>税抜合計</div>
-                                <div>{handleSumPrice().subtotal.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税(8%)</div>
-                                <div>{handleSumPrice().consumptionTaxEight.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税(10%)</div>
-                                <div>{handleSumPrice().consumptionTaxTen.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税合計</div>
-                                <div>{handleSumPrice().totalConsumptionTax.toFixed(0).toLocaleString()}円</div>
-                            </div>
                             <div className='flex'>
-                                <div className='w-40'>税込合計</div>
+                                <div className='w-40'>合計</div>
                                 <div>{handleSumPrice().Total.toFixed(0).toLocaleString()}円</div>
                             </div>
                         </div>

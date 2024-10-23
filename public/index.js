@@ -56,8 +56,9 @@ function createWindow() {
   if (!app.isPackaged) {
     mainWindow.webContents.openDevTools();
   }
-
-  require('./database/setupDatabase');
+  
+  const customersDB = require('./database/masters/customers');
+  customersDB.initializeDatabase();
   const deliveryCustomersDB = require('./database/masters/deliveryCustomers');
   deliveryCustomersDB.initializeDatabase();
   const productsDB = require('./database/masters/products');

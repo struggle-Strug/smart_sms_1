@@ -237,7 +237,7 @@ function StockInOutSlipsAdd() {
         let consumptionTaxTen = 0
 
         for (let i = 0; i < stockInOutSlipDetails.length; i++) {
-            SumPrice += stockInOutSlipDetails[i].price * stockInOutSlipDetails[i].number + (stockInOutSlipDetails[i].tax_rate * 0.01 + 1);
+            SumPrice += stockInOutSlipDetails[i].price * stockInOutSlipDetails[i].number;
             if (stockInOutSlipDetails[i].tax_rate === 8) {
                 consumptionTaxEight += stockInOutSlipDetails[i].price * stockInOutSlipDetails[i].number * 0.08;
             } else if (stockInOutSlipDetails[i].tax_rate === 10) {
@@ -245,7 +245,7 @@ function StockInOutSlipsAdd() {
             }
         }
 
-        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxEight + consumptionTaxTen, "Total": SumPrice }
+        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxEight + consumptionTaxTen, "Total": SumPrice + consumptionTaxEight + consumptionTaxTen }
     }
 
     const [isOpen, setIsOpen] = useState(null);

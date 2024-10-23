@@ -11,7 +11,7 @@ const CustomSelect = ({ options, placeholder = "Select an option", data, setData
 
   const selectOption = (option) => {
     setSelectedOption(option);
-    setData({ ...data, [name]: option });
+    setData({ ...data, [name]: option.value });
     setIsOpen(false);
   };
 

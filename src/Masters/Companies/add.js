@@ -8,6 +8,7 @@ const { ipcRenderer } = window.require('electron');
 function CompanyAdd() {
     const [company, setCompany] = useState({
         name: '',
+        code: '',
         address: '',
         phone_number: '',
         fax_number: '',
@@ -40,7 +41,7 @@ function CompanyAdd() {
     const handleSubmit = () => {
         // バリデーションを実行
         validator.required(company.name, 'name', '会社名');
-        validator.required(company.id, 'id', '自社コード');
+        validator.required(company.code, 'code', '自社コード');
         validator.required(company.address, 'address', '住所');
         validator.required(company.bank_name, 'bank_name', '銀行名');
         validator.required(company.bank_account_number, 'bank_account_number', '銀行口座番号');
@@ -55,6 +56,7 @@ function CompanyAdd() {
             // フォームのリセット
             setCompany({
                 name: '',
+                code: '',
                 address: '',
                 phone_number: '',
                 fax_number: '',
@@ -103,8 +105,8 @@ function CompanyAdd() {
                             type='text' 
                             className='border rounded px-4 py-2.5 bg-white w-2/3' 
                             placeholder='自社コードを入力' 
-                            name="id" 
-                            value={company.id} 
+                            name="code" 
+                            value={company.code} 
                             onChange={handleChange} 
                         />
                     </div>
@@ -279,7 +281,7 @@ function CompanyAdd() {
                         <div className='p-4'>口座種別 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <CustomSelect options={options} name={"account_type"} data={company} setData={setCompany} />
+                        <CustomSelect options={options} name={"account_type"} data={company} setData={setCompany} placeholder='口座種別を選択' />
                     </div>
                 </div>
                 {errors.account_type && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.account_type}</div>}

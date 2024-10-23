@@ -181,7 +181,7 @@ function PaymentVouchersAdd() {
         let consumptionTaxTen = 0
 
         for (let i = 0; i < paymentVoucherDetails.length; i++) {
-            SumPrice += paymentVoucherDetails[i].price * paymentVoucherDetails[i].number + (paymentVoucherDetails[i].tax_rate * 0.01 + 1)
+            SumPrice += paymentVoucherDetails[i].price * paymentVoucherDetails[i].number;
             if (paymentVoucherDetails[i].tax_rate === 8) {
                 consumptionTaxEight += paymentVoucherDetails[i].price * paymentVoucherDetails[i].number * 0.08;
             } else if (paymentVoucherDetails[i].tax_rate === 10) {
@@ -189,7 +189,7 @@ function PaymentVouchersAdd() {
             }
         }
 
-        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxTen, "Total": SumPrice}
+        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxTen, "Total": SumPrice + consumptionTaxEight + consumptionTaxTen}
     }
 
     const [isOpen, setIsOpen] = useState(null);

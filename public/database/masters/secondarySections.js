@@ -17,18 +17,18 @@ function getSecondarySectionById(id, callback) {
 }
 
 function saveSecondarySection(sectionData, callback) {
-    const { id, name, remarks } = sectionData;
+    const { id, name, code, remarks } = sectionData;
 
     if (id) {
         db.run(
-            `UPDATE secondary_sections SET name = ?, remarks = ?, updated = datetime('now') WHERE id = ?`,
-            [name, remarks, id],
+            `UPDATE secondary_sections SET name = ?, code = ?, remarks = ?, updated = datetime('now') WHERE id = ?`,
+            [name, code, remarks, id],
             callback
         );
     } else {
         db.run(
-            `INSERT INTO secondary_sections (name, remarks, created, updated) VALUES (?, ?, datetime('now'), datetime('now'))`,
-            [name, remarks],
+            `INSERT INTO secondary_sections (name, code, remarks, created, updated) VALUES (?, ?, ?, datetime('now'), datetime('now'))`,
+            [name, code, remarks],
             callback
         );
     }
@@ -48,6 +48,7 @@ function initializeDatabase() {
         CREATE TABLE IF NOT EXISTS secondary_sections (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name VARCHAR(255) NOT NULL,
+            code VARCHAR(255) DEFAULT NULL,
             remarks VARCHAR(255) DEFAULT NULL,
             created DATE DEFAULT (datetime('now')),
             updated DATE DEFAULT (datetime('now'))

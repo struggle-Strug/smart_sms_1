@@ -32,6 +32,7 @@ function App() {
   useEffect(() => {
     ipcRenderer.send('load-companies');
     ipcRenderer.on('load-companies', (event, data) => {
+      if (data.length === 0) return;
       setCompanyName(data[0].name);
     });
     return () => {

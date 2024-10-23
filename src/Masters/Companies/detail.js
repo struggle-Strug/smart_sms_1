@@ -42,7 +42,7 @@ function CompanyDetail() {
                         <div className='p-4'>自社コード</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{company.name || ''}</div>
+                        <div className='px-4 py-2.5'>{company.code || ''}</div>
                     </div>
                 </div>
                 <div className="flex bg-gray-100">

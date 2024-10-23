@@ -136,7 +136,7 @@ function VendorList() {
                             <tr className='border-b' key={vendor.id}>
                                 <td>{vendor.name_primary || <div className='border w-4'></div>}</td>
                                 <td>{vendor.name_secondary || <div className='border w-4'></div>}</td>
-                                <td>{vendor.id || <div className='border w-4'></div>}</td>
+                                <td>{vendor.code || <div className='border w-4'></div>}</td>
                                 <td>{vendor.phone_number || <div className='border w-4'></div>}</td>
                                 <td>{vendor.email || <div className='border w-4'></div>}</td>
                                 <td className='flex justify-center relative'>

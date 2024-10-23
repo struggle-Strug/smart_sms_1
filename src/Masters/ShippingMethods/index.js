@@ -132,7 +132,7 @@ function Index() {
                         {shippingMethods.map((method) => (
                             <tr className='border-b' key={method.id}>
                                 <td>{method.name || <div className='border w-4'></div>}</td>
-                                <td>{method.id || <div className='border w-4'></div>}</td>
+                                <td>{method.code || <div className='border w-4'></div>}</td>
                                 <td>{method.remarks || <div className='border w-4'></div>}</td>
                                 <td className='flex justify-center relative'>
                                     <div className='border rounded px-4 py-3 relative' onClick={() => toggleDropdown(method.id)}>

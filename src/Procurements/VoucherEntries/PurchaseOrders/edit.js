@@ -295,7 +295,7 @@ function PurchaseOrdersEdit() {
         let consumptionTaxTen = 0
 
         for (let i = 0; i < purchaseOrderDetails.length; i++) {
-            SumPrice += purchaseOrderDetails[i].price * purchaseOrderDetails[i].number + (purchaseOrderDetails[i].tax_rate * 0.01 + 1);
+            SumPrice += purchaseOrderDetails[i].price * purchaseOrderDetails[i].number;
             if (purchaseOrderDetails[i].tax_rate === 8) {
                 consumptionTaxEight += purchaseOrderDetails[i].price * purchaseOrderDetails[i].number * 0.08;
             } else if (purchaseOrderDetails[i].tax_rate === 10) {
@@ -303,7 +303,7 @@ function PurchaseOrdersEdit() {
             }
         }
 
-        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxEight + consumptionTaxTen, "Total": SumPrice }
+        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxEight + consumptionTaxTen, "Total": SumPrice + consumptionTaxEight + consumptionTaxTen }
     }
 
     const [isOpen, setIsOpen] = useState(null);

@@ -7,6 +7,7 @@ const { ipcRenderer } = window.require('electron');
 function SecondarySectionAdd() {
     const [secondarySection, setSecondarySection] = useState({
         name: '',
+        code: '',
         remarks: ''
     });
 
@@ -22,7 +23,7 @@ function SecondarySectionAdd() {
     const handleSubmit = () => {
         // バリデーションを実行
         validator.required(secondarySection.name, 'name', '区分名2');
-        validator.required(secondarySection.id, 'id', '区分コード2');
+        validator.required(secondarySection.code, 'code', '区分コード2');
 
         setErrors(validator.getErrors()); // エラーを設定
 
@@ -32,6 +33,7 @@ function SecondarySectionAdd() {
             // フォームのリセット
             setSecondarySection({
                 name: '',
+                code: '',
                 remarks: ''
             });
             alert('新規登録が完了しました。');
@@ -68,13 +70,13 @@ function SecondarySectionAdd() {
                             type='text' 
                             className='border rounded px-4 py-2.5 bg-white w-2/3' 
                             placeholder='区分コードを入力' 
-                            name="id" 
-                            value={secondarySection.id} 
+                            name="code" 
+                            value={secondarySection.code} 
                             onChange={handleChange} 
                         />
                     </div>
                 </div>
-                {errors.id && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.id}</div>}
+                {errors.code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.code}</div>}
 
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">

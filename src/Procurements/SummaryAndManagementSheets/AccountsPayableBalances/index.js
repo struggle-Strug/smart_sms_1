@@ -56,10 +56,13 @@ function Index() {
     };
 
 
+
+
     const handleCreateData = (data) => {
+        console.log(data)
 
         const result = data.reduce((acc, item) => {
-            const month = item.closing_date ? item.closing_date.slice(0, 7) : getCurrentMonth(); // 例: "2024-09"
+            const month = (item.closing_date && item.closing_date !== "") ? item.closing_date.slice(0, 7) : getCurrentMonth(); // 例: "2024-09"
             const key = `${item.vender_name}-${month}`;
 
             if (!acc[key]) {
@@ -150,7 +153,7 @@ function Index() {
         // 売上データを集計する
         const result = data.reduce((acc, item) => {
             // 日付から年月を取得
-            const month = (item.payment_date || item.payment_date !== "") ? item.payment_date.slice(0, 7) : getCurrentMonth(); // 例: "2024-09"
+            const month = (item.closing_date && item.closing_date !== "") ? item.payment_date.slice(0, 7) : getCurrentMonth(); // 例: "2024-09"
             const key = `${item.vender_name}-${month}`;
 
             // すでに同じvender_nameと月が存在するか確認
