@@ -71,7 +71,6 @@ function CompanyAdd() {
                 account_holder_name: '',
                 remarks: ''
             });
-            alert('新規登録が完了しました。');
         }
     };
 

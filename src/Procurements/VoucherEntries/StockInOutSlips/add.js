@@ -295,7 +295,7 @@ function StockInOutSlipsAdd() {
         <div className='w-5/6 mb-20'>
             <div className=''>
                 <div className='pt-8 pb-6 flex border-b px-8 items-center'>
-                    <div className='text-2xl font-bold'>入出庫伝票の新規作成</div>
+                    <div className='text-2xl font-bold'>新規作成</div>
                     <div className='flex ml-auto'>
                         <Link to="/invoice-settings" className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
                             <div className='pr-1.5 pl-1 flex items-center'>
@@ -623,7 +623,7 @@ function StockInOutSlipsAdd() {
                 </div>
                 <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
                     <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>新規登録</div>
-                    <Link to={`procurements/save-stock-in-out-slips`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
+                    <Link to={`/procurement/voucher-entries/stock-in-out-slips`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
                 </div>
             </div>
         </div>

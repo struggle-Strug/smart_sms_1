@@ -49,8 +49,8 @@ function createWindow() {
   });
   mainWindow.loadURL(
     app.isPackaged
-      ? `file://${path.join(__dirname, '../build/index.html')}`
-      : 'http://localhost:3000'
+    ? `file://${path.join(__dirname, '../build/index.html')}`
+    : 'http://localhost:3000'
   );
 
   if (!app.isPackaged) {
@@ -114,16 +114,19 @@ function createWindow() {
 const dbPath = path.join(app.getPath('userData'), 'database.db');
 const db = new sqlite3.Database(dbPath);
 
-app.on('ready', createWindow);
+// app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
+app.whenReady().then(() => {
+  createWindow();
 
-app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
-  }
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+    }
+  });
 });
