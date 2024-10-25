@@ -113,7 +113,7 @@ function editOrderSlip(id, callback) {
     });
 }
 
-function initializeOrderSlipsTable() {
+function initializeDatabase() {
     const sql = `
     CREATE TABLE IF NOT EXISTS order_slips (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -142,5 +142,5 @@ module.exports = {
     saveOrderSlip,
     deleteOrderSlipById,
     editOrderSlip,
-    initializeOrderSlipsTable
+    initializeDatabase
 };

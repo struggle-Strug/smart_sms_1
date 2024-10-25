@@ -161,7 +161,7 @@ function editDepositSlipDetail(id, callback) {
     });
 }
 
-function initializeDepositSlipDetailsDatabase() {
+function initializeDatabase() {
     const sql = `
     CREATE TABLE IF NOT EXISTS deposit_slip_details (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -193,5 +193,5 @@ module.exports = {
     saveDepositSlipDetail,
     deleteDepositSlipDetailById,
     editDepositSlipDetail,
-    initializeDepositSlipDetailsDatabase
+    initializeDatabase
 };

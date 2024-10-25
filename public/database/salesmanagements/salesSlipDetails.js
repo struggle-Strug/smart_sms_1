@@ -111,7 +111,7 @@ function editSalesSlipDetail(id, callback) {
     });
 }
 
-function initializeSalesSlipDetailsTable() {
+function initializeDatabase() {
     const sql = `
     CREATE TABLE IF NOT EXISTS sales_slip_details (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -139,5 +139,5 @@ module.exports = {
     saveSalesSlipDetail,
     deleteSalesSlipDetailById,
     editSalesSlipDetail,
-    initializeSalesSlipDetailsTable
+    initializeDatabase
 };

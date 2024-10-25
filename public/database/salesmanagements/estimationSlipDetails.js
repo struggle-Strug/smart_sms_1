@@ -34,7 +34,7 @@ function saveEstimationSlipDetail(detailData, callback) {
         storage_facility,
         stock,
         gross_profit,
-        gross_margin_rate
+        gross_margin_rate,
     } = detailData;
 
     if (id) {
@@ -113,7 +113,7 @@ function editEstimationSlipDetail(id, callback) {
     });
 }
 
-function initializeEstimationSlipDetailsTable() {
+function initializeDatabase() {
     const sql = `
     CREATE TABLE IF NOT EXISTS estimation_slip_details (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -121,14 +121,14 @@ function initializeEstimationSlipDetailsTable() {
         product_id INTEGER,
         product_name VARCHAR(255),
         number INTEGER,
-        unit VARCHAR(255),
+        unit VARCHAR(255) DEFAULT NULL,
         unit_price INTEGER,
         price INTEGER,
         tax_rate INTEGER,
-        lot_number INTEGER,
+        lot_number INTEGER DEFAULT NULL,
         storage_facility VARCHAR(255),
-        stock INTEGER,
-        gross_profit INTEGER,
+        stock INTEGER DEFAULT NULL,
+        gross_profit INTEGER DEFAULT NULL,
         gross_margin_rate INTEGER,
         created DATE DEFAULT CURRENT_DATE,
         updated DATE DEFAULT CURRENT_DATE
@@ -142,5 +142,5 @@ module.exports = {
     saveEstimationSlipDetail,
     deleteEstimationSlipDetailById,
     editEstimationSlipDetail,
-    initializeEstimationSlipDetailsTable
+    initializeDatabase,
 };
