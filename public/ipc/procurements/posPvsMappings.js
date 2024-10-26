@@ -7,7 +7,8 @@ const {
     editPosPvsMapping, 
     searchPosPvsMappings,
     searchPosPvsMappingsByPvsId,
-    deletePosPvsMappingsByPvsId
+    deletePosPvsMappingsByPvsId,
+    searchPosPvsMappingsByPos
 } = require('../../database/procurements/posPvsMappings');
 
 // pos_pvs_mappingsのデータを全てロード
@@ -98,6 +99,16 @@ ipcMain.on('delete-pos-pvs-mappings-by-pvs-id', (event, paymentVoucherId) => {
             console.error(err.message);
         } else {
             event.sender.send('delete-pos-pvs-mappings-by-pvs-id-result', paymentVoucherId);
+        }
+    });
+});
+
+ipcMain.on('search-payment-voucher-details-by-purchase-order-id', (event, query) => {
+    searchPosPvsMappingsByPos(query, (err, results) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('search-payment-voucher-details-by-purchase-order-id-result', results);
         }
     });
 });

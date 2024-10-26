@@ -14,18 +14,18 @@ function getCustomerById(id, callback) {
 }
 
 function saveCustomer(customerData, callback) {
-    const { id, name_primary, name_secondary, name_kana, honorific, phone_number, fax_number, zip_code, address, email, remarks, billing_code, billing_information, monthly_sales_target } = customerData;
+    const { id, name_primary, name_secondary, code, name_kana, honorific, phone_number, fax_number, zip_code, address, email, remarks, billing_code, billing_information, monthly_sales_target } = customerData;
 
     if (id) {
         db.run(
-            `UPDATE customers SET name_primary = ?, name_secondary = ?, name_kana = ?, honorific = ?, phone_number = ?, fax_number = ?, zip_code = ?, address = ?, email = ?, remarks = ?, billing_code = ?, billing_information = ?, monthly_sales_target = ?, updated = datetime('now') WHERE id = ?`,
-            [name_primary, name_secondary, name_kana, honorific, phone_number, fax_number, zip_code, address, email, remarks, billing_code, billing_information, monthly_sales_target, id],
+            `UPDATE customers SET name_primary = ?, code = ?, name_secondary = ?, name_kana = ?, honorific = ?, phone_number = ?, fax_number = ?, zip_code = ?, address = ?, email = ?, remarks = ?, billing_code = ?, billing_information = ?, monthly_sales_target = ?, updated = datetime('now') WHERE id = ?`,
+            [name_primary, code, name_secondary, name_kana, honorific, phone_number, fax_number, zip_code, address, email, remarks, billing_code, billing_information, monthly_sales_target, id],
             callback
         );
     } else {
         db.run(
-            `INSERT INTO customers (name_primary, name_secondary, name_kana, honorific, phone_number, fax_number, zip_code, address, email, remarks, billing_code, billing_information, monthly_sales_target, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
-            [name_primary, name_secondary, name_kana, honorific, phone_number, fax_number, zip_code, address, email, remarks, billing_code, billing_information, monthly_sales_target],
+            `INSERT INTO customers (name_primary, code, name_secondary, name_kana, honorific, phone_number, fax_number, zip_code, address, email, remarks, billing_code, billing_information, monthly_sales_target, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+            [name_primary, code, name_secondary, name_kana, honorific, phone_number, fax_number, zip_code, address, email, remarks, billing_code, billing_information, monthly_sales_target],
             callback
         );
     }
@@ -60,8 +60,36 @@ function searchCustomers(query, callback) {
     });
 }
 
+function initializeDatabase() {
+    const sql = `
+    CREATE TABLE IF NOT EXISTS customers (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name_primary VARCHAR(255) NOT NULL,
+      name_secondary VARCHAR(255) DEFAULT NULL,
+      code VARCHAR(255) DEFAULT NULL,
+      name_kana VARCHAR(255) DEFAULT NULL,
+      honorific VARCHAR(255) DEFAULT NULL,
+      phone_number INTEGER NOT NULL,
+      fax_number INTEGER DEFAULT NULL,
+      zip_code VARCHAR(255) DEFAULT NULL,
+      address VARCHAR(255) NOT NULL,
+      email VARCHAR(255) DEFAULT NULL,
+      remarks VARCHAR(255) DEFAULT NULL,
+      billing_code VARCHAR(255) NOT NULL,
+      billing_information VARCHAR(255) DEFAULT NULL,
+      monthly_sales_target INTEGER DEFAULT NULL,
+      created DATE NOT NULL,
+      updated DATE NOT NULL
+    )
+    `;
+    db.run(sql);
+}
+
+
+
 
 module.exports = {
+    initializeDatabase,
     loadCustomers,
     getCustomerById,
     saveCustomer,

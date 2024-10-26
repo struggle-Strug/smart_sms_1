@@ -132,7 +132,7 @@ function Index() {
                         {shops.map((shop) => (
                             <tr className='border-b' key={shop.id}>
                                 <td>{shop.name || <div className='border w-4'></div>}</td>
-                                <td>{shop.id || <div className='border w-4'></div>}</td>
+                                <td>{shop.code || <div className='border w-4'></div>}</td>
                                 <td>{shop.remarks || <div className='border w-4'></div>}</td>
                                 <td className='flex justify-center relative'>
                                     <div className='border rounded px-4 py-3 relative' onClick={() => toggleDropdown(shop.id)}>

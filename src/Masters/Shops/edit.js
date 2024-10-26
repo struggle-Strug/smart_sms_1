@@ -11,6 +11,7 @@ function ShopsEdit() {
     const [shop, setShop] = useState({
         id: '',
         name: '',
+        code: '',
         address: '',
         phone_number: '',
         fax_number: '',
@@ -43,7 +44,7 @@ function ShopsEdit() {
     const handleSubmit = () => {
         // バリデーションを実行
         validator.required(shop.name, 'name', '店舗名');
-        validator.required(shop.id, 'id', '店舗コード');
+        validator.required(shop.code, 'code', '店舗コード');
         validator.required(shop.address, 'address', '所在地');
 
         setErrors(validator.getErrors()); // エラーを設定
@@ -85,13 +86,13 @@ function ShopsEdit() {
                             type='text' 
                             className='border rounded px-4 py-2.5 bg-white w-2/3' 
                             placeholder='店舗コードを入力' 
-                            name="id" 
-                            value={shop.id} 
+                            name="code" 
+                            value={shop.code} 
                             onChange={handleChange} 
                         />
                     </div>
                 </div>
-                {errors.id && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.id}</div>}
+                {errors.code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.code}</div>}
 
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">

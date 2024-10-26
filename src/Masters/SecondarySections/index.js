@@ -130,7 +130,7 @@ function Index() {
                         {secondarySections.map((section) => (
                             <tr className='border-b' key={section.id}>
                                 <td>{section.name || <div className='border w-4'></div>}</td>
-                                <td>{section.id || <div className='border w-4'></div>}</td>
+                                <td>{section.code || <div className='border w-4'></div>}</td>
                                 <td>{section.remarks || <div className='border w-4'></div>}</td>
                                 <td className='flex justify-center relative'>
                                     <div className='border rounded px-4 py-3 relative' onClick={() => toggleDropdown(section.id)}>

@@ -38,7 +38,7 @@ function SecondarySectionDetail() {
                         <div className='p-4'>区分コード2</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{secondarySection.id || ''}</div>
+                        <div className='px-4 py-2.5'>{secondarySection.code || ''}</div>
                     </div>
                 </div>
                 <div className="flex bg-gray-100">

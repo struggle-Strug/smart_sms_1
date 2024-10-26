@@ -7,6 +7,7 @@ const { ipcRenderer } = window.require('electron');
 function ShopAdd() {
     const [shop, setShop] = useState({
         name: '',
+        code: '',
         address: '',
         phone_number: '',
         fax_number: '',
@@ -27,7 +28,7 @@ function ShopAdd() {
     const handleSubmit = () => {
         // バリデーションを実行
         validator.required(shop.name, 'name', '店舗名');
-        validator.required(shop.id, 'id', '店舗コード');
+        validator.required(shop.code, 'code', '店舗コード');
         validator.required(shop.address, 'address', '所在地');
 
         setErrors(validator.getErrors()); // エラーを設定
@@ -38,6 +39,7 @@ function ShopAdd() {
             // フォームのリセット
             setShop({
                 name: '',
+                code: '',
                 address: '',
                 phone_number: '',
                 fax_number: '',
@@ -52,7 +54,7 @@ function ShopAdd() {
     return (
         <div className='w-full'>
             <div className='p-8'>
-                <div className='text-2xl font-bold mb-8'>店舗の新規登録</div>
+                <div className='text-2xl font-bold mb-8'>新規登録</div>
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
                         <div className='p-4'>店舗名 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
@@ -79,13 +81,13 @@ function ShopAdd() {
                             type='text' 
                             className='border rounded px-4 py-2.5 bg-white w-2/3' 
                             placeholder='店舗コードを入力' 
-                            name="id" 
-                            value={shop.id} 
+                            name="code" 
+                            value={shop.code} 
                             onChange={handleChange} 
                         />
                     </div>
                 </div>
-                {errors.id && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.id}</div>}
+                {errors.code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.code}</div>}
 
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">

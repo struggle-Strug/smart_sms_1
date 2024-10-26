@@ -136,6 +136,25 @@ function searchPosPvsMappings(query, callback) {
     });
 }
 
+// 検索機能
+function searchPosPvsMappingsByPos(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM pos_pvs_mappings 
+        WHERE pos_id LIKE ?
+        `;
+        params = [`%${query}%`];
+    } else {
+        sql = `SELECT * FROM pos_pvs_mappings`;
+    }
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
 function searchPosPvsMappingsByPvsId(query, callback) {
     let sql;
     let params = [];
@@ -173,5 +192,6 @@ module.exports = {
     initializeDatabase,
     searchPosPvsMappings,
     searchPosPvsMappingsByPvsId,
-    deletePosPvsMappingsByPvsId
+    deletePosPvsMappingsByPvsId,
+    searchPosPvsMappingsByPos
 };

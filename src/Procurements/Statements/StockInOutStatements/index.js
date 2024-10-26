@@ -16,15 +16,14 @@ function Index() {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [customerIdToDelete, setCustomerIdToDelete] = useState(null);
     const [searchQueryList, setSearchQueryList] = useState({
-        "siod.warehouse_from": "",
-        "siod.warehouse_to": "",
-        "siod.processType": "",
+        "sio.warehouse_from": "",
+        "sio.warehouse_to": "",
+        "sio.processType": "",
         "siod.product_name": "",
-        "siod.contact_person": "",
-        "siod.status": "",
+        "sio.contact_person": "",
         "siod.lot_number": "",
-        "siod.created_start": "",
-        "siod.created_end": "",
+        "sio.created_start": "",
+        "sio.created_end": "",
         "v.classification1": "",
         "v.classification2": "",
 
@@ -157,16 +156,16 @@ function Index() {
     }, [settingId]);
 
     const handleSave = () => {
-        const settingData = {
-            id: settingId,
-            output_format: outputFormat,
-            remarks: remarks,
-        };
-
-        ipcRenderer.send('save-statement-setting', settingData);
-        ipcRenderer.once('load-statement-settings', (event, data) => {
-            handleConfirmDelete(data); // 更新されたデータを返す
-        });
+        if (outputFormat === 'print') {
+            
+        } else if (outputFormat === 'csv') {
+            exportToCSV();
+        } else if (outputFormat === 'Excel') {
+            exportToExcel();
+        } else if (outputFormat === 'PDF') {
+            exportPDF();
+        }
+        setIsDialogOpen(false);
     };
 
     const toggleDropdown = (id) => {
@@ -261,6 +260,8 @@ function Index() {
         };
     }, []);
 
+    console.log(stockInOutSlipDetails)
+
 
     return (
         <div className='w-5/6'>
@@ -268,11 +269,9 @@ function Index() {
                 <div className='pb-6 flex items-center'>
                     <div className='text-2xl font-bold'>入出庫明細表</div>
                     <div className='flex ml-auto'>
-                        <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold flex'>
-                            <div className='flex items-center'>
-                            </div>
-                            明細表設定
-                        </Link>
+                        <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={(e) => setIsDialogOpen(true)}>
+                            エクスポート
+                        </div>
                     </div>
                 </div>
                 <div className='bg-gray-100 rounded p-6'>
@@ -284,7 +283,6 @@ function Index() {
                             <div className='flex items-center'>
                                 <div>
                                     <div className='text-sm pb-1.5'>期間指定 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
-                                    {/* <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} /> */}
                                     <DatePicker
                                         selected={searchQueryList["siod.created_start"] ? new Date(searchQueryList["siod.created_start"]) : null}
                                         onChange={(date) => handleDateChange(date, "siod.created_start")}
@@ -300,7 +298,6 @@ function Index() {
 
                                 <div>
                                     <div className='text-sm pb-1.5 text-gray-100'>期間指定</div>
-                                    {/* <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} /> */}
                                     <DatePicker
                                         selected={searchQueryList["siod.created_end"] ? new Date(searchQueryList["siod.created_end"]) : null}
                                         onChange={(date) => handleDateChange(date, "siod.created_end")}
@@ -337,13 +334,13 @@ function Index() {
                             <div className='text-sm pb-1.5'>処理種別 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
                             <div className='my-2.5 flex'>
                                 <label className='text-base'>
-                                    <input type="radio" name="siod.processType" value="type1" className='mr-2' />出庫
+                                    <input type="radio" name="sio.processType" value="type1" className='mr-2' onChange={handleInputChange}/>出庫
                                 </label>
                                 <label className='text-base ml-10'>
-                                    <input type="radio" name="siod.processType" value="type2" className='mr-2' />入庫
+                                    <input type="radio" name="sio.processType" value="type2" className='mr-2' onChange={handleInputChange}/>入庫
                                 </label>
                                 <label className='text-base ml-10'>
-                                    <input type="radio" name="siod.processType" value="type3" className='mr-2' />振替
+                                    <input type="radio" name="sio.processType" value="type3" className='mr-2' onChange={handleInputChange}/>振替
                                 </label>
                             </div>
                         </div>
@@ -370,18 +367,7 @@ function Index() {
                             />
                         </div>
                     </div>
-                    <div className='grid grid-cols-4 gap-6 py-6'>
-                        <div>
-                            <div className='text-sm pb-1.5'>ステータス</div>
-                            <input
-                                type='text'
-                                className='border rounded px-4 py-2.5 bg-white w-full'
-                                placeholder=''
-                                name="siod.status"
-                                value={searchQueryList["siod.status"]}
-                                onChange={handleInputChange}
-                            />
-                        </div>
+                    <div className='grid grid-cols-3 gap-6 py-6'>
                         <div>
                             <div className='text-sm pb-1.5'>ロット番号</div>
                             <input
@@ -420,13 +406,6 @@ function Index() {
                         <div className='border rounded-lg py-3 px-7 text-base font-bold bg-blue-600 text-white' onClick={(e) => handleSearch()}>適用して表示</div>
                     </div>
                 </div>
-                <div className='flex justify-end'>
-                    <div className='flex ml-auto pt-6'>
-                        <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={() => exportToCSV()}>
-                            エクスポート
-                        </div>
-                    </div>
-                </div>
             </div>
             <div className='px-8 pb-8 overflow-x-scroll'>
                 <table className="w-full mt-8 table-auto" style={{ width: "2000px" }}>
@@ -450,7 +429,7 @@ function Index() {
                         {stockInOutSlipDetails.map((stockInOutSlipDetail) => (
                             <tr className='border-b' key={stockInOutSlipDetail.id}>
                                 <td className='py-4'>{stockInOutSlipDetail.order_date || <div className='border w-4'></div>}</td>
-                                <td className='py-4'>{stockInOutSlipDetail.order_date || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{stockInOutSlipDetail.code || <div className='border w-4'></div>}</td>
                                 <td className='py-4'>{stockInOutSlipDetail.processType || <div className='border w-4'></div>}</td>
                                 <td className='py-4'>{stockInOutSlipDetail.product_id || <div className='border w-4'></div>}</td>
                                 <td className='py-4'>{stockInOutSlipDetail.product_name || <div className='border w-4'></div>}</td>
@@ -470,7 +449,7 @@ function Index() {
                 isDialogOpen &&
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="container mx-auto sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl bg-white rounded-2xl shadow-md">
-                        <p className='text-2xl font-bold px-6 py-4'>明細表設定</p>
+                        <p className='text-2xl font-bold px-6 py-4'>エクスポート設定</p>
                         <hr />
                         <div className='flex-col px-6 pt-4'>
                             <div className=''>出力形式選択</div>
@@ -515,19 +494,6 @@ function Index() {
                                         className='mr-2'
                                     />印刷
                                 </label>
-                            </div>
-                        </div>
-                        <div className='px-6 pb-4'>
-                            <div className='py-2.5 text-xl'>備考</div>
-                            <div className='pb-2'>
-                                <textarea
-                                    className='border rounded px-4 py-2.5 bg-white w-full resize-none'
-                                    placeholder=''
-                                    rows={5}
-                                    name="remarks"
-                                    value={remarks}
-                                    onChange={(e) => setRemarks(e.target.value)}
-                                ></textarea>
                             </div>
                         </div>
                         <hr />

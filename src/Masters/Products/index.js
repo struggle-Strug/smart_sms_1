@@ -134,9 +134,9 @@ function ProductList() {
                         {products.map((product) => (
                             <tr className='border-b' key={product.id}>
                                 <td>{product.name || <div className='border w-4'></div>}</td>
+                                <td>{product.code || <div className='border w-4'></div>}</td>
                                 <td>{product.classification_primary || <div className='border w-4'></div>}</td>
-                                <td>{product.standard_retail_price || <div className='border w-4'></div>}</td>
-                                <td>{product.standard_retail_price || <div className='border w-4'></div>}</td>
+                                <td>{product.classification_secondary || <div className='border w-4'></div>}</td>
                                 <td>{product.standard_retail_price || <div className='border w-4'></div>}</td>
                                 <td className='flex justify-center relative'>
                                     <div className='border rounded px-4 py-3 relative' onClick={(e) => toggleDropdown(product.id)}>

@@ -16,6 +16,7 @@ function DeliveryCustomersAdd() {
 
     const [deliveryCustomer, setDeliveryCustomer] = useState({
         id: '',
+        code: '',
         name_primary: '',
         name_secondary: '',
         honorific: '',
@@ -54,7 +55,7 @@ function DeliveryCustomersAdd() {
 
     const handleSubmit = () => {
         validator.required(deliveryCustomer.name_primary, 'name_primary', '納品先名1');
-        validator.required(deliveryCustomer.billing_code, 'billing_code', '納品先コード');
+        validator.required(deliveryCustomer.code, 'code', '納品先コード');
         validator.required(deliveryCustomer.phone_number, 'phone_number', '電話番号');
         validator.required(deliveryCustomer.fax_number, 'fax_number', 'Fax');
         validator.required(deliveryCustomer.address, 'address', '住所');
@@ -64,6 +65,7 @@ function DeliveryCustomersAdd() {
             ipcRenderer.send('save-delivery-customer', deliveryCustomer);
             setDeliveryCustomer({
                 id: '',
+                code: '',
                 name_primary: '',
                 name_secondary: '',
                 honorific: '',
@@ -90,7 +92,7 @@ function DeliveryCustomersAdd() {
                         <div className='p-4'>納品先名1 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='株式会社テスト' name="name_primary" value={deliveryCustomer.name_primary} onChange={handleChange} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='納品先名1を入力' name="name_primary" value={deliveryCustomer.name_primary} onChange={handleChange} />
                     </div>
                 </div>
                 {errors.name_primary && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.name_primary}</div>}
@@ -99,7 +101,7 @@ function DeliveryCustomersAdd() {
                         <div className='p-4'>納品先名1(カタカナ)</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='株式会社テスト' name="honorific" value={deliveryCustomer.honorific} onChange={handleChange} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='納品先名1(カタカナ)を入力' name="honorific" value={deliveryCustomer.honorific} onChange={handleChange} />
                     </div>
                 </div>
                 {errors.honorific && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.honorific}</div>}
@@ -116,7 +118,7 @@ function DeliveryCustomersAdd() {
                         </div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='株式会社テスト' name="name_secondary" value={deliveryCustomer.name_secondary} onChange={handleChange} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='納品先名2を入力' name="name_secondary" value={deliveryCustomer.name_secondary} onChange={handleChange} />
                     </div>
                 </div>
                 {errors.name_secondary && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.name_secondary}</div>}
@@ -125,16 +127,16 @@ function DeliveryCustomersAdd() {
                         <div className='p-4'>納品先コード <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='株式会社テスト' name="billing_code" value={deliveryCustomer.billing_code} onChange={handleChange} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='納品先コードを入力' name="code" value={deliveryCustomer.code} onChange={handleChange} />
                     </div>
                 </div>
-                {errors.billing_code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.billing_code}</div>}
+                {errors.code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.code}</div>}
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
                         <div className='p-4'>電話番号 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='株式会社テスト' name="phone_number" value={deliveryCustomer.phone_number} onChange={handleChange} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='電話番号を入力' name="phone_number" value={deliveryCustomer.phone_number} onChange={handleChange} />
                     </div>
                 </div>
                 {errors.phone_number && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.phone_number}</div>}
@@ -143,7 +145,7 @@ function DeliveryCustomersAdd() {
                         <div className='p-4'>FAX</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='株式会社テスト' name="fax_number" value={deliveryCustomer.fax_number} onChange={handleChange} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='FAXを入力' name="fax_number" value={deliveryCustomer.fax_number} onChange={handleChange} />
                     </div>
                 </div>
                 {errors.fax_number && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.fax_number}</div>}
@@ -152,7 +154,7 @@ function DeliveryCustomersAdd() {
                         <div className='p-4'>メールアドレス</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input type='email' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='' name="email" value={deliveryCustomer.email} onChange={handleChange} />
+                        <input type='email' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='メールアドレスを入力' name="email" value={deliveryCustomer.email} onChange={handleChange} />
                     </div>
                 </div>
                 {errors.email && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.email}</div>}
@@ -170,7 +172,7 @@ function DeliveryCustomersAdd() {
                         <div className='p-4'>住所<span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='' name="address" value={deliveryCustomer.address} onChange={handleChange} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='住所を入力' name="address" value={deliveryCustomer.address} onChange={handleChange} />
                     </div>
                 </div>
                 {errors.address && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.address}</div>}
@@ -179,7 +181,7 @@ function DeliveryCustomersAdd() {
                         <div className='p-4'>敬称</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='' name="honorific" value={deliveryCustomer.honorific} onChange={handleChange} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='敬称を入力' name="honorific" value={deliveryCustomer.honorific} onChange={handleChange} />
                     </div>
                 </div>
                 {errors.honorific && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.honorific}</div>}
@@ -188,7 +190,7 @@ function DeliveryCustomersAdd() {
                         <div className='p-4'>請求先コード</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='' name="billing_code" value={deliveryCustomer.billing_code} onChange={handleChange} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='請求先コードを入力' name="billing_code" value={deliveryCustomer.billing_code} onChange={handleChange} />
                     </div>
                 </div>
                 {errors.billing_code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.billing_code}</div>}
@@ -197,10 +199,7 @@ function DeliveryCustomersAdd() {
                         <div className='p-4'>請求情報</div>
                     </div>
                     <div className="w-4/5 py-1.5 flex items-end">
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-48' placeholder='' name="billing_information" value={deliveryCustomer.billing_information} onChange={handleChange} />
-                        日締
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-48 ml-10' placeholder='' name="billing_information" value={deliveryCustomer.billing_information} onChange={handleChange} />
-                        日後入金
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-48' placeholder='請求情報を入力' name="billing_information" value={deliveryCustomer.billing_information} onChange={handleChange} />
                     </div>
                 </div>
                 {errors.billing_information && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.billing_information}</div>}
@@ -209,7 +208,7 @@ function DeliveryCustomersAdd() {
                         <div className='p-4'>月次売上目標</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input type='number' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='' name="monthly_sales_target" value={deliveryCustomer.monthly_sales_target} onChange={handleChange} />
+                        <input type='number' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='月次売上目標を入力' name="monthly_sales_target" value={deliveryCustomer.monthly_sales_target} onChange={handleChange} />
                     </div>
                 </div>
                 {errors.monthly_sales_target && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.monthly_sales_target}</div>}
@@ -218,7 +217,7 @@ function DeliveryCustomersAdd() {
                         <div className='p-4'>備考</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='' name="remarks" value={deliveryCustomer.remarks} onChange={handleChange} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='備考を入力' name="remarks" value={deliveryCustomer.remarks} onChange={handleChange} />
                     </div>
                 </div>
                 {errors.remarks && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.remarks}</div>}

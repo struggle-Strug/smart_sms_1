@@ -21,8 +21,6 @@ function SetProductDetail() {
         return <div>Loading...</div>;
     }
 
-    console.log(product);
-
     return (
         <div className='w-full'>
             <div className='p-8'>
@@ -40,7 +38,7 @@ function SetProductDetail() {
                         <div className='p-4'>セット商品コード</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <div className='px-4 py-2.5'>{product.id || ''}</div>
+                        <div className='px-4 py-2.5'>{product.code || ''}</div>
                     </div>
                 </div>
                 <div className="flex bg-gray-100">

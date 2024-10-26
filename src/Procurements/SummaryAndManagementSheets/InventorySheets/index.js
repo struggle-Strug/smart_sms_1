@@ -11,6 +11,7 @@ function Index() {
     const dropdownRef = useRef(null);
     const location = useLocation();
     const [searchQuery, setSearchQuery] = useState('');
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     useEffect(() => {
         ipcRenderer.send('get-customers');

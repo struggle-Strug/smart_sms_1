@@ -201,12 +201,13 @@ function PaymentVouchersEdit() {
 
     const handleSumPrice = () => {
         let SumPrice = 0
-
+        let feesAndCharges = 0
         for (let i = 0; i < paymentVoucherDetails.length; i++) {
-            SumPrice += paymentVoucherDetails[i].price * paymentVoucherDetails[i].number;
+            SumPrice += parseInt(paymentVoucherDetails[i].payment_price)
+            feesAndCharges += parseInt(paymentVoucherDetails[i].fees_and_charges)
         }
 
-        return { "subtotal": SumPrice, "consumptionTaxEight": SumPrice * 0.08, "consumptionTaxTen": 0, "totalConsumptionTax": SumPrice * 0.08, "Total": SumPrice * 1.08 }
+        return { "feesAndCharges": feesAndCharges, "Total": SumPrice}
     }
 
     const [isOpen, setIsOpen] = useState(null);
@@ -324,6 +325,7 @@ function PaymentVouchersEdit() {
                     const pos_id = connectedPurchaseOrders[i];
                     const pvs_id = paymentVoucher.id;
                     ipcRenderer.send('save-pos-pvs-mapping', { pos_id, pvs_id });
+                    ipcRenderer.send('update-purchase-invoice-status', { id: pos_id, status: "支払済" });
              }
             setPaymentVoucher({
                 code: '',
@@ -536,14 +538,11 @@ function PaymentVouchersEdit() {
                                     <td>{voucher.code || <div className='border w-4'></div>}</td>
                                     <td>{voucher.vender_name || <div className='border w-4'></div>}</td>
                                     <td>{voucher.vender_id || <div className='border w-4'></div>}</td>
-                                    <td>なし</td>
+                                    <td>{voucher.status || <div className='border w-4'></div>}</td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
-                    {/* <div className='flex my-6'>
-                        <div className='border rounded-lg py-3 px-4 text-base font-bold bg-blue-600 text-white'>紐付ける</div>
-                    </div> */}
                     <div className='py-3'>
                         <hr className='' />
                     </div>
@@ -583,10 +582,8 @@ function PaymentVouchersEdit() {
                                 {errors["payment_price" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["payment_price" + index]}</div>}
                                 <div className='flex items-center justify-end'>
                                     <div className='flex items-center'>
-                                        <div className='mr-4'>消費税額</div>
-                                        <div className='mr-4'>{(paymentVoucherDetails[index].price * paymentVoucherDetails[index].number * 0.08).toFixed(0)}円</div>
                                         <div className='mr-4'>金額</div>
-                                        <div className='text-lg font-bold'>{(paymentVoucherDetails[index].price * paymentVoucherDetails[index].number * 1.08).toFixed(0)}円</div>
+                                        <div className='text-lg font-bold'>{parseInt(paymentVoucherDetails[index].payment_price) + parseInt(paymentVoucherDetails[index].fees_and_charges)}円</div>
                                     </div>
                                 </div>
                                 <hr className='py-3' />
@@ -599,23 +596,11 @@ function PaymentVouchersEdit() {
                     <div className='py-6 flex'>
                         <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
                             <div className='flex pb-2'>
-                                <div className='w-40'>税抜合計</div>
-                                <div>{handleSumPrice().subtotal.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税(8%)</div>
-                                <div>{handleSumPrice().consumptionTaxEight.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税(10%)</div>
-                                <div>{handleSumPrice().consumptionTaxTen.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税合計</div>
-                                <div>{handleSumPrice().totalConsumptionTax.toFixed(0).toLocaleString()}円</div>
+                                <div className='w-40'>手数料合計</div>
+                                <div>{handleSumPrice().feesAndCharges.toFixed(0).toLocaleString()}円</div>
                             </div>
                             <div className='flex'>
-                                <div className='w-40'>税込合計</div>
+                                <div className='w-40'>合計</div>
                                 <div>{handleSumPrice().Total.toFixed(0).toLocaleString()}円</div>
                             </div>
                         </div>
@@ -633,8 +618,8 @@ function PaymentVouchersEdit() {
                     </div>
                 </div>
                 <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
-                    <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>新規登録</div>
-                    <Link to={`procurements/purchase-orders`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
+                    <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>保存</div>
+                    <Link to={`/procurement/voucher-entries/payment-vouchers`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
                 </div>
             </div>
         </div>

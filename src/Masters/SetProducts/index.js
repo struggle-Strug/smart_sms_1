@@ -122,7 +122,7 @@ function SetProductList() {
                         {products.map((product) => (
                             <tr className='border-b' key={product.id}>
                                 <td>{product.set_product_name || <div className='border w-4'></div>}</td>
-                                <td>{product.id || <div className='border w-4'></div>}</td>
+                                <td>{product.code || <div className='border w-4'></div>}</td>
                                 <td>{product.category || <div className='border w-4'></div>}</td>
                                 <td>{product.sub_category || <div className='border w-4'></div>}</td>
                                 <td>{product.set_product_price || <div className='border w-4'></div>}</td>

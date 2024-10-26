@@ -6,7 +6,8 @@ const {
     deletePurchaseOrderById, 
     editPurchaseOrder,
     searchPurchaseOrders,
-    searchPurchaseOrdersOnPV
+    searchPurchaseOrdersOnPV,
+    updatePurchaseOrderStatus
 } = require('../../database/procurements/purchaseOrders');
 
 // 発注書のデータをロード
@@ -82,6 +83,16 @@ ipcMain.on('search-purchase-orders-on-pv', (event, query) => {
             console.error(err.message);
         } else {
             event.sender.send('search-purchase-orders-on-pv-result', results);
+        }
+    });
+});
+
+ipcMain.on('update-purchase-order-status', (event, query) => {
+    updatePurchaseOrderStatus(query, (err, results) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('update-purchase-order-status-result', results);
         }
     });
 });

@@ -5,7 +5,8 @@ const {
     savePurchaseInvoice, 
     deletePurchaseInvoiceById, 
     editPurchaseInvoice, 
-    searchPurchaseInvoices 
+    searchPurchaseInvoices,
+    updatePurchaseInvoiceStatus
 } = require('../../database/procurements/purchaseInvoices');
 
 // 仕入請求書のデータをロード
@@ -70,6 +71,16 @@ ipcMain.on('search-purchase-invoices', (event, query) => {
             console.error(err.message);
         } else {
             event.sender.send('search-purchase-invoices-result', results);
+        }
+    });
+});
+
+ipcMain.on('update-purchase-invoice-status', (event, query) => {
+    updatePurchaseInvoiceStatus(query, (err, results) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('update-purchase-invoice-status-result', results);
         }
     });
 });

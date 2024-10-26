@@ -11,6 +11,7 @@ function PrimarySectionsEdit() {
     const [primarySection, setPrimarySection] = useState({
         id: '',
         name: '',
+        code: '',
         remarks: '',
     });
 
@@ -38,7 +39,7 @@ function PrimarySectionsEdit() {
     const handleSubmit = () => {
         // バリデーションを実行
         validator.required(primarySection.name, 'name', '区分名');
-        validator.required(primarySection.id, 'id', '区分コード');
+        validator.required(primarySection.code, 'code', '区分コード');
 
         setErrors(validator.getErrors()); // エラーを設定
 
@@ -55,13 +56,13 @@ function PrimarySectionsEdit() {
                 <div className='text-2xl font-bold mb-8'>{primarySection.name}</div>
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
-                        <div className='p-4'>区分名 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
+                        <div className='p-4'>区分名1 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
                         <input 
                             type='text' 
                             className='border rounded px-4 py-2.5 bg-white w-2/3' 
-                            placeholder='区分名を入力' 
+                            placeholder='区分名1を入力' 
                             name="name" 
                             value={primarySection.name} 
                             onChange={handleChange} 
@@ -72,15 +73,15 @@ function PrimarySectionsEdit() {
 
                 <div className="flex bg-white">
                     <div className="w-1/5">
-                        <div className='p-4'>区分コード <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
+                        <div className='p-4'>区分コード1 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
                         <input 
                             type='text' 
                             className='border rounded px-4 py-2.5 bg-white w-2/3' 
-                            placeholder='区分コードを入力' 
-                            name="id" 
-                            value={primarySection.id} 
+                            placeholder='区分コード1を入力' 
+                            name="code" 
+                            value={primarySection.code} 
                             onChange={handleChange} 
                         />
                     </div>

@@ -23,6 +23,7 @@ function saveCompany(companyData, callback) {
     const {
         id,
         name,
+        code,
         address,
         phone_number,
         fax_number,
@@ -42,6 +43,7 @@ function saveCompany(companyData, callback) {
         db.run(
             `UPDATE companies SET 
                 name = ?, 
+                code = ?, 
                 address = ?, 
                 phone_number = ?, 
                 fax_number = ?, 
@@ -51,14 +53,15 @@ function saveCompany(companyData, callback) {
                 bank_account_number = ?, 
                 bank_branch_name = ?, 
                 bank_branch_code = ?, 
-                account_type = ?, 
                 zip_code = ?,
                 account_holder_name = ?,
+                account_type = ?,
                 remarks = ?, 
                 updated = datetime('now') 
             WHERE id = ?`,
             [
                 name,
+                code,
                 address,
                 phone_number,
                 fax_number,
@@ -68,9 +71,9 @@ function saveCompany(companyData, callback) {
                 bank_account_number,
                 bank_branch_name,
                 bank_branch_code,
-                account_type,
-                account_holder_name,
                 zip_code,
+                account_holder_name,
+                account_type,
                 remarks,
                 id
             ],
@@ -79,11 +82,12 @@ function saveCompany(companyData, callback) {
     } else {
         db.run(
             `INSERT INTO companies 
-            (name, address, phone_number, fax_number, email, representive_name, bank_name, bank_account_number, bank_branch_name, bank_branch_code, account_type, zip_code,account_holder_name, remarks, created, updated) 
+            (name, code, address, phone_number, fax_number, email, representive_name, bank_name, bank_account_number, bank_branch_name, bank_branch_code, zip_code, account_holder_name, account_type, remarks, created, updated) 
             VALUES 
-            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
             [
                 name,
+                code,
                 address,
                 phone_number,
                 fax_number,
@@ -94,14 +98,15 @@ function saveCompany(companyData, callback) {
                 bank_branch_name,
                 bank_branch_code,
                 zip_code,
-                account_type,
                 account_holder_name,
+                account_type,
                 remarks
             ],
             callback
         );
     }
 }
+
 
 
 function deleteCompanyById(id, callback) {
@@ -123,6 +128,7 @@ function initializeDatabase() {
     CREATE TABLE IF NOT EXISTS companies (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name VARCHAR(255),
+        code VARCHAR(255) DEFAULT NULL,
         address VARCHAR(255),
         phone_number INTEGER,
         fax_number INTEGER,
@@ -132,27 +138,13 @@ function initializeDatabase() {
         bank_account_number VARCHAR(255),
         bank_branch_name VARCHAR(255),
         bank_branch_code INTEGER,
+        zip_code VARCHAR(255) DEFAULT NULL,
+        account_holder_name VARCHAR(255) DEFAULT NULL,
         account_type VARCHAR(255),
         remarks VARCHAR(255),
         created DATE DEFAULT CURRENT_DATE,
         updated DATE DEFAULT CURRENT_DATE
     )
-    `;
-    db.run(sql);
-}
-
-function addZipCodeColumn() {
-    const sql = `
-    ALTER TABLE companies 
-    ADD COLUMN zip_code VARCHAR(10)
-    `;
-    db.run(sql);
-}
-
-function addAccountHolderColumn() {
-    const sql = `
-    ALTER TABLE companies 
-    ADD COLUMN account_holder_name VARCHAR(255)
     `;
     db.run(sql);
 }
@@ -184,7 +176,5 @@ module.exports = {
     deleteCompanyById,
     editCompany,
     initializeDatabase,
-    addZipCodeColumn,
-    addAccountHolderColumn,
     searchCompanies
 };

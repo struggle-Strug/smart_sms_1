@@ -11,6 +11,7 @@ function PaymentMethodsEdit() {
     const [paymentMethod, setPaymentMethod] = useState({
         id: '',
         name: '',
+        code: '',
         remarks: '',
     });
 
@@ -75,8 +76,8 @@ function PaymentMethodsEdit() {
                             type='text' 
                             className='border rounded px-4 py-2.5 bg-white w-2/3' 
                             placeholder='支払方法コードを入力' 
-                            name="id" 
-                            value={paymentMethod.id} 
+                            name="code" 
+                            value={paymentMethod.code} 
                             onChange={handleChange} 
                         />
                     </div>

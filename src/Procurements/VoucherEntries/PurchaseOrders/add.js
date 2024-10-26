@@ -246,12 +246,19 @@ function PurchaseOrdersAdd() {
 
     const handleSumPrice = () => {
         let SumPrice = 0
+        let consumptionTaxEight = 0
+        let consumptionTaxTen = 0
 
         for (let i = 0; i < purchaseOrderDetails.length; i++) {
             SumPrice += purchaseOrderDetails[i].price * purchaseOrderDetails[i].number;
+            if (purchaseOrderDetails[i].tax_rate === 8) {
+                consumptionTaxEight += purchaseOrderDetails[i].price * purchaseOrderDetails[i].number * 0.08;
+            } else if (purchaseOrderDetails[i].tax_rate === 10) {
+                consumptionTaxTen += purchaseOrderDetails[i].price * purchaseOrderDetails[i].number * 0.1;
+            }
         }
 
-        return { "subtotal": SumPrice, "consumptionTaxEight": SumPrice * 0.08, "consumptionTaxTen": 0, "totalConsumptionTax": SumPrice * 0.08, "Total": SumPrice * 1.08 }
+        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxEight + consumptionTaxTen, "Total": SumPrice + consumptionTaxEight + consumptionTaxTen }
     }
 
     const [isOpen, setIsOpen] = useState(null);
@@ -611,9 +618,9 @@ function PurchaseOrdersAdd() {
                                 <div className='flex items-center justify-end'>
                                     <div className='flex items-center'>
                                         <div className='mr-4'>消費税額</div>
-                                        <div className='mr-4'>{(purchaseOrderDetails[index].price * purchaseOrderDetails[index].number * 0.08).toFixed(0)}円</div>
+                                        <div className='mr-4'>{(purchaseOrderDetails[index].price * purchaseOrderDetails[index].number * purchaseOrderDetails[index].tax_rate * 0.01).toFixed(0)}円</div>
                                         <div className='mr-4'>金額</div>
-                                        <div className='text-lg font-bold'>{(purchaseOrderDetails[index].price * purchaseOrderDetails[index].number * 1.08).toFixed(0)}円</div>
+                                        <div className='text-lg font-bold'>{(purchaseOrderDetails[index].price * purchaseOrderDetails[index].number * (purchaseOrderDetails[index].tax_rate * 0.01 + 1)).toFixed(0)}円</div>
                                     </div>
                                 </div>
                                 <hr className='py-3' />
@@ -699,9 +706,9 @@ function PurchaseOrdersAdd() {
                     <div className='py-2.5 font-bold text-xl flex items-center'>
                         納品情報
                         <a data-tooltip-id="my-tooltip" data-tooltip-content="得意先名の続き、支店名、部署名等" className='flex ml-3'>
-                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M8.47315 4.57084H10.1398V6.23751H8.47315V4.57084ZM8.47315 7.90418H10.1398V12.9042H8.47315V7.90418ZM9.30648 0.404175C4.70648 0.404175 0.973145 4.13751 0.973145 8.73751C0.973145 13.3375 4.70648 17.0708 9.30648 17.0708C13.9065 17.0708 17.6398 13.3375 17.6398 8.73751C17.6398 4.13751 13.9065 0.404175 9.30648 0.404175ZM9.30648 15.4042C5.63148 15.4042 2.63981 12.4125 2.63981 8.73751C2.63981 5.06251 5.63148 2.07084 9.30648 2.07084C12.9815 2.07084 15.9731 5.06251 15.9731 8.73751C15.9731 12.4125 12.9815 15.4042 9.30648 15.4042Z" fill="#1F2937" />
-                                </svg>
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8.47315 4.57084H10.1398V6.23751H8.47315V4.57084ZM8.47315 7.90418H10.1398V12.9042H8.47315V7.90418ZM9.30648 0.404175C4.70648 0.404175 0.973145 4.13751 0.973145 8.73751C0.973145 13.3375 4.70648 17.0708 9.30648 17.0708C13.9065 17.0708 17.6398 13.3375 17.6398 8.73751C17.6398 4.13751 13.9065 0.404175 9.30648 0.404175ZM9.30648 15.4042C5.63148 15.4042 2.63981 12.4125 2.63981 8.73751C2.63981 5.06251 5.63148 2.07084 9.30648 2.07084C12.9815 2.07084 15.9731 5.06251 15.9731 8.73751C15.9731 12.4125 12.9815 15.4042 9.30648 15.4042Z" fill="#1F2937" />
+                            </svg>
                         </a>
                         <Tooltip id="my-tooltip" />
                     </div>
@@ -720,7 +727,7 @@ function PurchaseOrdersAdd() {
                 </div>
                 <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
                     <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>新規登録</div>
-                    <Link to={`procurements/purchase-orders`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
+                    <Link to={`/procurement/voucher-entries/purchase-orders`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
                 </div>
             </div>
         </div>

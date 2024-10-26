@@ -10,6 +10,7 @@ function initializeDatabase() {
         CREATE TABLE IF NOT EXISTS storage_facilities (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name VARCHAR(255) NOT NULL,
+            code VARCHAR(255) DEFAULT NULL,
             address VARCHAR(255) NOT NULL,
             phone_number INTEGER DEFAULT NULL,
             fax_number INTEGER DEFAULT NULL,
@@ -32,18 +33,18 @@ function getStorageFacilityById(id, callback) {
 }
 
 function saveStorageFacility(facilityData, callback) {
-    const { id, name, address, phone_number, fax_number, contact_person, email, storage_method, remarks } = facilityData;
+    const { id, name, code, address, phone_number, fax_number, contact_person, email, storage_method, remarks } = facilityData;
 
     if (id) {
         db.run(
-            `UPDATE storage_facilities SET name = ?, address = ?, phone_number = ?, fax_number = ?, contact_person = ?, email = ?, storage_method = ?, remarks = ?, updated = datetime('now') WHERE id = ?`,
-            [name, address, phone_number, fax_number, contact_person, email, storage_method, remarks, id],
+            `UPDATE storage_facilities SET name = ?, code = ?, address = ?, phone_number = ?, fax_number = ?, contact_person = ?, email = ?, storage_method = ?, remarks = ?, updated = datetime('now') WHERE id = ?`,
+            [name, code, address, phone_number, fax_number, contact_person, email, storage_method, remarks, id],
             callback
         );
     } else {
         db.run(
-            `INSERT INTO storage_facilities (name, address, phone_number, fax_number, contact_person, email, storage_method, remarks, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
-            [name, address, phone_number, fax_number, contact_person, email, storage_method, remarks],
+            `INSERT INTO storage_facilities (name, code, address, phone_number, fax_number, contact_person, email, storage_method, remarks, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+            [name, code, address, phone_number, fax_number, contact_person, email, storage_method, remarks],
             callback
         );
     }

@@ -95,7 +95,7 @@ function VendorList() {
     return (
         <div className='w-full'>
             <div className='p-8'>
-                <div className='pb-6 text-2xl font-bold'>仕入先一覧</div>
+                <div className='pb-6 text-2xl font-bold'>仕入先</div>
                 <div className='flex'>
                 <div className='border rounded-lg py-3 px-7 mb-8 text-base font-bold bg-blue-600 text-white'><Link to="add" className={``}>新規登録</Link></div>
                 </div>
@@ -136,7 +136,7 @@ function VendorList() {
                             <tr className='border-b' key={vendor.id}>
                                 <td>{vendor.name_primary || <div className='border w-4'></div>}</td>
                                 <td>{vendor.name_secondary || <div className='border w-4'></div>}</td>
-                                <td>{vendor.id || <div className='border w-4'></div>}</td>
+                                <td>{vendor.code || <div className='border w-4'></div>}</td>
                                 <td>{vendor.phone_number || <div className='border w-4'></div>}</td>
                                 <td>{vendor.email || <div className='border w-4'></div>}</td>
                                 <td className='flex justify-center relative'>

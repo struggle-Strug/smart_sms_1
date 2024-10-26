@@ -7,6 +7,7 @@ const { ipcRenderer } = window.require('electron');
 function ContactPersonAdd() {
     const [contactPerson, setContactPerson] = useState({
         name: '',
+        code: '',
         department: '',
         position: '',
         phone_number: '',
@@ -36,6 +37,7 @@ function ContactPersonAdd() {
             ipcRenderer.send('save-contact-person', contactPerson);
             setContactPerson({
                 name: '',
+                code: '',
                 department: '',
                 position: '',
                 phone_number: '',
@@ -92,8 +94,8 @@ function ContactPersonAdd() {
                             type='text'
                             className='border rounded px-4 py-2.5 bg-white w-2/3'
                             placeholder='担当者コードを入力'
-                            name="id"
-                            value={contactPerson.id}
+                            name="code"
+                            value={contactPerson.code}
                             onChange={handleChange}
                         />
                     </div>
