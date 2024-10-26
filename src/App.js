@@ -44,7 +44,7 @@ function App() {
     <div className="App">
       <div className='bg-white border-b flex items-center w-full relative' style={{ minWidth: "1280px", margin: "auto" }}>
         <div className='text-3xl font-bold pl-10 py-4' style={{ color: "#0272F5" }}>
-          Smart_SMS
+          Smart_SMS_ver.0.1.3_test
         </div>
         <div className='absolute' style={{ top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
           <Link to="/" className={`py-6 px-4 mx-2  ${location.pathname === "/" && "font-bold border-b-4 border-blue-600"}`}>ダッシュボード</Link>

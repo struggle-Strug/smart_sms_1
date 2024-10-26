@@ -1,8 +1,12 @@
 {
   "name": "smart-sms",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "main": "public/index.js",
   "homepage": "./",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/esakiryota/smart-sms.git"
+  },
   "build": {
     "appId": "com.smart-sms.app",
     "files": [
@@ -42,6 +46,7 @@
     "browserify-fs": "^1.0.0",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
+    "electron-log": "^5.2.0",
     "electron-squirrel-startup": "^1.0.1",
     "fs": "^0.0.1-security",
     "json2csv": "^6.0.0-alpha.2",
@@ -54,6 +59,7 @@
     "react-scripts": "5.0.1",
     "react-tooltip": "^5.28.0",
     "sqlite3": "^5.1.7",
+    "update-electron-app": "^3.0.0",
     "web-vitals": "^2.1.4",
     "xlsx": "^0.18.5"
   },
