@@ -244,9 +244,8 @@ function PurchaseOrdersEdit() {
         setPurchaseOrder({ ...purchaseOrder, [name]: value });
     };
 
-
-    const handleOnClick = (name, value) => {
-        setPurchaseOrder({ ...purchaseOrder, [name]: value });
+    const handleOnClick = (value) => {
+        setPurchaseOrder({ ...purchaseOrder, ["vender_id"]: value.id, ["vender_name"]: value.name_primary, ["honorific"]: value.honorific, ["payment_due_date"]: value.payment_date, ["closing_date"]: value.closing_date, ["payment_method"]: value.payment_method, ["vender_contact_person"]: value.contact_person });
     };
 
     const handleOnDetailClick = (name, value, index) => {
@@ -409,7 +408,7 @@ function PurchaseOrdersEdit() {
                                                 <div className="flex flex-col space-y-2">
                                                     {
                                                         vendors.map((value, index) => (
-                                                            <div className="p-2 hover:bg-gray-100 hover:cursor-pointer" onClick={(e) => handleOnClick("vender_id", value.id)}>{value.name_primary}</div>
+                                                            <div className="p-2 hover:bg-gray-100 hover:cursor-pointer" onClick={(e) => handleOnClick(value)}>{value.name_primary}</div>
                                                         ))
                                                     }
                                                 </div>
@@ -431,7 +430,7 @@ function PurchaseOrdersEdit() {
                                                 <div className="flex flex-col space-y-2">
                                                     {
                                                         vendors.map((value, index) => (
-                                                            <div className="p-2 hover:bg-gray-100 hover:cursor-pointer" onClick={(e) => handleOnClick("vender_name", value.name_primary)}>{value.name_primary}</div>
+                                                            <div className="p-2 hover:bg-gray-100 hover:cursor-pointer" onClick={(e) => handleOnClick(value)}>{value.name_primary}</div>
                                                         ))
                                                     }
                                                 </div>
@@ -441,13 +440,13 @@ function PurchaseOrdersEdit() {
                                 }
                             </div>
                             <div className='ml-12'>
-                                <div className='text-sm pb-1.5 w-40'>宛名</div>
+                                <div className='text-sm pb-1.5 w-40'>敬称</div>
                                 <div className="relative" ref={dropdownRef}>
                                     <div
                                         className="bg-white border rounded px-4 py-2.5 cursor-pointer flex justify-between items-center"
                                         onClick={() => toggleDropdown("honorific")}
                                     >
-                                        <span>{purchaseOrder.honorific ? purchaseOrder.honorific : "宛名"}</span>
+                                        <span>{purchaseOrder.honorific ? purchaseOrder.honorific : "敬称"}</span>
                                         <svg
                                             className={`w-4 h-4 transform transition-transform ${isOpen === "honorific" ? 'rotate-180' : ''}`}
                                             xmlns="http://www.w3.org/2000/svg"

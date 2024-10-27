@@ -140,7 +140,7 @@ function ProductAdd() {
                 {errors.classification_primary && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.classification_primary}</div>}
                 <div className="flex bg白">
                     <div className="w-1/5">
-                        <div className='p-4'>カテゴリー<span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
+                        <div className='p-4'>カテゴリー <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
                         <input
@@ -247,7 +247,7 @@ function ProductAdd() {
                 </div>
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
-                        <div className='p-4'>単位<span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
+                        <div className='p-4'>単位 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
                         <CustomSelect placeholder={"1つ選んでください"} options={unitOptions} name={"unit"} data={product} setData={setProduct} />
@@ -267,14 +267,6 @@ function ProductAdd() {
                             value={product.country_of_origin}
                             onChange={handleChange}
                         />
-                    </div>
-                </div>
-                <div className="flex bg-gray-100">
-                    <div className="w-1/5">
-                        <div className='p-4'>保管場所</div>
-                    </div>
-                    <div className="w-4/5 py-1.5">
-                        <CustomSelect placeholder={"1つ選んでください"} options={storageLocation} name={"storage_location"} data={product} setData={setProduct} />
                     </div>
                 </div>
                 <div className="flex bg白">

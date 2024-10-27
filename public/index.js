@@ -20,6 +20,8 @@ require('./ipc/masters/primarySections');
 require('./ipc/masters/secondarySections');
 require('./ipc/masters/shops');
 require('./ipc/masters/setProducts'); // 追加
+require('./ipc/masters/categories'); // 追加
+require('./ipc/masters/subcategories'); // 追加
 
 //ダッシュボード
 require('./ipc/dashboard/salesTaxSettings'); // 追加
@@ -88,6 +90,10 @@ function createWindow() {
   setProductsSectionsDB.initializeDatabase();
   const setTaxesDB = require('./database/dashboard/salesTaxSettings'); // 追加
   setTaxesDB.initializeDatabase();
+  const setCategoriesDB = require('./database/masters/categories'); // 追加
+  setCategoriesDB.initializeDatabase();
+  const setSubcategoriesDB = require('./database/masters/subcategories'); // 追加
+  setSubcategoriesDB.initializeDatabase();
 
   // 仕入管理
   const purchaseOrdersDB = require('./database/procurements/purchaseOrders');

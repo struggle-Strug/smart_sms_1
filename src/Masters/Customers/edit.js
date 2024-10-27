@@ -168,7 +168,7 @@ function CustomersEdit() {
                 {errors.zip_code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.zip_code}</div>}
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
-                        <div className='p-4'>住所<span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
+                        <div className='p-4'>住所 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
                         <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='住所を入力' name="address" value={customer.address} onChange={handleChange} />

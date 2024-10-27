@@ -216,6 +216,10 @@ function PurchaseInvoicesEdit() {
         setPurchaseInvoice({ ...purchaseInvoice, [name]: value });
     };
 
+    const handleVendorOnClick = (value) => {
+        setPurchaseInvoice({ ...purchaseInvoice, ["vender_id"]: value.id, ["vender_name"]: value.name_primary, ["honorific"]: value.honorific, ["payment_due_date"]: value.payment_date, ["closing_date"]: value.closing_date, ["payment_method"]: value.payment_method, ["vender_contact_person"]: value.contact_person });
+    };
+
     const handleOnDetailClick = (name, value, index) => {
         const updatedDetails = purchaseInvoiceDetails.map((detail, i) =>
             i === index ? { ...detail, [name]: value } : detail
@@ -424,7 +428,7 @@ function PurchaseInvoicesEdit() {
                                                 <div className="flex flex-col space-y-2">
                                                     {
                                                         vendors.map((value, index) => (
-                                                            <div className="p-2 hover:bg-gray-100 hover:cursor-pointer" onClick={(e) => handleOnClick("vender_id", value.id)}>{value.name_primary}</div>
+                                                            <div className="p-2 hover:bg-gray-100 hover:cursor-pointer" onClick={(e) => handleVendorOnClick(value)}>{value.name_primary}</div>
                                                         ))
                                                     }
                                                 </div>
@@ -445,7 +449,7 @@ function PurchaseInvoicesEdit() {
                                                 <div className="flex flex-col space-y-2">
                                                     {
                                                         vendors.map((value, index) => (
-                                                            <div className="p-2 hover:bg-gray-100 hover:cursor-pointer" onClick={(e) => handleOnClick("vender_name", value.name_primary)}>{value.name_primary}</div>
+                                                            <div className="p-2 hover:bg-gray-100 hover:cursor-pointer" onClick={(e) => handleVendorOnClick(value)}>{value.name_primary}</div>
                                                         ))
                                                     }
                                                 </div>
@@ -455,13 +459,13 @@ function PurchaseInvoicesEdit() {
                                 }
                             </div>
                             <div className='ml-12'>
-                                <div className='w-40 text-sm pb-1.5'>宛名</div>
+                                <div className='w-40 text-sm pb-1.5'>敬称</div>
                                 <div className="relative" ref={dropdownRef}>
                                     <div
                                         className="bg-white border rounded px-4 py-2.5 cursor-pointer flex justify-between items-center"
                                         onClick={() => toggleDropdown("honorific")}
                                     >
-                                        <span>{purchaseInvoice.honorific ? purchaseInvoice.honorific : "宛名"}</span>
+                                        <span>{purchaseInvoice.honorific ? purchaseInvoice.honorific : "敬称"}</span>
                                         <svg
                                             className={`w-4 h-4 transform transition-transform ${isOpen === "honorific" ? 'rotate-180' : ''}`}
                                             xmlns="http://www.w3.org/2000/svg"

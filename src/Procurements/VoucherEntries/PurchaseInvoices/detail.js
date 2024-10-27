@@ -173,7 +173,7 @@ function PurchaseInvoicesDetail() {
                     </div>
                     <div className='py-2.5 font-bold text-xl'>取引先情報</div>
                     <div className='flex items-center pb-2'>
-                        <div className='w-40'>宛名</div>
+                        <div className='w-40'>敬称</div>
                         <div>{purchaseInvoice.vender_name}</div>
                     </div>
                     <div className='flex items-center pb-2'>

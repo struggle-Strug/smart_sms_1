@@ -19,7 +19,8 @@ function CustomersAdd() {
 
     const options = [
         { value: '御中', label: '御中' },
-        { value: '貴社', label: '貴社' },
+        { value: '様', label: '様' },
+        { value: '先生', label: '先生' },
     ];
 
     const [customer, setCustomer] = useState({
@@ -27,7 +28,7 @@ function CustomersAdd() {
         name_primary: '',
         name_secondary: '',
         name_kana: '',
-        honorific: '',
+        honorific: '御中',
         phone_number: '',
         fax_number: '',
         zip_code: '',
@@ -162,7 +163,7 @@ function CustomersAdd() {
                 {errors.zip_code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.zip_code}</div>}
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
-                        <div className='p-4'>住所<span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
+                        <div className='p-4'>住所 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
                         <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='住所を入力' name="address" value={customer.address} onChange={handleChange} />

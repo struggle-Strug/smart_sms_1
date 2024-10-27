@@ -126,7 +126,7 @@ function SetProductEdit() {
                 {errors.category && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.category}</div>}
                 <div className="flex bg-white">
                     <div className="w-1/5">
-                        <div className='p-4'>サブカテゴリー<span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
+                        <div className='p-4'>サブカテゴリー <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
                         <input 

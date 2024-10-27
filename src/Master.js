@@ -15,6 +15,8 @@ import CompaniesIndex from './Masters/Companies';
 import PrimarySectionsIndex from './Masters/PrimarySections';
 import SecondarySectionsIndex from './Masters/SecondarySections';
 import ShopsIndex from './Masters/Shops';
+import CategoriesIndex from './Masters/Categories';
+import SubcategoriesIndex from './Masters/Subcategories';
 
 function Master() {
   const [isOpen, setIsOpen] = useState(false);
@@ -68,6 +70,8 @@ function Master() {
             <div className={`text-center py-2 text-lg ${location.pathname.includes("/master/primary-sections") && "font-bold border-l-4 border-blue-600"}`}><Link to="primary-sections">区分1</Link></div>
             <div className={`text-center py-2 text-lg ${location.pathname.includes("/master/secondary-sections") && "font-bold border-l-4 border-blue-600"}`}><Link to="secondary-sections">区分2</Link></div>
             <div className={`text-center py-2 text-lg ${location.pathname.includes("/master/companies") && "font-bold border-l-4 border-blue-600"}`}><Link to="companies">自社マスタ</Link></div>
+            <div className={`text-center py-2 text-lg ${location.pathname.includes("/master/categories") && "font-bold border-l-4 border-blue-600"}`}><Link to="categories">カテゴリー</Link></div>
+            <div className={`text-center py-2 text-lg ${location.pathname.includes("/master/subcategories") && "font-bold border-l-4 border-blue-600"}`}><Link to="subcategories">サブカテゴリー</Link></div>
           </div>
         </div>
       )}
@@ -87,6 +91,8 @@ function Master() {
         <Route path="primary-sections/*" element={<PrimarySectionsIndex />} />
         <Route path="secondary-sections/*" element={<SecondarySectionsIndex />} />
         <Route path="companies/*" element={<CompaniesIndex />} />
+        <Route path="categories/*" element={<CategoriesIndex />} />
+        <Route path="subcategories/*" element={<SubcategoriesIndex />} />
       </Routes>
       </div>
     </div>)
