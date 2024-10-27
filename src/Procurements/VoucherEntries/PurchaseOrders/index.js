@@ -18,6 +18,9 @@ function Index() {
     useEffect(() => {
         ipcRenderer.send('load-purchase-orders');
         ipcRenderer.on('load-purchase-orders', (event, data) => {
+            console.log("@@@@@@@@@@@@@@@@@@@@@@仕入れ管理@@@@@@@@@@@@@@@@@@@@@@@@@");  // データの内容を確認
+            console.log(data);  // データの内容を確認
+
             setPurchaseOrders(data);
         });
 
