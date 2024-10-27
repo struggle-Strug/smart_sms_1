@@ -2,9 +2,9 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 
-const {updateElectronApp} = require('update-electron-app');
+// const {updateElectronApp} = require('update-electron-app');
 
-updateElectronApp()
+// updateElectronApp()
 
 //マスタ管理
 require('./ipc/masters/customers'); 
