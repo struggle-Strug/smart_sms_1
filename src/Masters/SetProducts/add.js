@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import CustomSelect from '../../Components/CustomSelect';
 import Validator from '../../utils/validator';
+import { useNavigate } from 'react-router-dom';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -15,6 +16,8 @@ function SetProductAdd() {
         { value: '倉庫', label: '倉庫' },
         { value: '社内', label: '社内' },
     ];
+
+    const navigate = useNavigate();
 
     const [errors, setErrors] = useState({});
 
@@ -65,6 +68,7 @@ function SetProductAdd() {
                 set_product_price: ''
             });
             alert('商品が正常に追加されました。');
+            navigate("/master/customers");
         }
     };
 

@@ -223,6 +223,13 @@ function PurchaseInvoicesEdit() {
         setPurchaseInvoiceDetails(updatedDetails);
     };
 
+    const handleProductClick = (product, index) => {
+        const updatedDetails = purchaseInvoiceDetails.map((detail, i) =>
+            i === index ? { ...detail, ["product_name"]: product.name, ["product_id"]: product.id, ["tax_rate"]: product.tax_rate, ["unit"] : product.unit, ["price"] : product.procurement_cost  } : detail
+        );
+        setPurchaseInvoiceDetails(updatedDetails);
+    }
+
     const validator = new Validator();
 
     const handleSubmit = () => {
@@ -536,7 +543,7 @@ function PurchaseInvoicesEdit() {
                                                                         products.map((product, idx) => (
                                                                             <div key={idx}
                                                                                 className="p-2 hover:bg-gray-100 hover:cursor-pointer"
-                                                                                onClick={(e) => handleOnDetailClick("product_id", product.id, index)}
+                                                                                onClick={(e) => handleProductClick(product, index)}
                                                                             >
                                                                                 {product.name}
                                                                             </div>
@@ -571,7 +578,7 @@ function PurchaseInvoicesEdit() {
                                                                         products.map((product, idx) => (
                                                                             <div key={idx}
                                                                                 className="p-2 hover:bg-gray-100 hover:cursor-pointer"
-                                                                                onClick={(e) => handleOnDetailClick("product_name", product.name, index)}
+                                                                                onClick={(e) => handleProductClick(product, index)}
                                                                             >
                                                                                 {product.name}
                                                                             </div>

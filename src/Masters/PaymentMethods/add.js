@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Validator from '../../utils/validator'; // バリデーションをインポート
 import { Code } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -11,6 +12,8 @@ function PaymentMethodAdd() {
         code: '',
         remarks: ''
     });
+
+    const navigate = useNavigate();
 
     const [errors, setErrors] = useState({}); // エラー状態を管理
 
@@ -34,6 +37,7 @@ function PaymentMethodAdd() {
                 remarks: ''
             });
             alert('新規登録が完了しました。');
+            navigate("/master/customers");
         }
     };
 

@@ -13,7 +13,7 @@ function initializeDatabase() {
             code VARCHAR(255) DEFAULT NULL,
             department VARCHAR(255),
             position VARCHAR(255),
-            phone_number INTEGER,
+            phone_number VARCHAR(255),
             email VARCHAR(255),
             remarks VARCHAR(255),
             created DATE DEFAULT CURRENT_TIMESTAMP,

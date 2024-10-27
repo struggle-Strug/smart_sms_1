@@ -82,6 +82,7 @@ function PaymentVouchersAdd() {
 
         ipcRenderer.on('search-name-products-result', (event, data) => {
             setProducts(data);
+            console.log(data)
         });
 
         ipcRenderer.send('load-sales-tax-settings');

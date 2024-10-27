@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import CustomSelect from '../../Components/CustomSelect';
 import Validator from '../../utils/validator';
 import { Tooltip } from 'react-tooltip';
+import { useNavigate } from 'react-router-dom';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -16,6 +17,10 @@ function ProductAdd() {
         { value: '倉庫', label: '倉庫' },
         { value: '社内', label: '社内' },
     ];
+
+    const navigate = useNavigate();
+
+    const [taxRateList, setTaxRateList] = useState([]);
 
     const [errors, setErrors] = useState({});
 
@@ -35,8 +40,30 @@ function ProductAdd() {
         country_of_origin: '',
         storage_location: '',
         storage_method: '',
-        threshold: ''
+        threshold: '',
+        tax_rate: ''
     });
+
+    useEffect(() => {
+        ipcRenderer.send('load-sales-tax-settings');
+        ipcRenderer.on('sales-tax-settings-data', (event, data) => {
+            console.log(data)
+            let arr = [];
+            for (let i = 0; i < data.length; i++) {
+                const taxRateTemplate = {
+                    value: data[i].tax_rate,
+                    label: data[i].tax_rate,
+                }
+                arr.push(taxRateTemplate)
+            }
+            setTaxRateList(arr);
+        });
+
+        return () => {
+            ipcRenderer.removeAllListeners('load-sales-tax-settings');
+            ipcRenderer.removeAllListeners('sales-tax-settings-data');
+        };
+    },[]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -71,6 +98,7 @@ function ProductAdd() {
                 threshold: ''
             });
             alert('商品が正常に追加されました。');
+            navigate("/master/customers");
         }
     };
 
@@ -266,6 +294,14 @@ function ProductAdd() {
                 </div>
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
+                        <div className='p-4'>税率計算</div>
+                    </div>
+                    <div className="w-4/5 py-1.5">
+                        <CustomSelect placeholder={"1つ選んでください"} options={taxRateList} name={"tax_rate"} data={product} setData={setProduct} />
+                    </div>
+                </div>
+                <div className="flex bg-gray-100">
+                    <div className="w-1/5">
                         <div className='p-4 flex items-center'>
                             警告値
                             <a data-tooltip-id="my-tooltip" data-tooltip-content="各倉庫で設定した警告値を下回ると在庫補充アラートが出ます" className='flex ml-3'>
@@ -288,7 +324,7 @@ function ProductAdd() {
                     </div>
                 </div>
             </div>
-            <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg白'>
+            <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
                 <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>新規登録</div>
                 <Link to={`/master/products`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
             </div>

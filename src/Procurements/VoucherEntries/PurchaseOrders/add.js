@@ -83,6 +83,7 @@ function PurchaseOrdersAdd() {
 
         ipcRenderer.on('search-name-products-result', (event, data) => {
             setProducts(data);
+            console.log(data);
         });
 
         ipcRenderer.send('load-sales-tax-settings');
@@ -196,6 +197,8 @@ function PurchaseOrdersAdd() {
         setPurchaseOrderDetails(updatedDetails);
     };
 
+    
+
 
 
     const validator = new Validator();
@@ -303,6 +306,13 @@ function PurchaseOrdersAdd() {
         const formattedDate = date ? date.toISOString().split('T')[0] : '';
         setPurchaseOrder({ ...purchaseOrder, [name]: formattedDate });
     };
+
+    const handleProductClick = (product, index) => {
+        const updatedDetails = purchaseOrderDetails.map((detail, i) =>
+            i === index ? { ...detail, ["product_name"]: product.name, ["product_id"]: product.id, ["tax_rate"]: product.tax_rate, ["unit"] : product.unit, ["price"] : product.procurement_cost  } : detail
+        );
+        setPurchaseOrderDetails(updatedDetails);
+    }
 
     return (
         <div className='w-full mb-20'>
@@ -466,7 +476,7 @@ function PurchaseOrdersAdd() {
                                                                         products.map((product, idx) => (
                                                                             <div key={idx}
                                                                                 className="p-2 hover:bg-gray-100 hover:cursor-pointer"
-                                                                                onClick={(e) => handleOnDetailClick("product_id", product.id, index)}
+                                                                                onClick={(e) => handleProductClick(product, index)}
                                                                             >
                                                                                 {product.name}
                                                                             </div>
@@ -501,7 +511,7 @@ function PurchaseOrdersAdd() {
                                                                         products.map((product, idx) => (
                                                                             <div key={idx}
                                                                                 className="p-2 hover:bg-gray-100 hover:cursor-pointer"
-                                                                                onClick={(e) => handleOnDetailClick("product_name", product.name, index)}
+                                                                                onClick={(e) => handleProductClick(product, index)}
                                                                             >
                                                                                 {product.name}
                                                                             </div>

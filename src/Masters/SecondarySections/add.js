@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Validator from '../../utils/validator'; // バリデーション用のクラスをインポート
 import { Tooltip } from 'react-tooltip';
+import { useNavigate } from 'react-router-dom';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -11,6 +12,8 @@ function SecondarySectionAdd() {
         code: '',
         remarks: ''
     });
+
+    const navigate = useNavigate();
 
     const [errors, setErrors] = useState({}); // エラーメッセージ用の状態
 
@@ -38,6 +41,7 @@ function SecondarySectionAdd() {
                 remarks: ''
             });
             alert('新規登録が完了しました。');
+            navigate("/master/customers");
         }
     };
 

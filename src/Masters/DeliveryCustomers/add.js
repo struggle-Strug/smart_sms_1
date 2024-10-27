@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Validator from '../../utils/validator';
+import { useNavigate } from 'react-router-dom';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -11,6 +12,7 @@ function DeliveryCustomersAdd() {
     const dropdownRef = useRef(null);
     const location = useLocation();
     const [errors, setErrors] = useState({});
+    const navigate = useNavigate();
 
     const validator = new Validator();
 
@@ -80,6 +82,7 @@ function DeliveryCustomersAdd() {
                 monthly_sales_target: ''
             });
             alert('新規登録が完了しました。');
+            navigate("/master/customers");
         }
     };
 

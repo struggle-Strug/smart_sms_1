@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip';
 import CustomSelect from '../../Components/CustomSelect';
 import Validator from '../../utils/validator';
+import { useNavigate } from 'react-router-dom';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -32,6 +33,13 @@ function VendorAdd() {
         { value: '現金', label: '現金' },
         { value: 'クレジット', label: 'クレジット' },
     ];
+    const taxCalculationOptions = [
+        { value: '明細毎', label: '明細毎' },
+        { value: '伝票毎', label: '伝票毎' },
+        { value: '請求時一括', label: '請求時一括' },
+    ];
+
+    const navigate = useNavigate();
 
     const [errors, setErrors] = useState({});
 
@@ -73,8 +81,60 @@ function VendorAdd() {
                 payment_method: '',      // 支払方法
             });
             alert('仕入先が正常に追加されました。');
+            navigate("/master/customers");
         }
     };
+
+    const [termsOfTrade, setTermsOfTrade] = useState([]);
+    const [primarySections, setPrimarySections] = useState([]);
+    const [secondarySections, setSecondarySections] = useState([]);
+
+    useEffect(() => {
+        ipcRenderer.send('load-payment-methods');
+        ipcRenderer.on('load-payment-methods', (event, data) => {
+            let arr = [];
+            for (let i = 0; i < data.length; i++) {
+                const taxRateTemplate = {
+                    value: data[i].name,
+                    label: data[i].name,
+                }
+                arr.push(taxRateTemplate)
+            }
+            setTermsOfTrade(arr);
+        });
+        ipcRenderer.send('load-primary-sections');
+        ipcRenderer.on('load-primary-sections', (event, data) => {
+            let arr = [];
+            for (let i = 0; i < data.length; i++) {
+                const taxRateTemplate = {
+                    value: data[i].name,
+                    label: data[i].name,
+                }
+                arr.push(taxRateTemplate)
+            }
+            setPrimarySections(arr);
+        });
+
+        ipcRenderer.send('load-secondary-sections');
+        ipcRenderer.on('load-secondary-sections', (event, data) => {
+            setSecondarySections(data);
+            let arr = [];
+            for (let i = 0; i < data.length; i++) {
+                const taxRateTemplate = {
+                    value: data[i].name,
+                    label: data[i].name,
+                }
+                arr.push(taxRateTemplate)
+            }
+            setPrimarySections(arr);
+        });
+
+        return () => {
+            ipcRenderer.removeAllListeners('load-payment-methods');
+            ipcRenderer.removeAllListeners('load-primary-sections');
+            ipcRenderer.removeAllListeners('load-secondary-sections');
+        };
+    }, []);
 
     return (
         <div className='w-full'>
@@ -246,7 +306,7 @@ function VendorAdd() {
                         <div className='p-4'>取引条件</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <CustomSelect options={options} placeholder={"1つ選んでください"} name={"terms_of_trade"} data={vendor} setData={setVendor} />
+                        <CustomSelect options={termsOfTrade} placeholder={"1つ選んでください"} name={"terms_of_trade"} data={vendor} setData={setVendor} />
                     </div>
                 </div>
                 <div className="flex bg-white">
@@ -254,7 +314,7 @@ function VendorAdd() {
                         <div className='p-4'>区分1</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <CustomSelect options={options} placeholder={"1つ選んでください"} name={"classification1"} data={vendor} setData={setVendor} />
+                        <CustomSelect options={primarySections} placeholder={"1つ選んでください"} name={"classification1"} data={vendor} setData={setVendor} />
                     </div>
                 </div>
                 <div className="flex bg-white">
@@ -262,7 +322,7 @@ function VendorAdd() {
                         <div className='p-4'>区分2</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <CustomSelect options={options} placeholder={"1つ選んでください"} name={"classification2"} data={vendor} setData={setVendor} />
+                        <CustomSelect options={secondarySections} placeholder={"1つ選んでください"} name={"classification2"} data={vendor} setData={setVendor} />
                     </div>
                 </div>
                 <div className="flex bg-white">
@@ -270,7 +330,7 @@ function VendorAdd() {
                         <div className='p-4'>消費税計算</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <CustomSelect options={options} placeholder={"1つ選んでください"} name={"tax_calculation"} data={vendor} setData={setVendor} />
+                        <CustomSelect options={taxCalculationOptions} placeholder={"1つ選んでください"} name={"tax_calculation"} data={vendor} setData={setVendor} />
                     </div>
                 </div>
                 <div className="flex bg-gray-100">

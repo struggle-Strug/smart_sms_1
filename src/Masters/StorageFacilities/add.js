@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import CustomSelect from '../../Components/CustomSelect';
 import Validator from '../../utils/validator';
+import { useNavigate } from 'react-router-dom';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -10,6 +11,14 @@ function StorageFacilityAdd() {
         { value: '倉庫', label: '倉庫' },
         { value: '社内', label: '社内' },
     ];
+
+    const storageMethodOptions = [
+        { value: '常温', label: '常温' },
+        { value: '冷蔵', label: '冷蔵' },
+        { value: '冷凍', label: '冷凍' },
+    ];
+
+    const navigate = useNavigate();
 
     const [facility, setFacility] = useState({
         name: '',
@@ -53,6 +62,7 @@ function StorageFacilityAdd() {
                 remarks: ''
             });
             alert('倉庫が正常に追加されました。');
+            navigate("/master/customers");
         }
     };
 
@@ -177,7 +187,7 @@ function StorageFacilityAdd() {
                         <div className='p-4'>保管方法</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <CustomSelect placeholder={"1つお選びください"} options={options} name={"storage_method"} data={facility} setData={setFacility} />
+                        <CustomSelect placeholder={"1つお選びください"} options={storageMethodOptions} name={"storage_method"} data={facility} setData={setFacility} />
                     </div>
                 </div>
                 {errors.email && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.email}</div>}
