@@ -280,23 +280,15 @@ function EstimationSlipEdit() {
         if (!validator.hasErrors()) {
 
             ipcRenderer.send('save-estimation-slip', estimationSlip);
-            console.log("Estimation slip saved:", estimationSlip);
-
-            ipcRenderer.on('save-estimation-slip-result', (event, data) => {
-                console.log("Estimation slip result received:", data);
-                // データが返ってきたか、エラーメッセージが含まれていないか確認
-                if (data.error) {
-                    console.error("Save error:", data.error);
-                }
+            ipcRenderer.send('delete-purchase-order-details-by-slip-id', id);
                 for (let i = 0; i < estimationSlipDetails.length; i++) {
                     const estimationSlipDetailData = estimationSlipDetails[i];
-                    estimationSlipDetailData.estimation_slip_id = data.id;
+                    estimationSlipDetailData.estimation_slip_id = estimationSlip.id;
                     ipcRenderer.send('save-estimation-slip-detail', estimationSlipDetailData);
                 }
-            });
-            alert('新規登録が完了しました。');
-        }
-    };
+                alert('新規登録が完了しました。');
+        };
+    }
 
     const handleSumPrice = () => {
         let SumPrice = 0
@@ -702,23 +694,23 @@ function EstimationSlipEdit() {
                         <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
                             <div className='flex pb-2'>
                                 <div className='w-40'>税抜合計</div>
-                                <div>5,000円</div>
+                                <div>{handleSumPrice().subtotal.toFixed(0).toLocaleString()}円</div>
                             </div>
                             <div className='flex pb-2'>
                                 <div className='w-40'>消費税(8%)</div>
-                                <div>5,000円</div>
+                                <div>{handleSumPrice().consumptionTaxEight.toFixed(0).toLocaleString()}円</div>
                             </div>
                             <div className='flex pb-2'>
                                 <div className='w-40'>消費税(10%)</div>
-                                <div>5,000円</div>
+                                <div>{handleSumPrice().consumptionTaxTen.toFixed(0).toLocaleString()}円</div>
                             </div>
                             <div className='flex pb-2'>
                                 <div className='w-40'>消費税合計</div>
-                                <div>5,000円</div>
+                                <div>{handleSumPrice().totalConsumptionTax.toFixed(0).toLocaleString()}円</div>
                             </div>
                             <div className='flex'>
                                 <div className='w-40'>税込合計</div>
-                                <div>5,000円</div>
+                                <div>{handleSumPrice().Total.toFixed(0).toLocaleString()}円</div>
                             </div>
                         </div>
                     </div>

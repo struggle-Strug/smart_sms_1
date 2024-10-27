@@ -34,7 +34,7 @@ function saveOrderSlip(orderSlipData, callback) {
         remarks,
         closing_date,
         deposit_due_date,
-        deposit_method
+        deposit_method,
     } = orderSlipData;
 
     if (id) {
@@ -71,7 +71,14 @@ function saveOrderSlip(orderSlipData, callback) {
                 deposit_method,
                 id
             ],
-            callback
+            // callback
+            function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                // 更新のため、IDをそのまま返す
+                callback(null, { lastID: id });
+            }
         );
     } else {
         db.run(
@@ -94,7 +101,14 @@ function saveOrderSlip(orderSlipData, callback) {
                 deposit_due_date,
                 deposit_method
             ],
-            callback
+            // callback
+            function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                // 更新のため、IDをそのまま返す
+                callback(null, { lastID: this.lastID });
+            }
         );
     }
 }

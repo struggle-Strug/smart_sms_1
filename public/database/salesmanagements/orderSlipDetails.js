@@ -111,6 +111,18 @@ function editOrderSlipDetail(id, callback) {
     });
 }
 
+function deleteOrderSlipDetailsBySlipId(orderSlipId, callback) {
+    const sql = `
+        DELETE FROM order_slip_details
+        WHERE order_slip_id = ?
+    `;
+    db.run(sql, [orderSlipId], (err) => {
+        callback(err);
+    });
+}
+
+
+
 function initializeDatabase() {
     const sql = `
     CREATE TABLE IF NOT EXISTS order_slip_details (
@@ -139,5 +151,6 @@ module.exports = {
     saveOrderSlipDetail,
     deleteOrderSlipDetailById,
     editOrderSlipDetail,
-    initializeDatabase
+    initializeDatabase,
+    deleteOrderSlipDetailsBySlipId
 };

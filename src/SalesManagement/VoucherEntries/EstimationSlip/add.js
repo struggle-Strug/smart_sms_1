@@ -297,7 +297,7 @@ function EstimationSlipAdd() {
         let SumPrice = 0
 
         for (let i = 0; i < estimationSlipDetails.length; i++) {
-            SumPrice += estimationSlipDetails[i].price * estimationSlipDetails[i].number;
+            SumPrice += estimationSlipDetails[i].unit_price * estimationSlipDetails[i].number;
         }
 
         return { "subtotal": SumPrice, "consumptionTaxEight": SumPrice * 0.08, "consumptionTaxTen": 0, "totalConsumptionTax": SumPrice * 0.08, "Total": SumPrice * 1.08 }
@@ -676,9 +676,9 @@ function EstimationSlipAdd() {
                                 <div className='flex items-center justify-end'>
                                     <div className='flex items-center'>
                                         <div className='mr-4'>消費税額</div>
-                                        <div className='mr-4'>{(estimationSlipDetails[index].price * estimationSlipDetails[index].number * 0.08).toFixed(0)}円</div>
+                                        <div className='mr-4'>{(estimationSlipDetails[index].unit_price * estimationSlipDetails[index].number * 0.08).toFixed(0)}円</div>
                                         <div className='mr-4'>金額</div>
-                                        <div className='text-lg font-bold'>{(estimationSlipDetails[index].price * estimationSlipDetails[index].number * 1.08).toFixed(0)}円</div>
+                                        <div className='text-lg font-bold'>{(estimationSlipDetails[index].unit_price * estimationSlipDetails[index].number * 1.08).toFixed(0)}円</div>
                                     </div>
                                 </div>
                                 <hr className='py-3' />
@@ -686,37 +686,31 @@ function EstimationSlipAdd() {
                         ))
                     }
 
-                    <div className='pb-6 flex flex-col mr-14'>
-                        <div className='flex items-center mr-10 pt-3'>
-                            <div className='ml-auto flex'>消費税額</div>
-                            <div className='ml-4'>0円</div>
-                            <div className='ml-10 flex'>金額</div>
-                            <div className='ml-4 text-lg font-semibold'>0円</div>
-                        </div>
+
                         <div className='py-6 flex'>
                         <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
                             <div className='flex pb-2'>
                                 <div className='w-40'>税抜合計</div>
-                                <div>5,000円</div>
+                                <div>{handleSumPrice().subtotal.toFixed(0).toLocaleString()}円</div>
                             </div>
                             <div className='flex pb-2'>
                                 <div className='w-40'>消費税(8%)</div>
-                                <div>5,000円</div>
+                                <div>{handleSumPrice().consumptionTaxEight.toFixed(0).toLocaleString()}円</div>
                             </div>
                             <div className='flex pb-2'>
                                 <div className='w-40'>消費税(10%)</div>
-                                <div>5,000円</div>
+                                <div>{handleSumPrice().consumptionTaxTen.toFixed(0).toLocaleString()}円</div>
                             </div>
                             <div className='flex pb-2'>
                                 <div className='w-40'>消費税合計</div>
-                                <div>5,000円</div>
+                                <div>{handleSumPrice().totalConsumptionTax.toFixed(0).toLocaleString()}円</div>
                             </div>
                             <div className='flex'>
                                 <div className='w-40'>税込合計</div>
-                                <div>5,000円</div>
+                                <div>{handleSumPrice().Total.toFixed(0).toLocaleString()}円</div>
                             </div>
                         </div>
-                    </div>
+
                     </div>
                     <div className='py-3'>
                         <hr className='' />

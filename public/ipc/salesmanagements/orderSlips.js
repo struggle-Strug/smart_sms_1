@@ -1,17 +1,17 @@
 const { ipcMain } = require('electron');
 const { 
-    loadorderSlips, 
+    loadOrderSlips, 
     getOrderSlipById, 
     saveOrderSlip, 
     deleteOrderSlipById, 
     editOrderSlip,
-    searchorderSlips,
-    searchorderSlipsOnPV
+    searchOrderSlips,
+    searchOrderSlipsOnPV
 } = require('../../database/salesmanagements/orderSlips');
 
 // 受注伝票のデータをロード
 ipcMain.on('load-order-slips', (event) => {
-    loadorderSlips((err, rows) => {
+    loadOrderSlips((err, rows) => {
         if (err) {
             console.error(err.message);
         } else {
@@ -67,7 +67,7 @@ ipcMain.on('edit-order-slip', (event, id) => {
 
 // 受注伝票の検索（オプション）
 ipcMain.on('search-order-slips', (event, query) => {
-    searchorderSlips(query, (err, results) => {
+    searchOrderSlips(query, (err, results) => {
         if (err) {
             console.error(err.message);
         } else {
@@ -77,7 +77,7 @@ ipcMain.on('search-order-slips', (event, query) => {
 
 });
 ipcMain.on('search-order-slips-on-pv', (event, query) => {
-    searchorderSlipsOnPV(query, (err, results) => {
+    searchOrderSlipsOnPV(query, (err, results) => {
         if (err) {
             console.error(err.message);
         } else {

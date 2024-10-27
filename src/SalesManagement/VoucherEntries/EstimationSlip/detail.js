@@ -190,8 +190,8 @@ function EstimationSlipDetail() {
                                 <td className='py-2'>{estimationSlipDetail.unit_price}</td>
                                 <td className='py-2'>{estimationSlipDetail.tax_rate}</td>
                                 <td className='py-2'>{estimationSlipDetail.storage_facility}</td>
-                                <td className='py-2'>{parseInt(estimationSlipDetail.price) * parseInt(estimationSlipDetail.number)}円</td>
-                                <td className='py-2'>{parseInt(estimationSlipDetail.price) * parseInt(estimationSlipDetail.number) * parseInt(estimationSlipDetail.tax_rate)}円</td>
+                                <td className='py-2'>{parseInt(estimationSlipDetail.unit_price) * parseInt(estimationSlipDetail.number)}円</td>
+                                <td className='py-2'>{parseInt(estimationSlipDetail.unit_price) * parseInt(estimationSlipDetail.number) * parseInt(estimationSlipDetail.tax_rate)}円</td>
                             </tr>
                         ))}
 
