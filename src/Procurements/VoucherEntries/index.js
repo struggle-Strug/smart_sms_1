@@ -43,31 +43,35 @@ function VoucherEntries() {
 
   const dropDown = (id) => {
     return (
-    <div className='absolute left-0 origin-top-right rounded shadow bg-white' style={{ top: "50px" }}>
-      <div className='text-center py-2 hover:bg-gray-100 mt-2'>詳細</div>
-      <div className='px-4 py-2 hover:bg-gray-100'>編集</div>
-      <div className='px-4 py-2 mb-2 hover:bg-gray-100'>削除</div>
-    </div>
+      <div className='absolute left-0 origin-top-right rounded shadow bg-white' style={{ top: "50px" }}>
+        <div className='text-center py-2 hover:bg-gray-100 mt-2'>詳細</div>
+        <div className='px-4 py-2 hover:bg-gray-100'>編集</div>
+        <div className='px-4 py-2 mb-2 hover:bg-gray-100'>削除</div>
+      </div>
     )
   }
 
   return (
     <div className='flex'>
-      <div className='border-r w-48 h-[100vh]'>
-        <div className='text-center py-2 pt-4'></div>
-        <div className='text-center py-2 pt-4 text-lg'></div>
-        <div className={`text-center py-2 text-lg ${location.pathname.includes("/procurement/voucher-entries/purchase-orders") && "font-bold border-l-4 border-blue-600"}`}><Link to="purchase-orders" className={``}>発注伝票</Link></div>
-        <div className={`text-center py-2 text-lg ${location.pathname.includes("/procurement/voucher-entries/purchase-invoices") && "font-bold border-l-4 border-blue-600"}`}><Link to="purchase-invoices" className={``}>仕入伝票</Link></div>
-        <div className={`text-center py-2 text-lg ${location.pathname.includes("/procurement/voucher-entries/stock-in-out-slips") && "font-bold border-l-4 border-blue-600"}`}><Link to="stock-in-out-slips" className={``}>入出庫伝票</Link></div>
-        <div className={`text-center py-2 text-lg ${location.pathname.includes("/procurement/voucher-entries/payment-vouchers") && "font-bold border-l-4 border-blue-600"}`}><Link to="payment-vouchers" className={``}>支払伝票</Link></div>
+      <div className='border-r w-48 h-[92vh]'>
+        <div>
+          <div className='text-center py-2 pt-4'></div>
+          <div className='text-center py-2 pt-4 text-lg'></div>
+          <div className={`text-center py-2 text-lg ${location.pathname.includes("/procurement/voucher-entries/purchase-orders") && "font-bold border-l-4 border-blue-600"}`}><Link to="purchase-orders" className={``}>発注伝票</Link></div>
+          <div className={`text-center py-2 text-lg ${location.pathname.includes("/procurement/voucher-entries/purchase-invoices") && "font-bold border-l-4 border-blue-600"}`}><Link to="purchase-invoices" className={``}>仕入伝票</Link></div>
+          <div className={`text-center py-2 text-lg ${location.pathname.includes("/procurement/voucher-entries/stock-in-out-slips") && "font-bold border-l-4 border-blue-600"}`}><Link to="stock-in-out-slips" className={``}>入出庫伝票</Link></div>
+          <div className={`text-center py-2 text-lg ${location.pathname.includes("/procurement/voucher-entries/payment-vouchers") && "font-bold border-l-4 border-blue-600"}`}><Link to="payment-vouchers" className={``}>支払伝票</Link></div>
+        </div>
       </div>
-      <Routes>
-        <Route path="" element={<PurchaseOrdersIndex />}/>
-        <Route path="purchase-orders/*" element={<PurchaseOrdersIndex />}/>
-        <Route path="purchase-invoices/*" element={<PurchaseInvoicesIndex />}/>
-        <Route path="stock-in-out-slips/*" element={<StockInOutSlipsIndex />}/>
-        <Route path="payment-vouchers/*" element={<PaymentVouchersIndex />}/>
-      </Routes>
+      <div className='overflow-y-scroll h-[92vh] w-full'>
+        <Routes>
+          <Route path="" element={<PurchaseOrdersIndex />} />
+          <Route path="purchase-orders/*" element={<PurchaseOrdersIndex />} />
+          <Route path="purchase-invoices/*" element={<PurchaseInvoicesIndex />} />
+          <Route path="stock-in-out-slips/*" element={<StockInOutSlipsIndex />} />
+          <Route path="payment-vouchers/*" element={<PaymentVouchersIndex />} />
+        </Routes>
+      </div>
     </div>)
 }
 
