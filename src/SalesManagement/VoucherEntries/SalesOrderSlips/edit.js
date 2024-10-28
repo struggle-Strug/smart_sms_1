@@ -58,6 +58,7 @@ function SalesOrderSlipsEdit() {
 
     const [orderSlip, setOrderSlip] = useState({
         id: '',
+        code: '',
         order_id: '',
         order_date: '',
         delivery_date: '',
@@ -77,7 +78,8 @@ function SalesOrderSlipsEdit() {
 
     useEffect(() => {
         ipcRenderer.send('get-order-slip-detail', id);
-        ipcRenderer.on('save-order-slip-result', (event, data) => {
+
+        ipcRenderer.on('order-slip-detail-data', (event, data) => {
             setOrderSlip(data);
         });
 
@@ -90,7 +92,6 @@ function SalesOrderSlipsEdit() {
         
         ipcRenderer.send('load-sales-tax-settings');
         ipcRenderer.on('sales-tax-settings-data', (event, data) => {
-            console.log(data)
             let arr = [];
             for (let i = 0; i < data.length; i++) {
                 const taxRateTemplate = {
@@ -171,7 +172,7 @@ function SalesOrderSlipsEdit() {
 
     const addOrderSlipDetail = () => {
         setOrderSlipDetails([...orderSlipDetails, {
-            code: '',
+            id: '',
             purchase_order_id: '',
             product_id: '',
             product_name: '',
@@ -231,7 +232,7 @@ function SalesOrderSlipsEdit() {
 
     const handleSubmit = () => {
         setErrors(null);
-        validator.required(orderSlip.id, 'id', '伝票番号');
+        validator.required(orderSlip.code, 'code', '伝票番号');
         validator.required(orderSlip.order_date, 'order_date', '受注日付');
         validator.required(orderSlip.vender_id, 'vender_id', '得意先コード');
         validator.required(orderSlip.vender_name, 'vender_name', '得意先名');
@@ -334,8 +335,8 @@ function SalesOrderSlipsEdit() {
                     <div className='pb-2.5 font-bold text-xl'>伝票情報</div>
                     <div className='pb-2'>
                         <div className='w-40 text-sm pb-1.5'>伝票番号 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-[480px]' placeholder='' name="id" value={orderSlip.id} onChange={handleChange}/>
-                        {errors.id && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.id}</div>}
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-[480px]' placeholder='' name="code" value={orderSlip.code} onChange={handleChange}/>
+                        {errors.code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.code}</div>}
                     </div>
                     <div className='pb-2'>
                     <div className='flex items-center text-sm pb-1.5'>受注番号

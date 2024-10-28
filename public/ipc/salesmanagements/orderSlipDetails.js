@@ -84,6 +84,7 @@ ipcMain.on('search-order-slip-details', (event, query) => {
 });
 
 ipcMain.on('search-order-slip-details-by-vender-id', (event, query) => {
+    console.log("ipc search-order-slip-details-by-vender-id");
     searchOrderSlipsByOrderSlipId(query, (err, results) => {
         if (err) {
             console.error(err.message);

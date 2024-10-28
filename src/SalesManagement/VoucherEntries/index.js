@@ -17,7 +17,7 @@ import { useLocation } from 'react-router-dom';
 import EstimationSlipIndex from './EstimationSlip';
 import PaymentSlipsIndex from './PaymentSlips';
 import SalesSlipsIndex from './SalesSlips';
-import SalesOrderSlipsIndex from './SalesOrderSlips';
+import OrderSlipsIndex from './OrderSlips';
 
 function VoucherEntries() {
   const [isOpen, setIsOpen] = useState(false);
@@ -57,14 +57,14 @@ function VoucherEntries() {
         <div className='text-center py-2 pt-4'></div>
         <div className='text-center py-2 pt-4 text-lg'></div>
         <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/voucher-entries/estimation-slip") && "font-bold border-l-4 border-blue-600"}`}><Link to="estimation-slip" className={``}>見積伝票</Link></div>
-        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/voucher-entries/sales-order-slips") && "font-bold border-l-4 border-blue-600"}`}><Link to="sales-order-slips" className={``}>受注伝票</Link></div>
+        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/voucher-entries/order-slips") && "font-bold border-l-4 border-blue-600"}`}><Link to="order-slips" className={``}>受注伝票</Link></div>
         <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/voucher-entries/sales-slips") && "font-bold border-l-4 border-blue-600"}`}><Link to="sales-slips" className={``}>売上伝票</Link></div>
         <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/voucher-entries/payment-slips") && "font-bold border-l-4 border-blue-600"}`}><Link to="payment-slips" className={``}>入金伝票</Link></div>
       </div>
       <Routes>
         <Route path="" element={<EstimationSlipIndex />}/>
         <Route path="estimation-slip/*" element={<EstimationSlipIndex />}/>
-        <Route path="sales-order-slips/*" element={<SalesOrderSlipsIndex />}/>
+        <Route path="order-slips/*" element={<OrderSlipsIndex />}/>
         <Route path="sales-slips/*" element={<SalesSlipsIndex />}/>
         <Route path="payment-slips/*" element={<PaymentSlipsIndex />}/>
       </Routes>

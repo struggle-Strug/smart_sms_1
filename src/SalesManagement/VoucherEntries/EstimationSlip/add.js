@@ -74,7 +74,7 @@ function EstimationSlipAdd() {
     });
 
     const [estimationSlip, setEstimationSlip] = useState({
-        id: '', 
+        code: '', 
         estimation_date: '',
         estimation_due_date: '',
         estimation_id: '',
@@ -234,7 +234,7 @@ function EstimationSlipAdd() {
 
     const handleSubmit = () => {
         setErrors(null);
-        validator.required(estimationSlip.id, 'id', '伝票番号');
+        validator.required(estimationSlip.code, 'code', '伝票番号');
         validator.required(estimationSlip.estimation_date, 'estimation_date', '見積日');
         validator.required(estimationSlip.estimation_due_date, 'estimation_due_date', '見積期限');
         validator.required(estimationSlip.vender_id, 'vender_id', '得意先コード');
@@ -274,7 +274,7 @@ function EstimationSlipAdd() {
                 }
             });
             setEstimationSlip({
-                id: '',
+                code: '',
                 estimation_date: '',
                 estimation_due_date: '',
                 estimation_id: '',
@@ -368,8 +368,8 @@ function EstimationSlipAdd() {
                     <div className='pb-2.5 font-bold text-xl'>伝票情報</div>
                     <div className='pb-2'>
                         <div className='w-40 text-sm pb-1.5'>伝票番号 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-[480px]' placeholder='' name="id" value={estimationSlip.id} onChange={handleChange} />
-                        {errors.id && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.id}</div>}
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-[480px]' placeholder='' name="code" value={estimationSlip.code} onChange={handleChange} />
+                        {errors.code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.code}</div>}
                     </div>
                     <div className='pb-2'>
                         <div className='w-40 text-sm pb-1.5'>見積日 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>

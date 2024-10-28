@@ -22,6 +22,7 @@ function getOrderSlipById(id, callback) {
 function saveOrderSlip(orderSlipData, callback) {
     const {
         id,
+        code,
         order_id,
         order_date,
         delivery_date,
@@ -40,6 +41,7 @@ function saveOrderSlip(orderSlipData, callback) {
     if (id) {
         db.run(
             `UPDATE order_slips SET 
+                code = ?,
                 order_id = ?, 
                 order_date = ?, 
                 delivery_date = ?, 
@@ -56,6 +58,7 @@ function saveOrderSlip(orderSlipData, callback) {
                 updated = datetime('now') 
             WHERE id = ?`,
             [
+                code,
                 order_id,
                 order_date,
                 delivery_date,
@@ -83,10 +86,11 @@ function saveOrderSlip(orderSlipData, callback) {
     } else {
         db.run(
             `INSERT INTO order_slips 
-            (order_id, order_date, delivery_date, vender_id, vender_name, honorific, vender_contact_person, estimation_slip_id, estimation_id, remarks, closing_date, deposit_due_date, deposit_method, created, updated) 
+            (code, order_id, order_date, delivery_date, vender_id, vender_name, honorific, vender_contact_person, estimation_slip_id, estimation_id, remarks, closing_date, deposit_due_date, deposit_method, created, updated) 
             VALUES 
-            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+            (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
             [
+                code,
                 order_id,
                 order_date,
                 delivery_date,
@@ -131,6 +135,7 @@ function initializeDatabase() {
     const sql = `
     CREATE TABLE IF NOT EXISTS order_slips (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        code VARCHAR(255) DEFAULT NULL,
         order_id VARCHAR(255),
         order_date DATE,
         delivery_date DATE,
@@ -150,11 +155,32 @@ function initializeDatabase() {
     db.run(sql);
 }
 
+function searchOrderSlips(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM order_slips 
+        WHERE vender_name LIKE ? OR order_id LIKE ? OR vender_contact_person LIKE ?
+        `;
+        // params = [`%${query}%`, `%${query}%`, `%${query}%`];
+        params = Array(2).fill(`%${query}%`);
+    } else {
+        sql = `SELECT * FROM order_slips`;
+    }
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
+
 module.exports = {
     loadOrderSlips,
     getOrderSlipById,
     saveOrderSlip,
     deleteOrderSlipById,
     editOrderSlip,
-    initializeDatabase
+    initializeDatabase,
+    searchOrderSlips
 };

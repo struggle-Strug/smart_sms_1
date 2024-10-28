@@ -18,9 +18,6 @@ function Index() {
     useEffect(() => {
             ipcRenderer.send('load-order-slips');
             ipcRenderer.on('load-order-slips', (event, data) => {
-                console.log("@@@@@@@@@@@@@@@@@@@@@@受注伝票@@@@@@@@@@@@@@@@@@@@@@@@@");  // データの内容を確認
-                console.log(data);  // データの内容を確認
-    
                 setOrderSlips(data);
             });
     

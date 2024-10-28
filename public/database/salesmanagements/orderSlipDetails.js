@@ -121,6 +121,24 @@ function deleteOrderSlipDetailsBySlipId(orderSlipId, callback) {
     });
 }
 
+function searchOrderSlipsByOrderSlipId(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM order_slip_details 
+        WHERE order_slip_id LIKE ?
+        `;
+        params = [`%${query}%`];
+    } else {
+        sql = `SELECT * FROM order_slip_details`;
+    }
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
 
 
 function initializeDatabase() {
@@ -152,5 +170,6 @@ module.exports = {
     deleteOrderSlipDetailById,
     editOrderSlipDetail,
     initializeDatabase,
-    deleteOrderSlipDetailsBySlipId
+    deleteOrderSlipDetailsBySlipId,
+    searchOrderSlipsByOrderSlipId
 };

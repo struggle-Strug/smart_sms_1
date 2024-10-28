@@ -8,6 +8,7 @@ const { ipcRenderer } = window.require('electron');
 function SalesOrderSlipsDetail() {
     const [orderSlip, setOrderSlip] = useState({
         id: '',
+        code: '',
         order_id: '',
         order_date: '',
         delivery_date: '',
@@ -27,7 +28,7 @@ function SalesOrderSlipsDetail() {
 
     useEffect(() => {
         ipcRenderer.send('get-order-slip-detail', id);
-        ipcRenderer.on('save-order-slip-result', (event, data) => {
+        ipcRenderer.on('order-slip-detail-data', (event, data) => {
             setOrderSlip(data);
         });
 
@@ -113,7 +114,7 @@ function SalesOrderSlipsDetail() {
                     <div className='py-2.5 font-bold text-xl'>伝票情報</div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>伝票番号</div>
-                        <div>{orderSlip.id}</div>
+                        <div>{orderSlip.code}</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>受注日付</div>

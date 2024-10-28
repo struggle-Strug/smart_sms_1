@@ -1,40 +1,40 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
-import EstimationSlipAdd from './add';
-import EstimationSlipEdit from './edit';
-import EstimationSlipDetail from './detail';
+import OrderSlipsAdd from './add';
+import OrderSlipsEdit from './edit';
+import OrderSlipsDetail from './detail';
 
 const { ipcRenderer } = window.require('electron');
 
 
 function Index() {
-    const [estimationSlips, setEstimationSlips] = useState([]);
+    const [orderSlips, setOrderSlips] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
     const location = useLocation();
     const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
-        ipcRenderer.send('load-estimation-slips');
-        ipcRenderer.on('load-estimation-slips', (event, data) => {
-            setEstimationSlips(data);
-        });
-
-        ipcRenderer.on('estimation-slip-deleted', (event, id) => {
-            setEstimationSlips((prevSlips) => prevSlips.filter(slip => slip.id !== id));
-        });
-
-        ipcRenderer.on('search-estimation-slips-result', (event, data) => {
-            setEstimationSlips(data);
-        });
-
-        return () => {
-            ipcRenderer.removeAllListeners('estimation-slips-data');
-            ipcRenderer.removeAllListeners('search-estimation-slips-result');
-        };
-    }, []);
-
+            ipcRenderer.send('load-order-slips');
+            ipcRenderer.on('load-order-slips', (event, data) => {
+                setOrderSlips(data);
+            });
+    
+            ipcRenderer.on('order-slip-deleted', (event, id) => {
+                setOrderSlips((prevOrders) => prevOrders.filter(order => order.id !== id));
+            });
+    
+            ipcRenderer.on('search-order-slips-result', (event, data) => {
+                setOrderSlips(data);
+            });
+    
+            return () => {
+                ipcRenderer.removeAllListeners('order-slips-data');
+                ipcRenderer.removeAllListeners('search-order-slips-result');
+            };
+        }, []);
+    
     const toggleDropdown = (id) => {
         
         if (!isOpen) setIsOpen(id);
@@ -48,13 +48,13 @@ function Index() {
     };
 
     const handleDelete = (id) => {
-        if (window.confirm('本当にこの見積伝票を削除しますか？')) {
-            ipcRenderer.send('delete-estimation-slip', id);
+        if (window.confirm('本当にこの受注伝票を削除しますか？')) {
+            ipcRenderer.send('delete-order-slip', id);
         }
     };
 
     const handleSearch = () => {
-        ipcRenderer.send('search-estimation-slips', searchQuery);
+        ipcRenderer.send('search-order-slips', searchQuery);
     };
 
     const handleKeyDown = (event) => {
@@ -83,7 +83,7 @@ function Index() {
     return (
         <div className='w-full'>
             <div className='p-8'>
-                <div className='pb-6 text-2xl font-bold'>見積伝票</div>
+                <div className='pb-6 text-2xl font-bold'>受注伝票</div>
                 <div className='flex'>
                 <div className='border rounded-lg py-3 px-7 mb-8 text-base font-bold bg-blue-600 text-white'><Link to="add" className={``}>新規登録</Link></div>
                 </div>
@@ -110,8 +110,8 @@ function Index() {
                 </div>
                 <table className="w-full mt-8 table-auto">
                     <thead className=''>
-                        <tr className='border-b'>
-                            <th className='text-left pb-2.5'>見積日付</th>
+                    <tr className='border-b'>
+                            <th className='text-left pb-2.5'>受注日付</th>
                             <th className='text-left pb-2.5'>伝票番号</th>
                             <th className='text-left pb-2.5'>得意先名</th>
                             <th className='text-left pb-2.5'>得意先コード</th>
@@ -120,12 +120,12 @@ function Index() {
                         </tr>
                     </thead>
                     <tbody>
-                        {estimationSlips.map((slip) => (
+                        {orderSlips.map((slip) => (
                             <tr className='border-b' key={slip.id}>
-                                <td>{slip.estimation_date || <div className='border w-4'></div>}</td>
+                                <td>{slip.order_date || <div className='border w-4'></div>}</td>
                                 <td>{slip.id || <div className='border w-4'></div>}</td>
                                 <td>{slip.vender_name || <div className='border w-4'></div>}</td>
-                                <td>{slip.vender_id || <div className='border w-4'></div>}</td>
+                                <td>{slip.vender_nid || <div className='border w-4'></div>}</td>
                                 <td>{slip.remarks}</td>
                                 <td className='flex justify-center relative'>
                                     <div className='border rounded px-4 py-3 relative hover:cursor-pointer' onClick={(e) => toggleDropdown(slip.id)}>
@@ -144,15 +144,15 @@ function Index() {
     )
 }
 
-function EstimationSlipIndex() {
+function OrderSlipsIndex() {
     return (
         <Routes>
             <Route path="" element={<Index />} />
-            <Route path="add" element={<EstimationSlipAdd />} />
-            <Route path="edit/:id" element={<EstimationSlipEdit />} />
-            <Route path="detail/:id" element={<EstimationSlipDetail />} />
+            <Route path="add" element={<OrderSlipsAdd />} />
+            <Route path="detail/:id" element={<OrderSlipsDetail />} />
+            <Route path="edit/:id" element={<OrderSlipsEdit />} />
         </Routes>
     )
 }
 
-export default EstimationSlipIndex;
+export default OrderSlipsIndex;

@@ -7,7 +7,7 @@ const {
     editSalesSlipDetail, 
     searchSalesSlipDetails,
     searchSalesSlipsBySalesSlipId,
-    deleteSalesSlipDetailsByPoId
+    deleteSalesSlipDetailsBySlipId
 } = require('../../database/salesmanagements/salesSlipDetails');
 
 // 売上伝票明細のデータをロード
@@ -92,12 +92,12 @@ ipcMain.on('search-sales-slip-details-by-vender-id', (event, query) => {
     });
 });
 
-ipcMain.on('delete-sales-slip-details-by-po-id', (event, salesSlipId) => {
-    deleteSalesSlipDetailsByPoId(salesSlipId, (err) => {
+ipcMain.on('delete-sales-slip-details-by-slip-id', (event, salesSlipId) => {
+    deleteSalesSlipDetailsBySlipId(salesSlipId, (err) => {
         if (err) {
             console.error(err.message);
         } else {
-            event.sender.send('sales-slip-details-deleted-by-po-id', salesSlipId);
+            event.sender.send('sales-slip-details-deleted-by-slip-id', salesSlipId);
         }
     });
 });
