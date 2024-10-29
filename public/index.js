@@ -41,6 +41,16 @@ require('./ipc/procurements/posPvsMappings');
 //ツール
 require('./ipc/utilis/export');
 
+//売上管理
+require('./ipc/salesmanagements/estimationSlips');
+require('./ipc/salesmanagements/estimationSlipDetails');
+require('./ipc/salesmanagements/depositSlips');
+require('./ipc/salesmanagements/depositSlipDetails');
+require('./ipc/salesmanagements/orderSlips');
+require('./ipc/salesmanagements/orderSlipDetails');
+require('./ipc/salesmanagements/salesSlips');
+require('./ipc/salesmanagements/salesSlipDetails');
+
 function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 1440,
@@ -118,6 +128,24 @@ function createWindow() {
   posPvsMappingsDB.initializeDatabase();
 
   //集計管理
+
+  //売上管理
+  const estimationSlipsDB = require('./database/salesmanagements/estimationSlips');
+  estimationSlipsDB.initializeDatabase();
+  const estimationSlipDetailsDB = require('./database/salesmanagements/estimationSlipDetails');
+  estimationSlipDetailsDB.initializeDatabase();
+  const depositSlipsDB = require('./database/salesmanagements/depositSlips');
+  depositSlipsDB.initializeDatabase();
+  const depositSlipDetailsDB = require('./database/salesmanagements/depositSlipDetails');
+  depositSlipDetailsDB.initializeDatabase();
+  const orderSlipsDB = require('./database/salesmanagements/orderSlips');
+  orderSlipsDB.initializeDatabase();
+  const orderSlipDetailsDB = require('./database/salesmanagements/orderSlipDetails');
+  orderSlipDetailsDB.initializeDatabase();
+  const salesSlipsDB = require('./database/salesmanagements/salesSlips');
+  salesSlipsDB.initializeDatabase();
+  const salesSlipDetailsDB = require('./database/salesmanagements/salesSlipDetails');
+  salesSlipDetailsDB.initializeDatabase();
 }
 
 const dbPath = path.join(app.getPath('userData'), 'database.db');
