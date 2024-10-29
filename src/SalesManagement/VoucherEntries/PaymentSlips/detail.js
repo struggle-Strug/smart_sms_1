@@ -6,13 +6,86 @@ import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 const { ipcRenderer } = window.require('electron');
 
 function PaymentSlipsDetail() {
+    const [depositSlip, setDepositSlip] = useState({
+        code: '',
+        deposit_date: '',
+        status: '',
+        vender_name: '',
+        vender_id: '',
+        remarks: '',
+    });
+
+    const { id } = useParams();
+
+    useEffect(() => {
+        ipcRenderer.send('get-deposit-slip-detail', id);
+
+        ipcRenderer.on('deposit-slip-detail-data', (event, data) => {
+            setDepositSlip(data);
+        });
+
+        ipcRenderer.send('search-deposit-slip-details-by-vender-id', id);
+
+
+        ipcRenderer.on('search-deposit-slip-details-by-vender-id-result', (event, data) => {
+            setDepositSlipDetails(data);
+        });
+
+        return () => {
+            ipcRenderer.removeAllListeners('deposit-slip-data');
+            ipcRenderer.removeAllListeners('search-deposit-slip-details-by-vender-id');
+        };
+    }, [id]);
+
+    const [depositSlipDetails, setDepositSlipDetails] = useState([
+        {
+            id: '',
+            deposit_slip_id: '',
+            deposit_date: '',
+            vender_id: '',
+            vender_name: '',
+            claim_id: '',
+            deposit_method: '',
+            deposits: '',
+            commission_fee: '',
+            data_category: '',
+        }
+    ]);
+
+    const addDepositSlipDetail = () => {
+        setDepositSlipDetails([...depositSlipDetails, {
+            id: '',
+            deposit_slip_id: '',
+            deposit_date: '',
+            vender_id: '',
+            vender_name: '',
+            claim_id: '',
+            deposit_method: '',
+            deposits: '',
+            commission_fee: '',
+            data_category: '',
+        }]);
+    }
+
+    const handleSumPrice = () => {
+        let SumPrice = 0
+
+        for (let i = 0; i < depositSlipDetails.length; i++) {
+            SumPrice += depositSlipDetails[i].unit_price * depositSlipDetails[i].number;
+        }
+
+        return { "subtotal": SumPrice, "consumptionTaxEight": SumPrice * 0.08, "consumptionTaxTen": 0, "totalConsumptionTax": SumPrice * 0.08, "Total": SumPrice * 1.08 }
+    }
+
+
+
     return (
         <div className='w-full'>
             <div className=''>
                 <div className='pt-8 pb-6 flex border-b px-8 items-center'>
                     <div className='text-2xl font-bold'></div>
                     <div className='flex ml-auto'>
-                        <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
+                        <Link to={`edit`} className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
                             <div className='pr-1.5 pl-1 flex items-center'>
                                 <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg" className=''>
                                     <path d="M0.391357 18.7308H4.14136L15.2014 7.67077L11.4514 3.92077L0.391357 14.9808V18.7308ZM2.39136 15.8108L11.4514 6.75077L12.3714 7.67077L3.31136 16.7308H2.39136V15.8108Z" fill="#1F2937" />
@@ -41,54 +114,14 @@ function PaymentSlipsDetail() {
                     </div>
                 </div>
                 <div className='px-8 py-6'>
-                    <div className='py-2.5 font-bold text-xl'>伝票番号</div>
+                    <div className='py-2.5 font-bold text-xl'>伝票情報</div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>伝票番号</div>
-                        <div>PO-0000000001</div>
+                        <div>{depositSlip.code}</div>
                     </div>
                     <div className='flex items-center pb-2'>
-                        <div className='w-40'>発注日付</div>
-                        <div>202-08-27</div>
-                    </div>
-                    <div className='py-3'>
-                        <hr className='' />
-                    </div>
-                    <div className='py-2.5 font-bold text-xl'>取引先情報</div>
-                    <div className='flex items-center pb-2'>
-                        <div className='w-40'>宛名</div>
-                        <div>株式会社御中</div>
-                    </div>
-                    <div className='flex items-center pb-2'>
-                        <div className='w-40'>仕入先コード</div>
-                        <div></div>
-                    </div>
-                    <div className='flex items-center pb-2'>
-                        <div className='w-40'>郵便番号</div>
-                        <div>1040031</div>
-                    </div>
-                    <div className='flex items-center pb-2'>
-                        <div className='w-40'>市区町村・番地</div>
-                        <div>東京都中央区銀座6丁目10-1建物名・部屋番号などGINZA SIX 13階</div>
-                    </div>
-                    <div className='flex items-center pb-2'>
-                        <div className='w-40'>担当者</div>
-                        <div></div>
-                    </div>
-                    <div className='py-3'>
-                        <hr className='' />
-                    </div>
-                    <div className='py-2.5 font-bold text-xl'>自社情報</div>
-                    <div className='flex items-center pb-2'>
-                        <div className='w-40'>自社名</div>
-                        <div></div>
-                    </div>
-                    <div className='flex items-center pb-2'>
-                        <div className='w-40'>担当者名</div>
-                        <div></div>
-                    </div>
-                    <div className='flex items-center pb-2'>
-                        <div className='w-40'>電話番号</div>
-                        <div>088040760246</div>
+                        <div className='w-40'>入金日付</div>
+                        <div>{depositSlip.deposit_date}</div>
                     </div>
                     <div className='py-3'>
                         <hr className='' />
@@ -97,31 +130,34 @@ function PaymentSlipsDetail() {
                     <table className="w-full mt-8 table-auto">
                         <thead className=''>
                             <tr className='border-b'>
-                                <th className='text-left py-2'>商品コード</th>
-                                <th className='text-left py-2 w-72'>商品名</th>
-                                <th className='text-left py-2'>数量</th>
-                                <th className='text-left py-2'>単位</th>
-                                <th className='text-left py-2'>発注残数</th>
-                                <th className='text-left py-2'>単価</th>
-                                <th className='text-left py-2'>税率</th>
-                                <th className='text-left py-2'>倉庫</th>
+                                <th className='text-left py-2'>得意先コード</th>
+                                <th className='text-left py-2 w-72'>得意先名</th>
+                                <th className='text-left py-2'>入金方法</th>
+                                <th className='text-left py-2'>入金額</th>
+                                <th className='text-left py-2'>手数料等</th>
+                                <th className='text-left py-2'>合計額</th>
+                                <th className='text-left py-2'>データ区分</th>
+                                <th className='text-left py-2'>請求番号</th>
                                 <th className='text-left py-2'>金額</th>
                                 <th className='text-left py-2'>税額</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr className='border-b'>
-                                <td className='py-2'>1234</td>
-                                <td className='py-2'>商品名が入ります。商品名が入ります。商品名が入ります。商品名が入ります。入ります</td>
-                                <td className='py-2'>200</td>
-                                <td className='py-2'>200</td>
-                                <td className='py-2'>20</td>
-                                <td className='py-2'>200</td>
-                                <td className='py-2'>10個</td>
-                                <td className='py-2'>倉庫</td>
-                                <td className='py-2'>0円</td>
-                                <td className='py-2'>0円</td>
+                        {
+                        depositSlipDetails.map((depositSlipDetail, index) => (
+                            <tr className='border-b' key={index}>
+                                <td className='py-2'>{depositSlipDetail.vender_id}</td>
+                                <td className='py-2'>{depositSlipDetail.vender_name}</td>
+                                <td className='py-2'>{depositSlipDetail.deposit_method}</td>
+                                <td className='py-2'>{depositSlipDetail.deposits}</td>
+                                <td className='py-2'>{depositSlipDetail.commission_fee}</td>
+                                <td className='py-2'>合計額</td>
+                                <td className='py-2'>{depositSlipDetail.data_category}%</td>
+                                <td className='py-2'>{depositSlipDetail.claim_id}</td>
+                                <td className='py-2'>金額</td>
+                                <td className='py-2'>税額</td>
                             </tr>
+                        ))}
                         </tbody>
                     </table>
                     <div className='py-6 flex'>
@@ -153,35 +189,10 @@ function PaymentSlipsDetail() {
                     </div>
                     <div className='py-2.5 font-bold text-xl'>備考</div>
                     <div className='flex items-center pb-2'>
-                    恐れいりますが、振込手数料は貴社にてご負担ください。
+                    {depositSlip.remarks}
                     </div>
                     <div className='py-3'>
                         <hr className='' />
-                    </div>
-                    <div className='py-2.5 font-bold text-xl'>支払情報</div>
-                    <div className='flex items-center pb-2'>
-                        <div className='w-40'>締日</div>
-                        <div></div>
-                    </div>
-                    <div className='flex items-center pb-2'>
-                        <div className='w-40'>支払期日</div>
-                        <div></div>
-                    </div>
-                    <div className='flex items-center pb-2'>
-                        <div className='w-40'>支払方法</div>
-                        <div></div>
-                    </div>
-                    <div className='py-3'>
-                        <hr className='' />
-                    </div>
-                    <div className='py-2.5 font-bold text-xl'>納品情報</div>
-                    <div className='flex items-center pb-2'>
-                        <div className='w-40'>入荷予定日</div>
-                        <div></div>
-                    </div>
-                    <div className='flex items-center pb-2'>
-                        <div className='w-40'>ステータス</div>
-                        <div></div>
                     </div>
                 </div>
             </div>

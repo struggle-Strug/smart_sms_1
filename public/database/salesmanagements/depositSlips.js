@@ -22,33 +22,70 @@ function getDepositSlipById(id, callback) {
 function saveDepositSlip(depositSlipData, callback) {
     const {
         id,
-        remarks
+        code,
+        deposit_date,
+        status,
+        vender_name,
+        vender_id,
+        remarks,
+        updated,
+        created,
+
     } = depositSlipData;
 
     if (id) {
         db.run(
             `UPDATE deposit_slips SET 
+                code = ?,
+                deposit_date = ?,
+                status = ?,
+                vender_name = ?,
+                vender_id = ?,
                 remarks = ?, 
                 updated = datetime('now') 
             WHERE id = ?`,
             [
-                remarks,
-                id
+                code,
+                deposit_date,
+                status,
+                vender_name,
+                vender_id,
+                remarks,  
+                id,
             ],
-            callback
+            function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                // 更新のため、IDをそのまま返す
+                callback(null, { lastID: id });
+            }
+
         );
     } else {
         db.run(
             `INSERT INTO deposit_slips 
-            (remarks, created, updated) 
-            VALUES (?, datetime('now'), datetime('now'))`,
+            (code, remarks, deposit_date, status, vender_name, vender_id, created, updated) 
+            VALUES 
+            (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
             [
-                remarks
-            ],
-            callback
-        );
+                code,
+                remarks,
+                deposit_date,
+                status,
+                vender_name,
+                vender_id,           ],
+                function (err) {
+                    if (err) {
+                        return callback(err);
+                    }
+                    // 更新のため、IDをそのまま返す
+                    callback(null, { lastID: this.lastID });
+                }
+    
+            );
+        }
     }
-}
 
 function deleteDepositSlipById(id, callback) {
     const sql = "DELETE FROM deposit_slips WHERE id = ?";
@@ -68,11 +105,37 @@ function initializeDatabase() {
     const sql = 
     `CREATE TABLE IF NOT EXISTS deposit_slips (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        code VARCHAR(255) DEFAULT NULL,
         remarks VARCHAR(255),
+        status VARCHAR(255),
+        deposit_date DATE NULL,
+        vender_id VARCHAR(255),
+        vender_name VARCHAR(255),
         created DATE DEFAULT CURRENT_DATE,
         updated DATE DEFAULT CURRENT_DATE
     )`;
     db.run(sql);
+}
+
+function searchDepositSlips(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM deposit_slips 
+        WHERE code LIKE ?
+        OR vender_name LIKE ? 
+        OR vender_id LIKE ?
+        `;
+        // params = [`%${query}%`, `%${query}%`, `%${query}%`];
+        params = Array(2).fill(`%${query}%`);
+    } else {
+        sql = `SELECT * FROM deposit_slips`;
+    }
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
 }
 
 module.exports = {
@@ -81,5 +144,6 @@ module.exports = {
     saveDepositSlip,
     deleteDepositSlipById,
     editDepositSlip,
-    initializeDatabase
+    initializeDatabase,
+    searchDepositSlips
 };

@@ -7,7 +7,7 @@ const {
     editDepositSlipDetail, 
     searchDepositSlipDetails,
     searchDepositSlipsByDepositSlipId,
-    deleteDepositSlipDetailsByPoId
+    deleteDepositSlipDetailsBySlipId
 } = require('../../database/salesmanagements/depositSlipDetails');
 
 // 購入注文明細のデータをロード
@@ -60,6 +60,17 @@ ipcMain.on('delete-deposit-slip-detail', (event, id) => {
     });
 });
 
+// 売上伝票明細を削除 (編集画面用)
+ipcMain.on('deposit-slip-details-deleted-by-slip-id', (event, id) => {
+    deleteDepositSlipDetailById(id, (err) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('deposit-slip-detail-deleted', id);
+        }
+    });
+});
+
 // 購入注文明細を編集
 ipcMain.on('edit-deposit-slip-detail', (event, id) => {
     editDepositSlipDetail(id, (err, row) => {
@@ -92,12 +103,12 @@ ipcMain.on('search-deposit-slip-details-by-vender-id', (event, query) => {
     });
 });
 
-ipcMain.on('delete-deposit-slip-details-by-po-id', (event, depositSlipId) => {
-    deleteDepositSlipDetailsByPoId(depositSlipId, (err) => {
+ipcMain.on('delete-deposit-slip-details-by-slip-id', (event, depositSlipId) => {
+    deleteDepositSlipDetailsBySlipId(depositSlipId, (err) => {
         if (err) {
             console.error(err.message);
         } else {
-            event.sender.send('deposit-slip-details-deleted-by-po-id', depositSlipId);
+            event.sender.send('deposit-slip-details-deleted-by-slip-id', depositSlipId);
         }
     });
 });
