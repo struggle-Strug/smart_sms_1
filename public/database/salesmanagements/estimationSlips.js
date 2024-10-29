@@ -71,6 +71,7 @@ function saveEstimationSlip(estimationData, callback) {
                 deposit_method,
                 id
             ],
+
             // callback
             function (err) {
                 if (err) {
@@ -102,6 +103,7 @@ function saveEstimationSlip(estimationData, callback) {
                 deposit_due_date,
                 deposit_method
             ],
+
             // callback
             function (err) {
                 if (err) {

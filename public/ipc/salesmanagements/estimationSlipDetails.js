@@ -75,6 +75,7 @@ ipcMain.on('edit-estimation-slip-detail', (event, id) => {
 // 見積書の検索（オプション）
 ipcMain.on('search-estimation-slip-details', (event, query) => {
     searchEstimationSlipDetails(query, (err, results) => {
+
         if (err) {
             console.error(err.message);
         } else {
@@ -83,6 +84,7 @@ ipcMain.on('search-estimation-slip-details', (event, query) => {
     });
 
 });
+
 
 ipcMain.on('search-estimation-slip-details-by-vender-id', (event, query) => {
     searchEstimationSlipsByEstimationSlipId(query, (err, results) => {
@@ -96,6 +98,7 @@ ipcMain.on('search-estimation-slip-details-by-vender-id', (event, query) => {
 
 ipcMain.on('search-estimation-slip-detail-on-pv', (event, query) => {
     searchEstimationSlipDetailsOnPV(query, (err, results) => {
+
         if (err) {
             console.error(err.message);
         } else {

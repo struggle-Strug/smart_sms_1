@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Validator from '../../utils/validator'; // バリデーション用のクラスをインポート
+import { useNavigate } from 'react-router-dom';
 
 const { ipcRenderer } = window.require('electron');
 
 function ShippingMethodAdd() {
     const [shippingMethod, setShippingMethod] = useState({
         name: '',
+        code: '',
         remarks: ''
     });
+
+    const navigate = useNavigate();
 
     const [errors, setErrors] = useState({}); // エラーメッセージ用の状態
 
@@ -22,7 +26,7 @@ function ShippingMethodAdd() {
     const handleSubmit = () => {
         // バリデーションを実行
         validator.required(shippingMethod.name, 'name', '配送方法名');
-        validator.required(shippingMethod.id, 'id', '配送方法コード');
+        validator.required(shippingMethod.code, 'code', '配送方法コード');
 
         setErrors(validator.getErrors()); // エラーを設定
 
@@ -31,16 +35,18 @@ function ShippingMethodAdd() {
             ipcRenderer.send('save-shipping-method', shippingMethod);
             setShippingMethod({
                 name: '',
+                code: '',
                 remarks: ''
             });
             alert('新規登録が完了しました。');
+            navigate("/master/customers");
         }
     };
 
     return (
         <div className='w-full'>
             <div className='p-8'>
-                <div className='text-2xl font-bold mb-8'>配送方法の新規登録</div>
+                <div className='text-2xl font-bold mb-8'>新規登録</div>
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
                         <div className='p-4'>配送方法名 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
@@ -67,13 +73,13 @@ function ShippingMethodAdd() {
                             type='text'
                             className='border rounded px-4 py-2.5 bg-white w-2/3'
                             placeholder='配送方法コードを入力'
-                            name="id"
-                            value={shippingMethod.id}
+                            name="code"
+                            value={shippingMethod.code}
                             onChange={handleChange}
                         />
                     </div>
                 </div>
-                {errors.id && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.id}</div>}
+                {errors.code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.code}</div>}
 
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">

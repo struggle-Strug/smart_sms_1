@@ -694,29 +694,29 @@ function QuotationSlipAdd() {
                             <div className='ml-4 text-lg font-semibold'>0円</div>
                         </div>
                         <div className='py-6 flex'>
-                        <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>税抜合計</div>
-                                <div>5,000円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税(8%)</div>
-                                <div>5,000円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税(10%)</div>
-                                <div>5,000円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税合計</div>
-                                <div>5,000円</div>
-                            </div>
-                            <div className='flex'>
-                                <div className='w-40'>税込合計</div>
-                                <div>5,000円</div>
+                            <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
+                                <div className='flex pb-2'>
+                                    <div className='w-40'>税抜合計</div>
+                                    <div>5,000円</div>
+                                </div>
+                                <div className='flex pb-2'>
+                                    <div className='w-40'>消費税(8%)</div>
+                                    <div>5,000円</div>
+                                </div>
+                                <div className='flex pb-2'>
+                                    <div className='w-40'>消費税(10%)</div>
+                                    <div>5,000円</div>
+                                </div>
+                                <div className='flex pb-2'>
+                                    <div className='w-40'>消費税合計</div>
+                                    <div>5,000円</div>
+                                </div>
+                                <div className='flex'>
+                                    <div className='w-40'>税込合計</div>
+                                    <div>5,000円</div>
+                                </div>
                             </div>
                         </div>
-                    </div>
                     </div>
                     <div className='py-3'>
                         <hr className='' />

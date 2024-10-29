@@ -80,6 +80,7 @@ function saveSalesSlip(salesSlipData, callback) {
                 // 更新のため、IDをそのまま返す
                 callback(null, { lastID: id });
             }
+
         );
     } else {
         db.run(
@@ -109,6 +110,7 @@ function saveSalesSlip(salesSlipData, callback) {
                 // 更新のため、IDをそのまま返す
                 callback(null, { lastID: this.lastID });
             }
+
         );
     }
 }
@@ -169,6 +171,7 @@ function searchSalesSlips(query, callback) {
     });
 }
 
+
 module.exports = {
     loadSalesSlips,
     getSalesSlipById,
@@ -177,4 +180,5 @@ module.exports = {
     editSalesSlip,
     initializeDatabase,
     searchSalesSlips
+
 };

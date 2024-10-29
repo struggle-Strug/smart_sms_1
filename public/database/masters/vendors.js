@@ -11,9 +11,10 @@ function initializeDatabase() {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name_primary VARCHAR(255) NOT NULL,
             name_secondary VARCHAR(255) DEFAULT NULL,
+            code VARCHAR(255) DEFAULT NULL,
             name_kana VARCHAR(255) DEFAULT NULL,
-            phone_number INTEGER NOT NULL,
-            fax_number INTEGER DEFAULT NULL,
+            phone_number VARCHAR(255) NOT NULL,
+            fax_number VARCHAR(255) DEFAULT NULL,
             zip_code INTEGER DEFAULT NULL,
             address VARCHAR(255) NOT NULL,
             contact_person VARCHAR(255) DEFAULT NULL,
@@ -42,7 +43,7 @@ function getVendorById(id, callback) {
 
 function saveVendor(vendorData, callback) {
     const {
-        id, name_primary, name_secondary, name_kana, phone_number, fax_number,
+        id, name_primary, code, name_secondary, name_kana, phone_number, fax_number,
         zip_code, address, contact_person, email, terms_of_trade, remarks,
         classification1, classification2, tax_calculation, closing_date,
         payment_date, payment_method
@@ -59,16 +60,16 @@ function saveVendor(vendorData, callback) {
             // If the record exists, perform an UPDATE
             console.log("Updating existing vendor:", vendorData);
             db.run(
-                `UPDATE vendors SET name_primary = ?, name_secondary = ?, name_kana = ?, phone_number = ?, fax_number = ?, zip_code = ?, address = ?, contact_person = ?, email = ?, terms_of_trade = ?, remarks = ?, classification1 = ?, classification2 = ?, tax_calculation = ?, closing_date = ?, payment_date = ?, payment_method = ?, updated = datetime('now') WHERE id = ?`,
-                [name_primary, name_secondary, name_kana, phone_number, fax_number, zip_code, address, contact_person, email, terms_of_trade, remarks, classification1, classification2, tax_calculation, closing_date, payment_date, payment_method, id],
+                `UPDATE vendors SET name_primary = ?, code = ?, name_secondary = ?, name_kana = ?, phone_number = ?, fax_number = ?, zip_code = ?, address = ?, contact_person = ?, email = ?, terms_of_trade = ?, remarks = ?, classification1 = ?, classification2 = ?, tax_calculation = ?, closing_date = ?, payment_date = ?, payment_method = ?, updated = datetime('now') WHERE id = ?`,
+                [name_primary, code, name_secondary, name_kana, phone_number, fax_number, zip_code, address, contact_person, email, terms_of_trade, remarks, classification1, classification2, tax_calculation, closing_date, payment_date, payment_method, id],
                 callback
             );
         } else {
             // If the record does not exist, perform an INSERT
             console.log("Inserting new vendor:", vendorData);
             db.run(
-                `INSERT INTO vendors (name_primary, name_secondary, name_kana, phone_number, fax_number, zip_code, address, contact_person, email, terms_of_trade, remarks, classification1, classification2, tax_calculation, closing_date, payment_date, payment_method, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
-                [name_primary, name_secondary, name_kana, phone_number, fax_number, zip_code, address, contact_person, email, terms_of_trade, remarks, classification1, classification2, tax_calculation, closing_date, payment_date, payment_method],
+                `INSERT INTO vendors (name_primary, code, name_secondary, name_kana, phone_number, fax_number, zip_code, address, contact_person, email, terms_of_trade, remarks, classification1, classification2, tax_calculation, closing_date, payment_date, payment_method, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+                [name_primary, code, name_secondary, name_kana, phone_number, fax_number, zip_code, address, contact_person, email, terms_of_trade, remarks, classification1, classification2, tax_calculation, closing_date, payment_date, payment_method],
                 callback
             );
         }

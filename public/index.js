@@ -2,6 +2,9 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 
+// const {updateElectronApp} = require('update-electron-app');
+
+// updateElectronApp()
 
 //マスタ管理
 require('./ipc/masters/customers'); 
@@ -17,6 +20,8 @@ require('./ipc/masters/primarySections');
 require('./ipc/masters/secondarySections');
 require('./ipc/masters/shops');
 require('./ipc/masters/setProducts'); // 追加
+require('./ipc/masters/categories'); // 追加
+require('./ipc/masters/subcategories'); // 追加
 
 //ダッシュボード
 require('./ipc/dashboard/salesTaxSettings'); // 追加
@@ -59,15 +64,16 @@ function createWindow() {
   });
   mainWindow.loadURL(
     app.isPackaged
-      ? `file://${path.join(__dirname, '../build/index.html')}`
-      : 'http://localhost:3000'
+    ? `file://${path.join(__dirname, '../build/index.html')}`
+    : 'http://localhost:3000'
   );
 
   if (!app.isPackaged) {
     mainWindow.webContents.openDevTools();
   }
-
-  require('./database/setupDatabase');
+  
+  const customersDB = require('./database/masters/customers');
+  customersDB.initializeDatabase();
   const deliveryCustomersDB = require('./database/masters/deliveryCustomers');
   deliveryCustomersDB.initializeDatabase();
   const productsDB = require('./database/masters/products');
@@ -94,6 +100,10 @@ function createWindow() {
   setProductsSectionsDB.initializeDatabase();
   const setTaxesDB = require('./database/dashboard/salesTaxSettings'); // 追加
   setTaxesDB.initializeDatabase();
+  const setCategoriesDB = require('./database/masters/categories'); // 追加
+  setCategoriesDB.initializeDatabase();
+  const setSubcategoriesDB = require('./database/masters/subcategories'); // 追加
+  setSubcategoriesDB.initializeDatabase();
 
   // 仕入管理
   const purchaseOrdersDB = require('./database/procurements/purchaseOrders');
@@ -141,16 +151,19 @@ function createWindow() {
 const dbPath = path.join(app.getPath('userData'), 'database.db');
 const db = new sqlite3.Database(dbPath);
 
-app.on('ready', createWindow);
+// app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
+app.whenReady().then(() => {
+  createWindow();
 
-app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
-  }
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+    }
+  });
 });

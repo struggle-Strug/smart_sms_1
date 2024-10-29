@@ -10,7 +10,7 @@ function PaymentSlipsDetail() {
         <div className='w-full'>
             <div className=''>
                 <div className='pt-8 pb-6 flex border-b px-8 items-center'>
-                    <div className='text-2xl font-bold'>{'株式会社テスト'}</div>
+                    <div className='text-2xl font-bold'></div>
                     <div className='flex ml-auto'>
                         <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
                             <div className='pr-1.5 pl-1 flex items-center'>

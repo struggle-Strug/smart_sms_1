@@ -4,12 +4,15 @@ import { Link } from 'react-router-dom';
 import CustomSelect from '../CustomSelect';
 import { Tooltip } from 'react-tooltip'
 import Switch from '@mui/material/Switch';
+import { useNavigate } from 'react-router-dom';
 
 function InvoiceSettings() {
   const options = [
     { value: '御中', label: '御中' },
     { value: '貴社', label: '貴社' },
   ];
+
+  const navigate = useNavigate();
 
   const [customer, setCustomer] = useState({
     id: '',
@@ -35,7 +38,7 @@ function InvoiceSettings() {
       <div className='flex mx-40 mt-10 mb-12'>
         <div className='flex-col max-w-[420px]'>
           <div className='flex mr-auto'>
-            <Link to="/invoice-settings" className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
+            <div className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex' onClick={() => navigate(-1)}>
               <div className='pr-1.5 pl-1 flex items-center'>
                 <svg width="21" height="19" viewBox="0 0 21 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M17.3926 5.72949H16.3926V0.729492H4.39258V5.72949H3.39258C1.73258 5.72949 0.392578 7.06949 0.392578 8.72949V14.7295H4.39258V18.7295H16.3926V14.7295H20.3926V8.72949C20.3926 7.06949 19.0526 5.72949 17.3926 5.72949ZM6.39258 2.72949H14.3926V5.72949H6.39258V2.72949ZM14.3926 16.7295H6.39258V12.7295H14.3926V16.7295ZM16.3926 12.7295V10.7295H4.39258V12.7295H2.39258V8.72949C2.39258 8.17949 2.84258 7.72949 3.39258 7.72949H17.3926C17.9426 7.72949 18.3926 8.17949 18.3926 8.72949V12.7295H16.3926Z" fill="#1F2937" />
@@ -43,7 +46,7 @@ function InvoiceSettings() {
                 </svg>
               </div>
               戻る
-            </Link>
+            </div>
           </div>
           <div className='mt-6'>
             <div className='text-3xl font-bold text-black'>伝票設定</div>
@@ -84,11 +87,12 @@ function InvoiceSettings() {
             </div>
             <div className=''>
               <div className='flex items-center text-sm pb-1.5'>倉庫選択
-                <a href="#" className="my-tooltip ml-2.5">
+                <a data-tooltip-id="my-tooltip" data-tooltip-content="得意先名の続き、支店名、部署名等" className='flex ml-3'>
                   <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M8.47315 4.57084H10.1398V6.23751H8.47315V4.57084ZM8.47315 7.90418H10.1398V12.9042H8.47315V7.90418ZM9.30648 0.404175C4.70648 0.404175 0.973145 4.13751 0.973145 8.73751C0.973145 13.3375 4.70648 17.0708 9.30648 17.0708C13.9065 17.0708 17.6398 13.3375 17.6398 8.73751C17.6398 4.13751 13.9065 0.404175 9.30648 0.404175ZM9.30648 15.4042C5.63148 15.4042 2.63981 12.4125 2.63981 8.73751C2.63981 5.06251 5.63148 2.07084 9.30648 2.07084C12.9815 2.07084 15.9731 5.06251 15.9731 8.73751C15.9731 12.4125 12.9815 15.4042 9.30648 15.4042Z" fill="#1F2937" />
                   </svg>
                 </a>
+                <Tooltip id="my-tooltip" />
               </div>
               <div className="w-full">
                 <CustomSelect placeholder={"倉庫を選んでください"} options={options} name={"honorific"} data={customer} setData={setCustomer} />

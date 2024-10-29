@@ -135,12 +135,14 @@ function initializeDatabase() {
         payment_due_date VARCHAR(255),
         payment_method VARCHAR(255),
         estimated_delivery_date VARCHAR(255),
+        status VARCHAR(255) DEFAULT '未処理',  -- デフォルト値を「未処理」に設定
         created DATE DEFAULT CURRENT_DATE,
         updated DATE DEFAULT CURRENT_DATE
     )
     `;
     db.run(sql);
 }
+
 
 function searchPurchaseOrders(query, callback) {
     let sql;
@@ -190,6 +192,17 @@ function searchPurchaseOrdersOnPV(conditions, callback) {
     });
 }
 
+function updatePurchaseOrderStatus(query, callback) {
+    const sql = `UPDATE purchase_orders SET status = ?, updated = datetime('now') WHERE code = ?`;
+    db.run(sql, [query.status, query.code], function (err) {
+        if (err) {
+            return callback(err);
+        }
+        callback(null, { code: query.code });
+    });
+}
+
+
 
 module.exports = {
     loadPurchaseOrders,
@@ -199,5 +212,6 @@ module.exports = {
     editPurchaseOrder,
     initializeDatabase,
     searchPurchaseOrders,
-    searchPurchaseOrdersOnPV
+    searchPurchaseOrdersOnPV,
+    updatePurchaseOrderStatus
 };

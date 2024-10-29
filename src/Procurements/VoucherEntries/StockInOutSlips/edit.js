@@ -196,6 +196,13 @@ function StockInOutSlipsEdit() {
         setStockInOutSlipDetails(updatedDetails);
     };
 
+    const handleProductClick = (product, index) => {
+        const updatedDetails = stockInOutSlipDetails.map((detail, i) =>
+            i === index ? { ...detail, ["product_name"]: product.name, ["product_id"]: product.id, ["tax_rate"]: product.tax_rate, ["unit"] : product.unit, ["price"] : product.procurement_cost  } : detail
+        );
+        setStockInOutSlipDetails(updatedDetails);
+    }
+
 
 
     const validator = new Validator();
@@ -229,12 +236,10 @@ function StockInOutSlipsEdit() {
 
     const handleSumPrice = () => {
         let SumPrice = 0
-
         for (let i = 0; i < stockInOutSlipDetails.length; i++) {
             SumPrice += stockInOutSlipDetails[i].price * stockInOutSlipDetails[i].number;
         }
-
-        return { "subtotal": SumPrice, "consumptionTaxEight": SumPrice * 0.08, "consumptionTaxTen": 0, "totalConsumptionTax": SumPrice * 0.08, "Total": SumPrice * 1.08 }
+        return { "Total": SumPrice }
     }
 
     const [isOpen, setIsOpen] = useState(null);
@@ -316,11 +321,12 @@ function StockInOutSlipsEdit() {
                     </div>
                     <div className='w-40 text-sm pb-1.5 flex items-center'>
                         処理種別
-                        <a href="#" className="my-tooltip ml-2.5">
+                        <a data-tooltip-id="my-tooltip" data-tooltip-content="得意先名の続き、支店名、部署名等" className='flex ml-3'>
                             <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M8.47315 4.57084H10.1398V6.23751H8.47315V4.57084ZM8.47315 7.90418H10.1398V12.9042H8.47315V7.90418ZM9.30648 0.404175C4.70648 0.404175 0.973145 4.13751 0.973145 8.73751C0.973145 13.3375 4.70648 17.0708 9.30648 17.0708C13.9065 17.0708 17.6398 13.3375 17.6398 8.73751C17.6398 4.13751 13.9065 0.404175 9.30648 0.404175ZM9.30648 15.4042C5.63148 15.4042 2.63981 12.4125 2.63981 8.73751C2.63981 5.06251 5.63148 2.07084 9.30648 2.07084C12.9815 2.07084 15.9731 5.06251 15.9731 8.73751C15.9731 12.4125 12.9815 15.4042 9.30648 15.4042Z" fill="#1F2937" />
                             </svg>
                         </a>
+                        <Tooltip id="my-tooltip" />
                         <span className='ml-2.5 text-xs font-bold text-red-600'>必須</span>
                     </div>
                     <div className='pb-4 flex'>
@@ -331,6 +337,7 @@ function StockInOutSlipsEdit() {
                                 value="type1"
                                 className='mr-2'
                                 onChange={handleChange}
+                                checked={stockInOutSlip.processType === "type1"}
                             />
                             出庫
                         </label>
@@ -341,6 +348,7 @@ function StockInOutSlipsEdit() {
                                 value="type2"
                                 className='mr-2'
                                 onChange={handleChange}
+                                checked={stockInOutSlip.processType === "type2"}
                             />
                             入庫
                         </label>
@@ -351,6 +359,7 @@ function StockInOutSlipsEdit() {
                                 value="type3"
                                 className='mr-2'
                                 onChange={handleChange}
+                                checked={stockInOutSlip.processType === "type3"}
                             />
                             振替
                         </label>
@@ -361,11 +370,12 @@ function StockInOutSlipsEdit() {
                     </div>
                     <div className='pb-2'>
                         <div className='flex items-center text-sm pb-1.5'>出庫元倉庫
-                            <a href="#" className="my-tooltip ml-2.5">
+                            <a data-tooltip-id="my-tooltip" data-tooltip-content="得意先名の続き、支店名、部署名等" className='flex ml-3'>
                                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M8.47315 4.57084H10.1398V6.23751H8.47315V4.57084ZM8.47315 7.90418H10.1398V12.9042H8.47315V7.90418ZM9.30648 0.404175C4.70648 0.404175 0.973145 4.13751 0.973145 8.73751C0.973145 13.3375 4.70648 17.0708 9.30648 17.0708C13.9065 17.0708 17.6398 13.3375 17.6398 8.73751C17.6398 4.13751 13.9065 0.404175 9.30648 0.404175ZM9.30648 15.4042C5.63148 15.4042 2.63981 12.4125 2.63981 8.73751C2.63981 5.06251 5.63148 2.07084 9.30648 2.07084C12.9815 2.07084 15.9731 5.06251 15.9731 8.73751C15.9731 12.4125 12.9815 15.4042 9.30648 15.4042Z" fill="#1F2937" />
                                 </svg>
                             </a>
+                            <Tooltip id="my-tooltip" />
                         </div>
                         <div className="w-[480px] pb-1.5">
                             {/* <CustomSelect placeholder={""} options={options} name={"warehouse_to"} data={stockInOutSlip} setData={setStockInOutSlip} /> */}
@@ -404,11 +414,12 @@ function StockInOutSlipsEdit() {
                     </div>
                     <div className='pb-2'>
                         <div className='flex items-center text-sm pb-1.5'>入庫先倉庫
-                            <a href="#" className="my-tooltip ml-2.5">
+                            <a data-tooltip-id="my-tooltip" data-tooltip-content="得意先名の続き、支店名、部署名等" className='flex ml-3'>
                                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M8.47315 4.57084H10.1398V6.23751H8.47315V4.57084ZM8.47315 7.90418H10.1398V12.9042H8.47315V7.90418ZM9.30648 0.404175C4.70648 0.404175 0.973145 4.13751 0.973145 8.73751C0.973145 13.3375 4.70648 17.0708 9.30648 17.0708C13.9065 17.0708 17.6398 13.3375 17.6398 8.73751C17.6398 4.13751 13.9065 0.404175 9.30648 0.404175ZM9.30648 15.4042C5.63148 15.4042 2.63981 12.4125 2.63981 8.73751C2.63981 5.06251 5.63148 2.07084 9.30648 2.07084C12.9815 2.07084 15.9731 5.06251 15.9731 8.73751C15.9731 12.4125 12.9815 15.4042 9.30648 15.4042Z" fill="#1F2937" />
                                 </svg>
                             </a>
+                            <Tooltip id="my-tooltip" />
                         </div>
                         <div className="w-[480px] pb-1.5">
                             <div className="relative" ref={dropdownRef}>
@@ -480,7 +491,7 @@ function StockInOutSlipsEdit() {
                                                                         products.map((product, idx) => (
                                                                             <div key={idx}
                                                                                 className="p-2 hover:bg-gray-100 hover:cursor-pointer"
-                                                                                onClick={(e) => handleOnDetailClick("product_id", product.id, index)}
+                                                                                onClick={(e) => handleProductClick(product, index)}
                                                                             >
                                                                                 {product.name}
                                                                             </div>
@@ -515,7 +526,7 @@ function StockInOutSlipsEdit() {
                                                                         products.map((product, idx) => (
                                                                             <div key={idx}
                                                                                 className="p-2 hover:bg-gray-100 hover:cursor-pointer"
-                                                                                onClick={(e) => handleOnDetailClick("product_name", product.name, index)}
+                                                                                onClick={(e) => handleProductClick(product, index)}
                                                                             >
                                                                                 {product.name}
                                                                             </div>
@@ -561,10 +572,8 @@ function StockInOutSlipsEdit() {
                                 </div>
                                 <div className='flex items-center justify-end'>
                                     <div className='flex items-center'>
-                                        <div className='mr-4'>消費税額</div>
-                                        <div className='mr-4'>{(stockInOutSlipDetails[index].price * stockInOutSlipDetails[index].number * 0.08).toFixed(0)}円</div>
                                         <div className='mr-4'>金額</div>
-                                        <div className='text-lg font-bold'>{(stockInOutSlipDetails[index].price * stockInOutSlipDetails[index].number * 1.08).toFixed(0)}円</div>
+                                        <div className='text-lg font-bold'>{stockInOutSlipDetails[index].price * stockInOutSlipDetails[index].number}円</div>
                                     </div>
                                 </div>
                                 <hr className='py-3' />
@@ -576,24 +585,8 @@ function StockInOutSlipsEdit() {
                     </div>
                     <div className='py-6 flex'>
                         <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>税抜合計</div>
-                                <div>{handleSumPrice().subtotal.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税(8%)</div>
-                                <div>{handleSumPrice().consumptionTaxEight.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税(10%)</div>
-                                <div>{handleSumPrice().consumptionTaxTen.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税合計</div>
-                                <div>{handleSumPrice().totalConsumptionTax.toFixed(0).toLocaleString()}円</div>
-                            </div>
                             <div className='flex'>
-                                <div className='w-40'>税込合計</div>
+                                <div className='w-40'>合計</div>
                                 <div>{handleSumPrice().Total.toFixed(0).toLocaleString()}円</div>
                             </div>
                         </div>
@@ -608,8 +601,8 @@ function StockInOutSlipsEdit() {
                     </div>
                 </div>
                 <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
-                    <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>新規登録</div>
-                    <Link to={`procurements/save-stock-in-out-slips`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
+                    <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>保存</div>
+                    <Link to={`/procurement/voucher-entries/stock-in-out-slips`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
                 </div>
             </div>
         </div>

@@ -11,6 +11,7 @@ function initializeDatabase() {
             CREATE TABLE IF NOT EXISTS shipping_methods (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name VARCHAR(255),
+                code VARCHAR(255) DEFAULT NULL,
                 remarks VARCHAR(255),
                 created DATE DEFAULT (datetime('now')),
                 updated DATE DEFAULT (datetime('now'))
@@ -32,19 +33,19 @@ function getShippingMethodById(id, callback) {
 }
 
 function saveShippingMethod(data, callback) {
-    const { id, name, remarks } = data;
+    const { id, name, code, remarks } = data;
     if (id) {
         db.run(
-            `UPDATE shipping_methods SET name = ?, remarks = ?, updated = datetime('now') WHERE id = ?`,
-            [name, remarks, id],
+            `UPDATE shipping_methods SET name = ?, code = ?, remarks = ?, updated = datetime('now') WHERE id = ?`,
+            [name, code, remarks, id],
             (err) => {
                 callback(err);
             }
         );
     } else {
         db.run(
-            `INSERT INTO shipping_methods (name, remarks, created, updated) VALUES (?, ?, datetime('now'), datetime('now'))`,
-            [name, remarks],
+            `INSERT INTO shipping_methods (name, code, remarks, created, updated) VALUES (?, ?, ?, datetime('now'), datetime('now'))`,
+            [name, code, remarks],
             (err) => {
                 callback(err);
             }

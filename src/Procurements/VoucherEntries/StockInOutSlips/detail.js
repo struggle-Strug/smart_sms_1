@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import ConfirmDialog from '../../../Components/ConfirmDialog';
+import { useNavigate } from 'react-router-dom';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -14,6 +16,11 @@ function StockInOutSlipsDetail() {
         contact_person: '',
         remarks: '',
     });
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [customerIdToDelete, setCustomerIdToDelete] = useState(null);
+    const [messageToDelete, setMessageToDelete] = useState('');
+
+    const navigate = useNavigate();
 
     const [stockInOutSlipDetails, setStockInOutSlipDetails] = useState([
         {
@@ -46,11 +53,28 @@ function StockInOutSlipsDetail() {
         };
     }, [id]);
 
+    const handleDelete = (id, name) => {
+        setCustomerIdToDelete(id);
+        setMessageToDelete(name);
+        setIsDialogOpen(true);
+    };
+
+    const handleConfirmDelete = () => {
+        ipcRenderer.send('delete-stock-in-out-slip', customerIdToDelete);
+
+        setIsDialogOpen(false);
+        navigate("/procurement/voucher-entries/stock-in-out-slips");
+    };
+
+    const handleCancelDelete = () => {
+        setIsDialogOpen(false);
+    };
+
     return (
         <div className='w-full'>
             <div className=''>
                 <div className='pt-8 pb-6 flex border-b px-8 items-center'>
-                    <div className='text-2xl font-bold'>{stockInOutSlip.vender_name || '株式会社テスト'}</div>
+                    <div className='text-2xl font-bold'>{stockInOutSlip.vender_name || ''}</div>
                     <div className='flex ml-auto'>
                         <Link to={`/procurement/voucher-entries/stock-in-out-slips/edit/` + id}  className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
                             <div className='pr-1.5 pl-1 flex items-center'>
@@ -61,7 +85,7 @@ function StockInOutSlipsDetail() {
                             </div>
                             編集
                         </Link>
-                        <Link to={`/stock-in-out-slips/print/${id}`} className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
+                        <Link to={`/invoice-settings`} className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
                             <div className='pr-1.5 pl-1 flex items-center'>
                                 <svg width="21" height="19" viewBox="0 0 21 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M17.3926 5.72949H16.3926V0.729492H4.39258V5.72949H3.39258C1.73258 5.72949 0.392578 7.06949 0.392578 8.72949V14.7295H4.39258V18.7295H16.3926V14.7295H20.3926V8.72949C20.3926 7.06949 19.0526 5.72949 17.3926 5.72949ZM6.39258 2.72949H14.3926V5.72949H6.39258V2.72949ZM14.3926 16.7295H6.39258V12.7295H14.3926V16.7295ZM16.3926 12.7295V10.7295H4.39258V12.7295H2.39258V8.72949C2.39258 8.17949 2.84258 7.72949 3.39258 7.72949H17.3926C17.9426 7.72949 18.3926 8.17949 18.3926 8.72949V12.7295H16.3926Z" fill="#1F2937" />
@@ -70,41 +94,41 @@ function StockInOutSlipsDetail() {
                             </div>
                             印刷
                         </Link>
-                        <Link to={`/stock-in-out-slips/delete/${id}`} className='py-3 px-4 border rounded-lg text-base font-bold flex'>
+                        <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={() => handleDelete(stockInOutSlip.id, stockInOutSlip.code)}>
                             <div className='pr-1.5 pl-1 flex items-center'>
                                 <svg width="15" height="19" viewBox="0 0 15 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M11.3926 6.72949V16.7295H3.39258V6.72949H11.3926ZM9.89258 0.729492H4.89258L3.89258 1.72949H0.392578V3.72949H14.3926V1.72949H10.8926L9.89258 0.729492ZM13.3926 4.72949H1.39258V16.7295C1.39258 17.8295 2.29258 18.7295 3.39258 18.7295H11.3926C12.4926 18.7295 13.3926 17.8295 13.3926 16.7295V4.72949Z" fill="#1F2937" />
                                 </svg>
                             </div>
                             削除
-                        </Link>
+                        </div>
                     </div>
                 </div>
                 <div className='px-8 py-6'>
                     <div className='py-2.5 font-bold text-xl'>伝票番号</div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>伝票番号</div>
-                        <div>{stockInOutSlip.code || "N/A"}</div>
+                        <div>{stockInOutSlip.code }</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>入出庫日付</div>
-                        <div>{stockInOutSlip.stock_in_out_date || "N/A"}</div>
+                        <div>{stockInOutSlip.stock_in_out_date }</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>処理種別</div>
-                        <div>{stockInOutSlip.processType || "N/A"}</div>
+                        <div>{stockInOutSlip.processType }</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>出庫元倉庫</div>
-                        <div>{stockInOutSlip.warehouse_from || "N/A"}</div>
+                        <div>{stockInOutSlip.warehouse_from }</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>入庫先倉庫</div>
-                        <div>{stockInOutSlip.warehouse_to || "N/A"}</div>
+                        <div>{stockInOutSlip.warehouse_to }</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>担当者</div>
-                        <div>{stockInOutSlip.contact_person || "N/A"}</div>
+                        <div>{stockInOutSlip.contact_person }</div>
                     </div>
                     <div className='py-3'>
                         <hr className='' />
@@ -125,11 +149,11 @@ function StockInOutSlipsDetail() {
                         <tbody>
                             {stockInOutSlipDetails.map((detail, index) => (
                                 <tr className='border-b' key={index}>
-                                    <td className='py-2'>{detail.product_id || "N/A"}</td>
-                                    <td className='py-2'>{detail.product_name || "N/A"}</td>
+                                    <td className='py-2'>{detail.product_id }</td>
+                                    <td className='py-2'>{detail.product_name }</td>
                                     <td className='py-2'>{detail.number || 0}</td>
-                                    <td className='py-2'>{detail.unit || "N/A"}</td>
-                                    <td className='py-2'>{detail.lot_number || "N/A"}</td>
+                                    <td className='py-2'>{detail.unit }</td>
+                                    <td className='py-2'>{detail.lot_number }</td>
                                     <td className='py-2'>{detail.price || 0}円</td>
                                     <td className='py-2'>{parseInt(detail.price) * parseInt(detail.number) || 0}円</td>
                                 </tr>
@@ -145,6 +169,18 @@ function StockInOutSlipsDetail() {
                     </div>
                 </div>
             </div>
+            <ConfirmDialog
+                isOpen={isDialogOpen}
+                message={messageToDelete + "を削除しますか？"}
+                additionalMessage={
+                    <>
+                       この操作は取り消しできません。<br />
+                       確認し、問題ない場合は削除ボタンを押してください。
+                    </>
+                }
+                onConfirm={handleConfirmDelete}
+                onCancel={handleCancelDelete}
+            />
         </div>
     );
 }

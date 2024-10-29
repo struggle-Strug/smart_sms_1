@@ -19,6 +19,7 @@ function CustomersEdit() {
 
     const [customer, setCustomer] = useState({
         id: '',
+        code: '',
         name_primary: '',
         name_secondary: '',
         name_kana: '',
@@ -68,7 +69,7 @@ function CustomersEdit() {
     const handleSubmit = () => {
         
         validator.required(customer.name_primary, 'name_primary', '得意先名1');
-        validator.required(customer.billing_code, 'billing_code', '得意先コード');
+        validator.required(customer.code, 'code', '得意先コード');
         validator.required(customer.phone_number, 'phone_number', '電話番号');
         validator.required(customer.fax_number, 'fax_number', 'Fax');
         validator.required(customer.address, 'address', '住所');
@@ -90,16 +91,16 @@ function CustomersEdit() {
                         <div className='p-4'>得意先名1 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='株式会社テスト' name="name_primary" value={customer.name_primary} onChange={handleChange} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='得意先名1を入力' name="name_primary" value={customer.name_primary} onChange={handleChange} />
                     </div>
                 </div>
                 {errors.name_primary && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.name_primary}</div>}
                 <div className="flex bg-white">
                     <div className="w-1/5">
-                        <div className='p-4'>顧客名1(カタカナ)</div>
+                        <div className='p-4'>得意先名1(カタカナ)</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='株式会社テスト' name="name_kana" value={customer.name_kana} onChange={handleChange} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='得意先名1(カタカナ)を入力' name="name_kana" value={customer.name_kana} onChange={handleChange} />
                     </div>
                 </div>
                 {errors.name_kana && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.name_kana}</div>}
@@ -116,7 +117,7 @@ function CustomersEdit() {
                         </div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='株式会社テスト' name="name_secondary" value={customer.name_secondary} onChange={handleChange} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='得意先名2を入力' name="name_secondary" value={customer.name_secondary} onChange={handleChange} />
                     </div>
                 </div>
                 {errors.name_secondary && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.name_secondary}</div>}
@@ -125,16 +126,16 @@ function CustomersEdit() {
                         <div className='p-4'>得意先コード <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='株式会社テスト' name="billing_code" value={customer.billing_code} onChange={handleChange} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='得意先コードを入力' name="code" value={customer.code} onChange={handleChange} />
                     </div>
                 </div>
-                {errors.billing_code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.billing_code}</div>}
+                {errors.code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.code}</div>}
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
                         <div className='p-4'>電話番号 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='株式会社テスト' name="phone_number" value={customer.phone_number} onChange={handleChange} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='電話番号を入力' name="phone_number" value={customer.phone_number} onChange={handleChange} />
                     </div>
                 </div>
                 {errors.phone_number && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.phone_number}</div>}
@@ -143,7 +144,7 @@ function CustomersEdit() {
                         <div className='p-4'>FAX <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='株式会社テスト' name="fax_number" value={customer.fax_number} onChange={handleChange} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='FAXを入力' name="fax_number" value={customer.fax_number} onChange={handleChange} />
                     </div>
                 </div>
                 {errors.fax_number && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.fax_number}</div>}
@@ -152,7 +153,7 @@ function CustomersEdit() {
                         <div className='p-4'>メールアドレス</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input type='email' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='' name="email" value={customer.email} onChange={handleChange} />
+                        <input type='email' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='メールアドレスを入力' name="email" value={customer.email} onChange={handleChange} />
                     </div>
                 </div>
                 {errors.email && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.email}</div>}
@@ -161,16 +162,16 @@ function CustomersEdit() {
                         <div className='p-4'>郵便番号</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='' name="zip_code" value={customer.zip_code} onChange={handleChange} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='郵便番号を入力' name="zip_code" value={customer.zip_code} onChange={handleChange} />
                     </div>
                 </div>
                 {errors.zip_code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.zip_code}</div>}
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
-                        <div className='p-4'>住所<span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
+                        <div className='p-4'>住所 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='' name="address" value={customer.address} onChange={handleChange} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='住所を入力' name="address" value={customer.address} onChange={handleChange} />
                     </div>
                 </div>
                 {errors.address && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.address}</div>}
@@ -188,7 +189,7 @@ function CustomersEdit() {
                         <div className='p-4'>請求先コード</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='' name="billing_code" value={customer.billing_code} onChange={handleChange} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='請求先コードを入力' name="billing_code" value={customer.billing_code} onChange={handleChange} />
                     </div>
                 </div>
                 {errors.billing_code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.billing_code}</div>}
@@ -197,10 +198,7 @@ function CustomersEdit() {
                         <div className='p-4'>請求情報</div>
                     </div>
                     <div className="w-4/5 py-1.5 flex items-end">
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-48' placeholder='' name="billing_information" value={customer.billing_information} onChange={handleChange} />
-                        日締
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-48 ml-10' placeholder='' name="billing_information" value={customer.billing_information} onChange={handleChange} />
-                        日後入金
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-48' placeholder='請求情報を入力' name="billing_information" value={customer.billing_information} onChange={handleChange} />
                     </div>
                 </div>
                 {errors.billing_information && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.billing_information}</div>}
@@ -209,7 +207,7 @@ function CustomersEdit() {
                         <div className='p-4'>月次売上目標</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input type='number' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='' name="monthly_sales_target" value={customer.monthly_sales_target} onChange={handleChange} />
+                        <input type='number' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='月次売上目標を入力' name="monthly_sales_target" value={customer.monthly_sales_target} onChange={handleChange} />
                     </div>
                 </div>
                 {errors.monthly_sales_target && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.monthly_sales_target}</div>}
@@ -218,7 +216,7 @@ function CustomersEdit() {
                         <div className='p-4'>備考</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='' name="remarks" value={customer.remarks} onChange={handleChange} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-2/3' placeholder='備考を入力' name="remarks" value={customer.remarks} onChange={handleChange} />
                     </div>
                 </div>
                 {errors.remarks && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.remarks}</div>}

@@ -141,6 +141,7 @@ function searchOrderSlipsByOrderSlipId(query, callback) {
 
 
 
+
 function initializeDatabase() {
     const sql = `
     CREATE TABLE IF NOT EXISTS order_slip_details (
@@ -172,4 +173,5 @@ module.exports = {
     initializeDatabase,
     deleteOrderSlipDetailsBySlipId,
     searchOrderSlipsByOrderSlipId
+
 };

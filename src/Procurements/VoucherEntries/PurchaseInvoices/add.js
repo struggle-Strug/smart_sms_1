@@ -240,12 +240,27 @@ function PurchaseInvoicesAdd() {
         setPurchaseInvoice({ ...purchaseInvoice, [name]: value });
     };
 
+    const handleVendorOnClick = (value) => {
+        setPurchaseInvoice({ ...purchaseInvoice, ["vender_id"]: value.id, ["vender_name"]: value.name_primary, ["honorific"]: value.honorific, ["payment_due_date"]: value.payment_date, ["closing_date"]: value.closing_date, ["payment_method"]: value.payment_method, ["vender_contact_person"]: value.contact_person });
+    };
+
     const handleOnDetailClick = (name, value, index) => {
         const updatedDetails = purchaseInvoiceDetails.map((detail, i) =>
             i === index ? { ...detail, [name]: value } : detail
         );
         setPurchaseInvoiceDetails(updatedDetails);
     };
+
+    const handleProductClick = (product, index) => {
+        const updatedDetails = purchaseInvoiceDetails.map((detail, i) =>
+            i === index ? { ...detail, ["product_name"]: product.name, ["product_id"]: product.id, ["tax_rate"]: product.tax_rate, ["unit"] : product.unit, ["price"] : product.procurement_cost  } : detail
+        );
+        setPurchaseInvoiceDetails(updatedDetails);
+    }
+
+    
+
+    
 
     const validator = new Validator();
 
@@ -278,6 +293,11 @@ function PurchaseInvoicesAdd() {
                     ipcRenderer.send('save-purchase-invoice-detail', purchaseInvoiceDetailData);
                 }
             });
+            ipcRenderer.send('search-purchase-order-details', {"po.id": purchaseInvoice.purchase_order_id});
+            ipcRenderer.on('search-purchase-order-details-result', (event, data) => {
+                const status = createStatus(data);
+                ipcRenderer.send('update-purchase-order-status', {"status": status, "code": purchaseInvoice.purchase_order_id});
+            })
             setPurchaseInvoice({
                 code: '',
                 order_date: '',
@@ -298,12 +318,19 @@ function PurchaseInvoicesAdd() {
 
     const handleSumPrice = () => {
         let SumPrice = 0
+        let consumptionTaxEight = 0
+        let consumptionTaxTen = 0
 
         for (let i = 0; i < purchaseInvoiceDetails.length; i++) {
             SumPrice += purchaseInvoiceDetails[i].price * purchaseInvoiceDetails[i].number;
+            if (purchaseInvoiceDetails[i].tax_rate === 8) {
+                consumptionTaxEight += purchaseInvoiceDetails[i].price * purchaseInvoiceDetails[i].number * 0.08;
+            } else if (purchaseInvoiceDetails[i].tax_rate === 10) {
+                consumptionTaxTen += purchaseInvoiceDetails[i].price * purchaseInvoiceDetails[i].number * 0.1;
+            }
         }
 
-        return { "subtotal": SumPrice, "consumptionTaxEight": SumPrice * 0.08, "consumptionTaxTen": 0, "totalConsumptionTax": SumPrice * 0.08, "Total": SumPrice * 1.08 }
+        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax":consumptionTaxEight + consumptionTaxTen, "Total": SumPrice + consumptionTaxEight + consumptionTaxTen }
     }
 
     const [isOpen, setIsOpen] = useState(null);
@@ -347,6 +374,33 @@ function PurchaseInvoicesAdd() {
         const formattedDate = date ? date.toISOString().split('T')[0] : '';
         setPurchaseInvoice({ ...purchaseInvoice, [name]: formattedDate });
     };
+
+    const createStatus = (purchaseOrderDetails)  => {
+        let data = {}
+        for (let i = 0; i < purchaseOrderDetails.length; i++) {
+            if (data["product_id_" + purchaseOrderDetails[i].product_id]) {
+                data["product_id_" + purchaseOrderDetails[i].product_id] += purchaseOrderDetails[i].number;
+            } else {
+                data["product_id_" + purchaseOrderDetails[i].product_id] = purchaseOrderDetails[i].number;
+            }
+        }
+
+        for (let i = 0; i < purchaseInvoiceDetails.length; i++) {
+            if (data["product_id_" + purchaseInvoiceDetails[i].product_id]) {
+                data["product_id_" + purchaseInvoiceDetails[i].product_id] -= purchaseInvoiceDetails[i].number;
+            }
+        }
+
+        if (purchaseInvoiceDetails.length === 0) return "未処理"
+        let flag = true
+        for (let key in data) {
+            if (data[key] !== 0) {
+                flag = false;
+            }
+        }
+        if (flag) return "発注済"
+        else return "一部処理"
+    }
 
 
     return (
@@ -402,7 +456,7 @@ function PurchaseInvoicesAdd() {
                                                 <div className="flex flex-col space-y-2">
                                                     {
                                                         vendors.map((value, index) => (
-                                                            <div className="p-2 hover:bg-gray-100 hover:cursor-pointer" onClick={(e) => handleOnClick("vender_id", value.id)}>{value.name_primary}</div>
+                                                            <div className="p-2 hover:bg-gray-100 hover:cursor-pointer" onClick={(e) => handleVendorOnClick(value)}>{value.name_primary}</div>
                                                         ))
                                                     }
                                                 </div>
@@ -423,7 +477,7 @@ function PurchaseInvoicesAdd() {
                                                 <div className="flex flex-col space-y-2">
                                                     {
                                                         vendors.map((value, index) => (
-                                                            <div className="p-2 hover:bg-gray-100 hover:cursor-pointer" onClick={(e) => handleOnClick("vender_name", value.name_primary)}>{value.name_primary}</div>
+                                                            <div className="p-2 hover:bg-gray-100 hover:cursor-pointer" onClick={(e) => handleVendorOnClick(value)}>{value.name_primary}</div>
                                                         ))
                                                     }
                                                 </div>
@@ -433,13 +487,13 @@ function PurchaseInvoicesAdd() {
                                 }
                             </div>
                             <div className='ml-12'>
-                                <div className='w-40 text-sm pb-1.5'>宛名</div>
+                                <div className='w-40 text-sm pb-1.5'>敬称</div>
                                 <div className="relative" ref={dropdownRef}>
                                     <div
                                         className="bg-white border rounded px-4 py-2.5 cursor-pointer flex justify-between items-center"
                                         onClick={() => toggleDropdown("honorific")}
                                     >
-                                        <span>{purchaseInvoice.honorific ? purchaseInvoice.honorific : "宛名"}</span>
+                                        <span>{purchaseInvoice.honorific ? purchaseInvoice.honorific : "敬称"}</span>
                                         <svg
                                             className={`w-4 h-4 transform transition-transform ${isOpen === "honorific" ? 'rotate-180' : ''}`}
                                             xmlns="http://www.w3.org/2000/svg"
@@ -538,7 +592,7 @@ function PurchaseInvoicesAdd() {
                                                                         products.map((product, idx) => (
                                                                             <div key={idx}
                                                                                 className="p-2 hover:bg-gray-100 hover:cursor-pointer"
-                                                                                onClick={(e) => handleOnDetailClick("product_id", product.id, index)}
+                                                                                onClick={(e) => handleProductClick(product, index)}
                                                                             >
                                                                                 {product.name}
                                                                             </div>
@@ -573,7 +627,7 @@ function PurchaseInvoicesAdd() {
                                                                         products.map((product, idx) => (
                                                                             <div key={idx}
                                                                                 className="p-2 hover:bg-gray-100 hover:cursor-pointer"
-                                                                                onClick={(e) => handleOnDetailClick("product_name", product.name, index)}
+                                                                                onClick={(e) => handleProductClick(product, index)}
                                                                             >
                                                                                 {product.name}
                                                                             </div>
@@ -690,9 +744,9 @@ function PurchaseInvoicesAdd() {
                                 <div className='flex items-center justify-end'>
                                     <div className='flex items-center'>
                                         <div className='mr-4'>消費税額</div>
-                                        <div className='mr-4'>{(purchaseInvoiceDetails[index].price * purchaseInvoiceDetails[index].number * 0.08).toFixed(0)}円</div>
+                                        <div className='mr-4'>{(purchaseInvoiceDetails[index].price * purchaseInvoiceDetails[index].number * purchaseInvoiceDetails[index].tax_rate*0.01).toFixed(0)}円</div>
                                         <div className='mr-4'>金額</div>
-                                        <div className='text-lg font-bold'>{(purchaseInvoiceDetails[index].price * purchaseInvoiceDetails[index].number * 1.08).toFixed(0)}円</div>
+                                        <div className='text-lg font-bold'>{(purchaseInvoiceDetails[index].price * purchaseInvoiceDetails[index].number * ( purchaseInvoiceDetails[index].tax_rate*0.01 + 1)).toFixed(0)}円</div>
                                     </div>
                                 </div>
                                 <hr className='py-3' />
@@ -778,7 +832,7 @@ function PurchaseInvoicesAdd() {
             </div>
             <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
                 <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>新規登録</div>
-                <Link to={`procurements/purchase-orders`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
+                <Link to={`/procurement/voucher-entries/purchase-invoices`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
             </div>
         </div>
     );

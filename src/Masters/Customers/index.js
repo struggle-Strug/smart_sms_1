@@ -137,7 +137,7 @@ function Index() {
                             <tr className='border-b' key={customer.id}>
                                 <td>{customer.name_primary || <div className='border w-4'></div>}</td>
                                 <td>{customer.name_secondary || <div className='border w-4'></div>}</td>
-                                <td>{customer.billing_code || <div className='border w-4'></div>}</td>
+                                <td>{customer.code || <div className='border w-4'></div>}</td>
                                 <td>{customer.phone_number || <div className='border w-4'></div>}</td>
                                 <td>{customer.email}</td>
                                 <td className='flex justify-center relative'>

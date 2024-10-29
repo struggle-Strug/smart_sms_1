@@ -10,9 +10,10 @@ function initializeDatabase() {
         db.run(`CREATE TABLE IF NOT EXISTS contact_persons (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name VARCHAR(255) NOT NULL,
+            code VARCHAR(255) DEFAULT NULL,
             department VARCHAR(255),
             position VARCHAR(255),
-            phone_number INTEGER,
+            phone_number VARCHAR(255),
             email VARCHAR(255),
             remarks VARCHAR(255),
             created DATE DEFAULT CURRENT_TIMESTAMP,
@@ -49,14 +50,14 @@ function getContactPersonById(id, callback) {
 
 // 担当者情報を保存または更新する関数
 function saveContactPerson(contactPerson, callback) {
-    const { id, name, department, position, phone_number, email, remarks } = contactPerson;
+    const { id, name, code, department, position, phone_number, email, remarks } = contactPerson;
 
     if (id) {
         // 既存の担当者情報を更新
         const sql = `UPDATE contact_persons
-                     SET name = ?, department = ?, position = ?, phone_number = ?, email = ?, remarks = ?, updated = CURRENT_TIMESTAMP
+                     SET name = ?, code = ?, department = ?, position = ?, phone_number = ?, email = ?, remarks = ?, updated = CURRENT_TIMESTAMP
                      WHERE id = ?`;
-        db.run(sql, [name, department, position, phone_number, email, remarks, id], function(err) {
+        db.run(sql, [name, code,  department, position, phone_number, email, remarks, id], function(err) {
             if (err) {
                 console.error(err.message);
                 callback(err);
@@ -66,9 +67,9 @@ function saveContactPerson(contactPerson, callback) {
         });
     } else {
         // 新しい担当者情報を挿入
-        const sql = `INSERT INTO contact_persons (name, department, position, phone_number, email, remarks, created, updated)
-                     VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`;
-        db.run(sql, [name, department, position, phone_number, email, remarks], function(err) {
+        const sql = `INSERT INTO contact_persons (name, code, department, position, phone_number, email, remarks, created, updated)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`;
+        db.run(sql, [name, code, department, position, phone_number, email, remarks], function(err) {
             if (err) {
                 console.error(err.message);
                 callback(err);

@@ -107,6 +107,7 @@ function deleteSalesSlipDetailsBySlipId(salesSlipId, callback) {
     });
 }
 
+
 function deleteSalesSlipDetailById(id, callback) {
     const sql = `DELETE FROM sales_slip_details WHERE id = ?`;
     db.run(sql, [id], (err) => {
@@ -139,6 +140,7 @@ function searchSalesSlipsBySalesSlipId(query, callback) {
     });
 }
 
+
 function initializeDatabase() {
     const sql = `
     CREATE TABLE IF NOT EXISTS sales_slip_details (
@@ -170,4 +172,5 @@ module.exports = {
     initializeDatabase,
     deleteSalesSlipDetailsBySlipId,
     searchSalesSlipsBySalesSlipId
+
 };

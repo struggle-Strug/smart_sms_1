@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import CustomSelect from '../../Components/CustomSelect';
 import Validator from '../../utils/validator';
+import { useNavigate } from 'react-router-dom';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -16,12 +17,15 @@ function SetProductAdd() {
         { value: '社内', label: '社内' },
     ];
 
+    const navigate = useNavigate();
+
     const [errors, setErrors] = useState({});
 
     const validator = new Validator();
 
     const [product, setProduct] = useState({
         set_product_name: '',
+        code: '',
         category: '',
         sub_category: '',
         jan_code: '',
@@ -53,6 +57,7 @@ function SetProductAdd() {
             // フォームのリセット
             setProduct({
                 set_product_name: '',
+                code: '',
                 category: '',
                 sub_category: '',
                 jan_code: '',
@@ -63,6 +68,7 @@ function SetProductAdd() {
                 set_product_price: ''
             });
             alert('商品が正常に追加されました。');
+            navigate("/master/customers");
         }
     };
 
@@ -85,7 +91,22 @@ function SetProductAdd() {
                         />
                     </div>
                 </div>
-                {errors.set_product_name && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.set_product_name}</div>}
+                <div className="flex bg-gray-100">
+                    <div className="w-1/5">
+                        <div className='p-4'>セット商品コード <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
+                    </div>
+                    <div className="w-4/5 py-1.5">
+                        <input 
+                            type='text' 
+                            className='border rounded px-4 py-2.5 bg-white w-2/3' 
+                            placeholder='セット商品コードを入力' 
+                            name="code" 
+                            value={product.code} 
+                            onChange={handleChange} 
+                        />
+                    </div>
+                </div>
+                {errors.code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.code}</div>}
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
                         <div className='p-4'>カテゴリー <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
@@ -104,7 +125,7 @@ function SetProductAdd() {
                 {errors.category && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.category}</div>}
                 <div className="flex bg白">
                     <div className="w-1/5">
-                        <div className='p-4'>サブカテゴリー<span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
+                        <div className='p-4'>サブカテゴリー <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
                         <input 
@@ -120,7 +141,7 @@ function SetProductAdd() {
                 {errors.sub_category && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.sub_category}</div>}
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
-                        <div className='p-4'>JANコード<span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
+                        <div className='p-4'>JANコード <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
                         <input 
@@ -214,7 +235,7 @@ function SetProductAdd() {
             </div>
             <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg白'>
                 <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>新規登録</div>
-                <Link to={`/master/products`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
+                <Link to={`/master/set-products`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
             </div>
         </div>
     );

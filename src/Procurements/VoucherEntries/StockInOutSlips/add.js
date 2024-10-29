@@ -177,6 +177,13 @@ function StockInOutSlipsAdd() {
         setStockInOutSlipDetails(updatedDetails);
     };
 
+    const handleProductClick = (product, index) => {
+        const updatedDetails = stockInOutSlipDetails.map((detail, i) =>
+            i === index ? { ...detail, ["product_name"]: product.name, ["product_id"]: product.id, ["tax_rate"]: product.tax_rate, ["unit"] : product.unit, ["price"] : product.procurement_cost  } : detail
+        );
+        setStockInOutSlipDetails(updatedDetails);
+    }
+
 
 
     const validator = new Validator();
@@ -198,11 +205,11 @@ function StockInOutSlipsAdd() {
 
             ipcRenderer.send('save-stock-in-out-slip', stockInOutSlip);
             ipcRenderer.on('get-stock-in-out-slip-data-result', (event, data) => {
-                console.log("stockInOutSlipDetails",stockInOutSlipDetails)
+                console.log("stockInOutSlipDetails", stockInOutSlipDetails)
                 for (let i = 0; i < stockInOutSlipDetails.length; i++) {
                     const stockInOutSlipDetailData = stockInOutSlipDetails[i];
                     stockInOutSlipDetailData.stock_in_out_slip_id = data.id;
-                    
+
                     ipcRenderer.send('save-stock-in-out-slip-detail', stockInOutSlipDetailData);
                 }
             });
@@ -231,15 +238,21 @@ function StockInOutSlipsAdd() {
         }
     };
 
-
     const handleSumPrice = () => {
         let SumPrice = 0
+        let consumptionTaxEight = 0
+        let consumptionTaxTen = 0
 
         for (let i = 0; i < stockInOutSlipDetails.length; i++) {
             SumPrice += stockInOutSlipDetails[i].price * stockInOutSlipDetails[i].number;
+            if (stockInOutSlipDetails[i].tax_rate === 8) {
+                consumptionTaxEight += stockInOutSlipDetails[i].price * stockInOutSlipDetails[i].number * 0.08;
+            } else if (stockInOutSlipDetails[i].tax_rate === 10) {
+                consumptionTaxTen += stockInOutSlipDetails[i].price * stockInOutSlipDetails[i].number * 0.1;
+            }
         }
 
-        return { "subtotal": SumPrice, "consumptionTaxEight": SumPrice * 0.08, "consumptionTaxTen": 0, "totalConsumptionTax": SumPrice * 0.08, "Total": SumPrice * 1.08 }
+        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxEight + consumptionTaxTen, "Total": SumPrice + consumptionTaxEight + consumptionTaxTen }
     }
 
     const [isOpen, setIsOpen] = useState(null);
@@ -289,7 +302,7 @@ function StockInOutSlipsAdd() {
         <div className='w-5/6 mb-20'>
             <div className=''>
                 <div className='pt-8 pb-6 flex border-b px-8 items-center'>
-                    <div className='text-2xl font-bold'>入出庫伝票</div>
+                    <div className='text-2xl font-bold'>新規作成</div>
                     <div className='flex ml-auto'>
                         <Link to="/invoice-settings" className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
                             <div className='pr-1.5 pl-1 flex items-center'>
@@ -322,11 +335,12 @@ function StockInOutSlipsAdd() {
                     </div>
                     <div className='w-40 text-sm pb-1.5 flex items-center'>
                         処理種別
-                        <a href="#" className="my-tooltip ml-2.5">
+                        <a data-tooltip-id="my-tooltip" data-tooltip-content="倉庫間移動は振替、入庫先を指定しない場合は出庫、出庫元を指定しない場合は入庫" className='flex ml-3'>
                             <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M8.47315 4.57084H10.1398V6.23751H8.47315V4.57084ZM8.47315 7.90418H10.1398V12.9042H8.47315V7.90418ZM9.30648 0.404175C4.70648 0.404175 0.973145 4.13751 0.973145 8.73751C0.973145 13.3375 4.70648 17.0708 9.30648 17.0708C13.9065 17.0708 17.6398 13.3375 17.6398 8.73751C17.6398 4.13751 13.9065 0.404175 9.30648 0.404175ZM9.30648 15.4042C5.63148 15.4042 2.63981 12.4125 2.63981 8.73751C2.63981 5.06251 5.63148 2.07084 9.30648 2.07084C12.9815 2.07084 15.9731 5.06251 15.9731 8.73751C15.9731 12.4125 12.9815 15.4042 9.30648 15.4042Z" fill="#1F2937" />
                             </svg>
                         </a>
+                        <Tooltip id="my-tooltip" />
                         <span className='ml-2.5 text-xs font-bold text-red-600'>必須</span>
                     </div>
                     <div className='pb-4 flex'>
@@ -367,11 +381,12 @@ function StockInOutSlipsAdd() {
                     </div>
                     <div className='pb-2'>
                         <div className='flex items-center text-sm pb-1.5'>出庫元倉庫
-                            <a href="#" className="my-tooltip ml-2.5">
+                            <a data-tooltip-id="my-tooltip" data-tooltip-content="出庫処理の場合：出庫元倉庫のみを指定" className='flex ml-3'>
                                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M8.47315 4.57084H10.1398V6.23751H8.47315V4.57084ZM8.47315 7.90418H10.1398V12.9042H8.47315V7.90418ZM9.30648 0.404175C4.70648 0.404175 0.973145 4.13751 0.973145 8.73751C0.973145 13.3375 4.70648 17.0708 9.30648 17.0708C13.9065 17.0708 17.6398 13.3375 17.6398 8.73751C17.6398 4.13751 13.9065 0.404175 9.30648 0.404175ZM9.30648 15.4042C5.63148 15.4042 2.63981 12.4125 2.63981 8.73751C2.63981 5.06251 5.63148 2.07084 9.30648 2.07084C12.9815 2.07084 15.9731 5.06251 15.9731 8.73751C15.9731 12.4125 12.9815 15.4042 9.30648 15.4042Z" fill="#1F2937" />
                                 </svg>
                             </a>
+                            <Tooltip id="my-tooltip" />
                         </div>
                         <div className="w-[480px] pb-1.5">
                             <div className="relative" ref={dropdownRef}>
@@ -409,11 +424,12 @@ function StockInOutSlipsAdd() {
                     </div>
                     <div className='pb-2'>
                         <div className='flex items-center text-sm pb-1.5'>入庫先倉庫
-                            <a href="#" className="my-tooltip ml-2.5">
+                            <a data-tooltip-id="my-tooltip" data-tooltip-content="入庫処理の場合：入庫先倉庫のみを指定" className='flex ml-3'>
                                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M8.47315 4.57084H10.1398V6.23751H8.47315V4.57084ZM8.47315 7.90418H10.1398V12.9042H8.47315V7.90418ZM9.30648 0.404175C4.70648 0.404175 0.973145 4.13751 0.973145 8.73751C0.973145 13.3375 4.70648 17.0708 9.30648 17.0708C13.9065 17.0708 17.6398 13.3375 17.6398 8.73751C17.6398 4.13751 13.9065 0.404175 9.30648 0.404175ZM9.30648 15.4042C5.63148 15.4042 2.63981 12.4125 2.63981 8.73751C2.63981 5.06251 5.63148 2.07084 9.30648 2.07084C12.9815 2.07084 15.9731 5.06251 15.9731 8.73751C15.9731 12.4125 12.9815 15.4042 9.30648 15.4042Z" fill="#1F2937" />
                                 </svg>
                             </a>
+                            <Tooltip id="my-tooltip" />
                         </div>
                         <div className="w-[480px] pb-1.5">
                             <div className="relative" ref={dropdownRef}>
@@ -485,7 +501,7 @@ function StockInOutSlipsAdd() {
                                                                         products.map((product, idx) => (
                                                                             <div key={idx}
                                                                                 className="p-2 hover:bg-gray-100 hover:cursor-pointer"
-                                                                                onClick={(e) => handleOnDetailClick("product_id", product.id, index)}
+                                                                                onClick={(e) => handleProductClick(product, index)}
                                                                             >
                                                                                 {product.name}
                                                                             </div>
@@ -520,7 +536,7 @@ function StockInOutSlipsAdd() {
                                                                         products.map((product, idx) => (
                                                                             <div key={idx}
                                                                                 className="p-2 hover:bg-gray-100 hover:cursor-pointer"
-                                                                                onClick={(e) => handleOnDetailClick("product_name", product.name, index)}
+                                                                                onClick={(e) => handleProductClick(product, index)}
                                                                             >
                                                                                 {product.name}
                                                                             </div>
@@ -567,9 +583,9 @@ function StockInOutSlipsAdd() {
                                 <div className='flex items-center justify-end'>
                                     <div className='flex items-center'>
                                         <div className='mr-4'>消費税額</div>
-                                        <div className='mr-4'>{(stockInOutSlipDetails[index].price * stockInOutSlipDetails[index].number * 0.08).toFixed(0)}円</div>
+                                        <div className='mr-4'>{(stockInOutSlipDetails[index].price * stockInOutSlipDetails[index].number * (stockInOutSlipDetails[index].tax_rate * 0.01)).toFixed(0)}円</div>
                                         <div className='mr-4'>金額</div>
-                                        <div className='text-lg font-bold'>{(stockInOutSlipDetails[index].price * stockInOutSlipDetails[index].number * 1.08).toFixed(0)}円</div>
+                                        <div className='text-lg font-bold'>{(stockInOutSlipDetails[index].price * stockInOutSlipDetails[index].number * (stockInOutSlipDetails[index].tax_rate * 0.01 + 1)).toFixed(0)}円</div>
                                     </div>
                                 </div>
                                 <hr className='py-3' />
@@ -614,7 +630,7 @@ function StockInOutSlipsAdd() {
                 </div>
                 <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
                     <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>新規登録</div>
-                    <Link to={`procurements/save-stock-in-out-slips`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
+                    <Link to={`/procurement/voucher-entries/stock-in-out-slips`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
                 </div>
             </div>
         </div>

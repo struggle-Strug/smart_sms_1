@@ -1,7 +1,39 @@
 {
-  "name": "my-app",
-  "version": "0.1.0",
-  "private": true,
+  "name": "smart-sms",
+  "version": "0.1.3",
+  "main": "public/index.js",
+  "homepage": "./",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/esakiryota/smart-sms.git"
+  },
+  "build": {
+    "appId": "com.smart-sms.app",
+    "files": [
+      "public/**/*",
+      "src/**/*",
+      "node_modules/**/*",
+      "package.json",
+      "build/**/*"
+    ],
+    "extraResources": [
+      "assets/**/*",
+      "node_modules/sqlite3/**/*"
+    ],
+    "extraMetadata": {
+      "main": "public/index.js"
+    },
+    "mac": {
+      "category": "public.app-category.utilities",
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  },
   "dependencies": {
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
@@ -14,6 +46,8 @@
     "browserify-fs": "^1.0.0",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
+    "electron-log": "^5.2.0",
+    "electron-squirrel-startup": "^1.0.1",
     "fs": "^0.0.1-security",
     "json2csv": "^6.0.0-alpha.2",
     "path-browserify": "^1.0.1",
@@ -25,16 +59,17 @@
     "react-scripts": "5.0.1",
     "react-tooltip": "^5.28.0",
     "sqlite3": "^5.1.7",
+    "update-electron-app": "^3.0.0",
     "web-vitals": "^2.1.4",
     "xlsx": "^0.18.5"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "electron": "concurrently \"npm:start\" \"wait-on http://localhost:3000 && electron ./public\""
-  },
+  "start": "react-scripts start",
+  "build": "react-scripts build",
+  "test": "react-scripts test",
+  "eject": "react-scripts eject",
+  "electron": "concurrently \"npm:start\" \"wait-on http://localhost:3000 && electron ./public\""
+},
   "eslintConfig": {
     "extends": [
       "react-app",
@@ -54,9 +89,21 @@
     ]
   },
   "devDependencies": {
+    "@electron-forge/cli": "^7.5.0",
+    "@electron-forge/maker-deb": "^7.5.0",
+    "@electron-forge/maker-rpm": "^7.5.0",
+    "@electron-forge/maker-squirrel": "^7.5.0",
+    "@electron-forge/maker-zip": "^7.5.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.5.0",
+    "@electron-forge/plugin-fuses": "^7.5.0",
+    "@electron-forge/publisher-github": "^7.5.0",
+    "@electron/fuses": "^1.8.0",
     "autoprefixer": "^10.4.19",
     "concurrently": "^8.2.2",
     "electron": "^31.2.1",
+    "electron-osx-sign": "^0.6.0",
+    "electron-packager": "^17.1.2",
+    "electron-rebuild": "^3.2.9",
     "postcss": "^8.4.39",
     "tailwindcss": "^3.4.6",
     "wait-on": "^7.2.0"
