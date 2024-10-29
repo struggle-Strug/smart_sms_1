@@ -1,17 +1,17 @@
 const { ipcMain } = require('electron');
 const { 
-    loadestimationSlips, 
+    loadEstimationSlips, 
     getEstimationSlipById, 
     saveEstimationSlip, 
     deleteEstimationSlipById, 
     editEstimationSlip,
-    searchestimationSlips,
-    searchestimationSlipsOnPV
+    searchEstimationSlips,
+    searchEstimationSlipsOnPV
 } = require('../../database/salesmanagements/estimationSlips');
 
 // 見積書のデータをロード
 ipcMain.on('load-estimation-slips', (event) => {
-    loadestimationSlips((err, rows) => {
+    loadEstimationSlips((err, rows) => {
         if (err) {
             console.error(err.message);
         } else {
@@ -67,7 +67,7 @@ ipcMain.on('edit-estimation-slip', (event, id) => {
 
 // 見積書の検索（オプション）
 ipcMain.on('search-estimation-slips', (event, query) => {
-    searchestimationSlips(query, (err, results) => {
+    searchEstimationSlips(query, (err, results) => {
         if (err) {
             console.error(err.message);
         } else {
@@ -77,7 +77,7 @@ ipcMain.on('search-estimation-slips', (event, query) => {
 
 });
 ipcMain.on('search-estimation-slips-on-pv', (event, query) => {
-    searchestimationSlipsOnPV(query, (err, results) => {
+    searchEstimationSlipsOnPV(query, (err, results) => {
         if (err) {
             console.error(err.message);
         } else {

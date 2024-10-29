@@ -5,18 +5,19 @@ import { Tooltip } from 'react-tooltip'
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 const { ipcRenderer } = window.require('electron');
 
-function SalesSlipsDetail() {
-    const [salesSlip, setSalesSlip] = useState({
+function OrderSlipsDetail() {
+    const [orderSlip, setOrderSlip] = useState({
         id: '',
         code: '',
-        sales_date: '',
-        delivery_due_date: '',
+        order_id: '',
+        order_date: '',
+        delivery_date: '',
         vender_id: '',
         vender_name: '',
         honorific: '',
         vender_contact_person: '',
-        order_slip_id: '',
-        order_id: '',
+        estimation_slip_id: '',
+        estimation_id: '',
         remarks: '',
         closing_date: '',
         deposit_due_date: '',
@@ -26,29 +27,28 @@ function SalesSlipsDetail() {
     const { id } = useParams();
 
     useEffect(() => {
-        ipcRenderer.send('get-sales-slip-detail', id);
-
-        ipcRenderer.on('sales-slip-detail-data', (event, data) => {
-            setSalesSlip(data);
+        ipcRenderer.send('get-order-slip-detail', id);
+        ipcRenderer.on('order-slip-detail-data', (event, data) => {
+            setOrderSlip(data);
         });
 
-        ipcRenderer.send('search-sales-slip-details-by-vender-id', id);
+        ipcRenderer.send('search-order-slip-details-by-vender-id', id);
 
-
-        ipcRenderer.on('search-sales-slip-details-by-vender-id-result', (event, data) => {
-            setSalesSlipDetails(data);
+        
+        ipcRenderer.on('search-order-slip-details-by-vender-id-result', (event, data) => {
+            setOrderSlipDetails(data);
         });
 
         return () => {
-            ipcRenderer.removeAllListeners('sales-slip-data');
-            ipcRenderer.removeAllListeners('search-sales-slip-details-by-vender-id');
+            ipcRenderer.removeAllListeners('order-slip-data');
+            ipcRenderer.removeAllListeners('search-order-slip-details-by-vender-id');
         };
     }, [id]);
 
-    const [salesSlipDetails, setSalesSlipDetails] = useState([
+    const [orderSlipDetails, setOrderSlipDetails] = useState([
         {
             id: '',
-            sales_slip_id: '',
+            order_slip_id: '',
             product_id: '',
             product_name: '',
             number: '',
@@ -68,8 +68,8 @@ function SalesSlipsDetail() {
     const handleSumPrice = () => {
         let SumPrice = 0
 
-        for (let i = 0; i < salesSlipDetails.length; i++) {
-            SumPrice += salesSlipDetails[i].unit_price * salesSlipDetails[i].number;
+        for (let i = 0; i < orderSlipDetails.length; i++) {
+            SumPrice += orderSlipDetails[i].unit_price * orderSlipDetails[i].number;
         }
 
         return { "subtotal": SumPrice, "consumptionTaxEight": SumPrice * 0.08, "consumptionTaxTen": 0, "totalConsumptionTax": SumPrice * 0.08, "Total": SumPrice * 1.08 }
@@ -80,7 +80,7 @@ function SalesSlipsDetail() {
         <div className='w-full'>
             <div className=''>
                 <div className='pt-8 pb-6 flex border-b px-8 items-center'>
-                    <div className='text-2xl font-bold'>{'株式会社テスト'}</div>
+                    <div className='text-2xl font-bold'>受注伝票</div>
                     <div className='flex ml-auto'>
                         <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
                             <div className='pr-1.5 pl-1 flex items-center'>
@@ -111,14 +111,18 @@ function SalesSlipsDetail() {
                     </div>
                 </div>
                 <div className='px-8 py-6'>
-                    <div className='py-2.5 font-bold text-xl'>伝票番号</div>
+                    <div className='py-2.5 font-bold text-xl'>伝票情報</div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>伝票番号</div>
-                        <div>{salesSlip.code}</div>
+                        <div>{orderSlip.code}</div>
                     </div>
                     <div className='flex items-center pb-2'>
-                        <div className='w-40'>売上日付</div>
-                        <div>{salesSlip.sales_date}</div>
+                        <div className='w-40'>受注日付</div>
+                        <div>{orderSlip.order_date}</div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>納品日付</div>
+                        <div>{orderSlip.delivery_date}</div>
                     </div>
                     <div className='py-3'>
                         <hr className='' />
@@ -126,11 +130,11 @@ function SalesSlipsDetail() {
                     <div className='py-2.5 font-bold text-xl'>取引先情報</div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>宛名</div>
-                        <div>{salesSlip.vender_name}御中</div>
+                        <div>{orderSlip.vender_name}御中</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>得意先コード</div>
-                        <div>{salesSlip.vender_id}</div>
+                        <div>{orderSlip.vender_id}</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>郵便番号</div>
@@ -142,7 +146,7 @@ function SalesSlipsDetail() {
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>担当者</div>
-                        <div>{salesSlip.vender_contact_person}</div>
+                        <div>{orderSlip.vender_contact_person}</div>
                     </div>
                     <div className='py-3'>
                         <hr className='' />
@@ -163,18 +167,17 @@ function SalesSlipsDetail() {
                     <div className='py-3'>
                         <hr className='' />
                     </div>
-                    <div className='py-2.5 font-bold text-xl'>受注伝票</div>
+                    <div className='py-2.5 font-bold text-xl'>見積伝票</div>
                     <div className='flex items-center pb-2'>
-                        <div className='w-40'>受注伝票番号</div>
-                        <div>{salesSlip.order_slip_id}</div>
+                        <div className='w-40'>見積伝票番号</div>
+                        <div>{orderSlip.estimation_slip_id}</div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>見積番号</div>
+                        <div>{orderSlip.estimation_id}</div>
                     </div>
                     <div className='py-3'>
                         <hr className='' />
-                    </div>
-                    <div className='py-2.5 font-bold text-xl'>受注番号</div>
-                    <div className='flex items-center pb-2'>
-                        <div className='w-40'>受注番号</div>
-                        <div>{salesSlip.order_id}</div>
                     </div>
                     <div className='py-2.5 font-bold text-xl'>明細</div>
                     <table className="w-full mt-8 table-auto">
@@ -185,6 +188,7 @@ function SalesSlipsDetail() {
                                 <th className='text-left py-2 w-72'>数量</th>
                                 <th className='text-left py-2 w-72'>単位</th>
                                 <th className='text-left py-2 w-72'>ロット番号</th>
+                                <th className='text-left py-2 w-72'>受注残数</th>
                                 <th className='text-left py-2 w-72'>単価</th>
                                 <th className='text-left py-2 w-72'>粗利益</th>
                                 <th className='text-left py-2 w-72'>粗利率</th>
@@ -196,20 +200,21 @@ function SalesSlipsDetail() {
                         </thead>
                         <tbody>
                         {
-                        salesSlipDetails.map((salesSlipDetail, index) => (
+                        orderSlipDetails.map((orderSlipDetail, index) => (
                             <tr className='border-b' key={index}>
-                                <td className='py-2'>{salesSlipDetail.product_id}</td>
-                                <td className='py-2'>{salesSlipDetail.product_name}</td>
-                                <td className='py-2'>{salesSlipDetail.number}</td>
-                                <td className='py-2'>{salesSlipDetail.unit}</td>
-                                <td className='py-2'>{salesSlipDetail.lot_number}</td>
-                                <td className='py-2'>{salesSlipDetail.unit_price}</td>
-                                <td className='py-2'>{salesSlipDetail.gross_profit}%</td>
-                                <td className='py-2'>{salesSlipDetail.gross_margin_rate}</td>
-                                <td className='py-2'>{salesSlipDetail.tax_rate}</td>
-                                <td className='py-2'>{salesSlipDetail.storage_facility}</td>
-                                <td className='py-2'>{parseInt(salesSlipDetail.unit_price) * parseInt(salesSlipDetail.number)}円</td>
-                                <td className='py-2'>{parseInt(salesSlipDetail.unit_price) * parseInt(salesSlipDetail.number) * parseInt(salesSlipDetail.tax_rate)}円</td>
+                                <td className='py-2'>{orderSlipDetail.product_id}</td>
+                                <td className='py-2'>{orderSlipDetail.product_name}</td>
+                                <td className='py-2'>{orderSlipDetail.number}</td>
+                                <td className='py-2'>{orderSlipDetail.unit}</td>
+                                <td className='py-2'>{orderSlipDetail.lot_number}</td>
+                                <td className='py-2'>{"発注残数??"}</td>
+                                <td className='py-2'>{orderSlipDetail.unit_price}</td>
+                                <td className='py-2'>{orderSlipDetail.gross_profit}%</td>
+                                <td className='py-2'>{orderSlipDetail.gross_margin_rate}</td>
+                                <td className='py-2'>{orderSlipDetail.tax_rate}</td>
+                                <td className='py-2'>{orderSlipDetail.storage_facility}</td>
+                                <td className='py-2'>{parseInt(orderSlipDetail.unit_price) * parseInt(orderSlipDetail.number)}円</td>
+                                <td className='py-2'>{parseInt(orderSlipDetail.unit_price) * parseInt(orderSlipDetail.number) * parseInt(orderSlipDetail.tax_rate)}円</td>
                             </tr>
                         ))}
                         </tbody>
@@ -238,14 +243,12 @@ function SalesSlipsDetail() {
                             </div>
                         </div>
                     </div>
-
-
                     <div className='py-3'>
                         <hr className='' />
                     </div>
                     <div className='py-2.5 font-bold text-xl'>備考</div>
                     <div className='flex items-center pb-2'>
-                    {salesSlip.remarks}
+                    {orderSlip.remarks}
                     </div>
                     <div className='py-3'>
                         <hr className='' />
@@ -257,11 +260,11 @@ function SalesSlipsDetail() {
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>入金期日</div>
-                        <div>{salesSlip.deposit_due_date}</div>
+                        <div>{orderSlip.deposit_due_date}</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>入金方法</div>
-                        <div>{salesSlip.deposit_method}</div>
+                        <div>{orderSlip.deposit_method}</div>
                     </div>
                 </div>
             </div>
@@ -269,4 +272,4 @@ function SalesSlipsDetail() {
     );
 }
 
-export default SalesSlipsDetail;
+export default OrderSlipsDetail;

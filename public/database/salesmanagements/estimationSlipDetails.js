@@ -136,6 +136,24 @@ function initializeDatabase() {
     db.run(sql);
 }
 
+function searchEstimationSlipsByEstimationSlipId(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM estimation_slip_details 
+        WHERE estimation_slip_id LIKE ?
+        `;
+        params = [`%${query}%`];
+    } else {
+        sql = `SELECT * FROM estimation_slip_details`;
+    }
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
 module.exports = {
     loadEstimationSlipDetails,
     getEstimationSlipDetailById,
@@ -143,4 +161,5 @@ module.exports = {
     deleteEstimationSlipDetailById,
     editEstimationSlipDetail,
     initializeDatabase,
+    searchEstimationSlipsByEstimationSlipId
 };

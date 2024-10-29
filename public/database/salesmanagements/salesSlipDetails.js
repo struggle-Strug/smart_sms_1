@@ -97,6 +97,17 @@ function saveSalesSlipDetail(salesSlipDetailData, callback) {
     }
 }
 
+function deleteSalesSlipDetailsBySlipId(salesSlipId, callback) {
+    const sql = `
+        DELETE FROM order_slip_details
+        WHERE sales_slip_id = ?
+    `;
+    db.run(sql, [salesSlipId], (err) => {
+        callback(err);
+    });
+}
+
+
 function deleteSalesSlipDetailById(id, callback) {
     const sql = `DELETE FROM sales_slip_details WHERE id = ?`;
     db.run(sql, [id], (err) => {
@@ -110,6 +121,25 @@ function editSalesSlipDetail(id, callback) {
         callback(err, row);
     });
 }
+
+function searchSalesSlipsBySalesSlipId(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM sales_slip_details 
+        WHERE sales_slip_id LIKE ?
+        `;
+        params = [`%${query}%`];
+    } else {
+        sql = `SELECT * FROM sales_slip_details`;
+    }
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
 
 function initializeDatabase() {
     const sql = `
@@ -139,5 +169,8 @@ module.exports = {
     saveSalesSlipDetail,
     deleteSalesSlipDetailById,
     editSalesSlipDetail,
-    initializeDatabase
+    initializeDatabase,
+    deleteSalesSlipDetailsBySlipId,
+    searchSalesSlipsBySalesSlipId
+
 };

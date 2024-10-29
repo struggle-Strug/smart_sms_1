@@ -22,6 +22,7 @@ function getSalesSlipById(id, callback) {
 function saveSalesSlip(salesSlipData, callback) {
     const {
         id,
+        code,
         sales_date,
         delivery_due_date,
         vender_id,
@@ -41,6 +42,7 @@ function saveSalesSlip(salesSlipData, callback) {
     if (id) {
         db.run(
             `UPDATE sales_slips SET 
+                code = ?,
                 sales_date = ?, 
                 delivery_due_date = ?, 
                 vender_id = ?, 
@@ -56,6 +58,7 @@ function saveSalesSlip(salesSlipData, callback) {
                 updated = datetime('now') 
             WHERE id = ?`,
             [
+                code,
                 sales_date,
                 delivery_due_date,
                 vender_id,
@@ -70,15 +73,23 @@ function saveSalesSlip(salesSlipData, callback) {
                 deposit_method,
                 id
             ],
-            callback
+            function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                // 更新のため、IDをそのまま返す
+                callback(null, { lastID: id });
+            }
+
         );
     } else {
         db.run(
             `INSERT INTO sales_slips 
-            (sales_date, delivery_due_date, vender_id, vender_name, honorific, vender_contact_person, order_slip_id, order_id, remarks, closing_date, deposit_due_date, deposit_method, created, updated) 
+            (code, sales_date, delivery_due_date, vender_id, vender_name, honorific, vender_contact_person, order_slip_id, order_id, remarks, closing_date, deposit_due_date, deposit_method, created, updated) 
             VALUES 
-            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
             [
+                code,
                 sales_date,
                 delivery_due_date,
                 vender_id,
@@ -92,7 +103,14 @@ function saveSalesSlip(salesSlipData, callback) {
                 deposit_due_date,
                 deposit_method
             ],
-            callback
+            function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                // 更新のため、IDをそのまま返す
+                callback(null, { lastID: this.lastID });
+            }
+
         );
     }
 }
@@ -115,6 +133,7 @@ function initializeDatabase() {
     const sql = `
     CREATE TABLE IF NOT EXISTS sales_slips (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        code VARCHAR(255) DEFAULT NULL,
         sales_date DATE,
         delivery_due_date DATE NULL,
         vender_id VARCHAR(255),
@@ -133,11 +152,33 @@ function initializeDatabase() {
     db.run(sql);
 }
 
+function searchSalesSlips(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM sales_slips 
+        WHERE vender_name LIKE ? OR vender_contact_person LIKE ?
+        `;
+        // params = [`%${query}%`, `%${query}%`, `%${query}%`];
+        params = Array(2).fill(`%${query}%`);
+    } else {
+        sql = `SELECT * FROM sales_slips`;
+    }
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
+
 module.exports = {
     loadSalesSlips,
     getSalesSlipById,
     saveSalesSlip,
     deleteSalesSlipById,
     editSalesSlip,
-    initializeDatabase
+    initializeDatabase,
+    searchSalesSlips
+
 };

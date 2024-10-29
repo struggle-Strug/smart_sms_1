@@ -22,6 +22,7 @@ function getEstimationSlipById(id, callback) {
 function saveEstimationSlip(estimationData, callback) {
     const {
         id,
+        code,
         estimation_date,
         estimation_due_date,
         estimation_id,
@@ -39,6 +40,7 @@ function saveEstimationSlip(estimationData, callback) {
     if (id) {
         db.run(
             `UPDATE estimation_slips SET 
+                code = ?,
                 estimation_date = ?, 
                 estimation_due_date = ?, 
                 estimation_id = ?, 
@@ -54,6 +56,7 @@ function saveEstimationSlip(estimationData, callback) {
                 updated = datetime('now') 
             WHERE id = ?`,
             [
+                code,
                 estimation_date,
                 estimation_due_date,
                 estimation_id,
@@ -68,15 +71,25 @@ function saveEstimationSlip(estimationData, callback) {
                 deposit_method,
                 id
             ],
-            callback
+
+            // callback
+            function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                // 更新のため、IDをそのまま返す
+                callback(null, { lastID: id });
+            }
         );
     } else {
+        console.log("@@@@@@@@@@@@@@@update@@@@@@@@@@@@@@@@@@@@");
         db.run(
             `INSERT INTO estimation_slips 
-            (estimation_date, estimation_due_date, estimation_id, vender_id, vender_name, honorific, vender_contact_person, remarks, estimated_delivery_date, closing_date, deposit_due_date, deposit_method, created, updated) 
+            (code, estimation_date, estimation_due_date, estimation_id, vender_id, vender_name, honorific, vender_contact_person, remarks, estimated_delivery_date, closing_date, deposit_due_date, deposit_method, created, updated) 
             VALUES 
-            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+            (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
             [
+                code,
                 estimation_date,
                 estimation_due_date,
                 estimation_id,
@@ -90,7 +103,17 @@ function saveEstimationSlip(estimationData, callback) {
                 deposit_due_date,
                 deposit_method
             ],
-            callback
+
+            // callback
+            function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                // 更新のため、IDをそのまま返す
+                console.log("@@@@@@@@@@@@@@@this lastID@@@@@@@@@@@@@@@@@@@@");
+                console.log(this.lastID);
+                callback(null, { lastID: this.lastID });
+            }
         );
     }
 }
@@ -113,6 +136,7 @@ function initializeDatabase() {
     const sql = `
     CREATE TABLE IF NOT EXISTS estimation_slips (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        code VARCHAR(255) DEFAULT NULL,
         estimation_date DATE,
         estimation_due_date DATE,
         estimation_id VARCHAR(255),
@@ -141,7 +165,8 @@ function searchEstimationSlips(query, callback) {
         SELECT * FROM estimation_slips 
         WHERE vender_name LIKE ? OR estimation_id LIKE ? OR vender_contact_person LIKE ?
         `;
-        params = [`%${query}%`, `%${query}%`, `%${query}%`];
+        // params = [`%${query}%`, `%${query}%`, `%${query}%`];
+        params = Array(2).fill(`%${query}%`);
     } else {
         sql = `SELECT * FROM estimation_slips`;
     }

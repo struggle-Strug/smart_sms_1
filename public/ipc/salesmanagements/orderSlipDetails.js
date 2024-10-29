@@ -7,6 +7,7 @@ const {
     editOrderSlipDetail, 
     searchOrderSlipDetails,
     searchOrderSlipsByOrderSlipId,
+    deleteOrderSlipDetailsBySlipId,
     deleteOrderSlipDetailsByPoId
 } = require('../../database/salesmanagements/orderSlipDetails');
 
@@ -34,7 +35,7 @@ ipcMain.on('get-order-slip-detail-data', (event, id) => {
 
 // 購入注文明細を保存
 ipcMain.on('save-order-slip-detail', (event, detailData) => {
-    saveOrderSlipDetail(detailData, (err) => {
+    saveOrderSlipDetail(detailData, (err,result) => {
         if (err) {
             console.error(err.message);
         } else {
@@ -83,6 +84,7 @@ ipcMain.on('search-order-slip-details', (event, query) => {
 });
 
 ipcMain.on('search-order-slip-details-by-vender-id', (event, query) => {
+    console.log("ipc search-order-slip-details-by-vender-id");
     searchOrderSlipsByOrderSlipId(query, (err, results) => {
         if (err) {
             console.error(err.message);
@@ -92,12 +94,12 @@ ipcMain.on('search-order-slip-details-by-vender-id', (event, query) => {
     });
 });
 
-ipcMain.on('delete-order-slip-details-by-po-id', (event, orderSlipId) => {
-    deleteOrderSlipDetailsByPoId(orderSlipId, (err) => {
+ipcMain.on('delete-order-slip-details-by-slip-id', (event, orderSlipId) => {
+    deleteOrderSlipDetailsBySlipId(orderSlipId, (err) => {
         if (err) {
             console.error(err.message);
         } else {
-            event.sender.send('order-slip-details-deleted-by-po-id', orderSlipId);
+            event.sender.send('order-slip-details-deleted-by-slip-id', orderSlipId);
         }
     });
 });

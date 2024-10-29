@@ -111,6 +111,37 @@ function editOrderSlipDetail(id, callback) {
     });
 }
 
+function deleteOrderSlipDetailsBySlipId(orderSlipId, callback) {
+    const sql = `
+        DELETE FROM order_slip_details
+        WHERE order_slip_id = ?
+    `;
+    db.run(sql, [orderSlipId], (err) => {
+        callback(err);
+    });
+}
+
+function searchOrderSlipsByOrderSlipId(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM order_slip_details 
+        WHERE order_slip_id LIKE ?
+        `;
+        params = [`%${query}%`];
+    } else {
+        sql = `SELECT * FROM order_slip_details`;
+    }
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
+
+
+
 function initializeDatabase() {
     const sql = `
     CREATE TABLE IF NOT EXISTS order_slip_details (
@@ -139,5 +170,8 @@ module.exports = {
     saveOrderSlipDetail,
     deleteOrderSlipDetailById,
     editOrderSlipDetail,
-    initializeDatabase
+    initializeDatabase,
+    deleteOrderSlipDetailsBySlipId,
+    searchOrderSlipsByOrderSlipId
+
 };

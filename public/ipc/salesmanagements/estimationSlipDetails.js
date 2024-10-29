@@ -1,17 +1,18 @@
 const { ipcMain } = require('electron');
 const { 
-    loadestimationSlipDetails, 
+    loadEstimationSlipDetails, 
     getEstimationSlipDetailById, 
     saveEstimationSlipDetail, 
     deleteEstimationSlipDetailById, 
     editEstimationSlipDetail,
-    searchestimationSlipDetails,
-    searchestimationSlipDetailsOnPV
+    searchEstimationSlipsByEstimationSlipId,
+    searchEstimationSlipDetails,
+    searchEstimationSlipDetailsOnPV
 } = require('../../database/salesmanagements/estimationSlipDetails');
 
 // 見積書のデータをロード
 ipcMain.on('load-estimation-slip-details', (event) => {
-    loadestimationSlipDetails((err, rows) => {
+    loadEstimationSlipDetails((err, rows) => {
         if (err) {
             console.error(err.message);
         } else {
@@ -32,12 +33,19 @@ ipcMain.on('get-estimation-slip-detail-data', (event, id) => {
 });
 
 // 見積書を保存
-ipcMain.on('save-estimation-slip-detail', (event, EstimationSlipDetail) => {
-    saveEstimationSlipDetail(EstimationSlipDetail, (err, result) => {
+ipcMain.on('save-estimation-slip-detail', (event, detailData) => {
+    saveEstimationSlipDetail(detailData, (err, result) => {
         if (err) {
             console.error(err.message);
         } else {
-            event.sender.send('save-estimation-slip-detail-result', { id: result.lastID });
+            // event.sender.send('save-estimation-slip-detail-result', { id: result.lastID });
+            loadEstimationSlipDetails((loadErr, rows) => {
+                if (loadErr) {
+                    console.error(loadErr.message);
+                } else {
+                    event.sender.send('load-estimation-slip-details', rows);
+                }
+            });
         }
     });
 });
@@ -66,7 +74,8 @@ ipcMain.on('edit-estimation-slip-detail', (event, id) => {
 
 // 見積書の検索（オプション）
 ipcMain.on('search-estimation-slip-details', (event, query) => {
-    searchestimationSlipDetails(query, (err, results) => {
+    searchEstimationSlipDetails(query, (err, results) => {
+
         if (err) {
             console.error(err.message);
         } else {
@@ -75,8 +84,21 @@ ipcMain.on('search-estimation-slip-details', (event, query) => {
     });
 
 });
+
+
+ipcMain.on('search-estimation-slip-details-by-vender-id', (event, query) => {
+    searchEstimationSlipsByEstimationSlipId(query, (err, results) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('search-estimation-slip-details-by-vender-id-result', results);
+        }
+    });
+});
+
 ipcMain.on('search-estimation-slip-detail-on-pv', (event, query) => {
-    searchestimationSlipDetailsOnPV(query, (err, results) => {
+    searchEstimationSlipDetailsOnPV(query, (err, results) => {
+
         if (err) {
             console.error(err.message);
         } else {
