@@ -6,6 +6,76 @@ import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 const { ipcRenderer } = window.require('electron');
 
 function SalesSlipsDetail() {
+    const [salesSlip, setSalesSlip] = useState({
+        id: '',
+        code: '',
+        sales_date: '',
+        delivery_due_date: '',
+        vender_id: '',
+        vender_name: '',
+        honorific: '',
+        vender_contact_person: '',
+        order_slip_id: '',
+        order_id: '',
+        remarks: '',
+        closing_date: '',
+        deposit_due_date: '',
+        deposit_method: '',
+    });
+
+    const { id } = useParams();
+
+    useEffect(() => {
+        ipcRenderer.send('get-sales-slip-detail', id);
+
+        ipcRenderer.on('sales-slip-detail-data', (event, data) => {
+            setSalesSlip(data);
+        });
+
+        ipcRenderer.send('search-sales-slip-details-by-vender-id', id);
+
+
+        ipcRenderer.on('search-sales-slip-details-by-vender-id-result', (event, data) => {
+            setSalesSlipDetails(data);
+        });
+
+        return () => {
+            ipcRenderer.removeAllListeners('sales-slip-data');
+            ipcRenderer.removeAllListeners('search-sales-slip-details-by-vender-id');
+        };
+    }, [id]);
+
+    const [salesSlipDetails, setSalesSlipDetails] = useState([
+        {
+            id: '',
+            sales_slip_id: '',
+            product_id: '',
+            product_name: '',
+            number: '',
+            unit: '',
+            unit_price: '',
+            tax_rate: '',
+            lot_number: '',
+            storage_facility: '',
+            stock: '',
+            gross_profit: '',
+            gross_margin_rate: '',
+            created: '',
+            updated: '',
+        }
+    ]);
+
+    const handleSumPrice = () => {
+        let SumPrice = 0
+
+        for (let i = 0; i < salesSlipDetails.length; i++) {
+            SumPrice += salesSlipDetails[i].unit_price * salesSlipDetails[i].number;
+        }
+
+        return { "subtotal": SumPrice, "consumptionTaxEight": SumPrice * 0.08, "consumptionTaxTen": 0, "totalConsumptionTax": SumPrice * 0.08, "Total": SumPrice * 1.08 }
+    }
+
+
     return (
         <div className='w-full'>
             <div className=''>
@@ -44,62 +114,154 @@ function SalesSlipsDetail() {
                     <div className='py-2.5 font-bold text-xl'>伝票番号</div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>伝票番号</div>
-                        <div>PO-0000000001</div>
+                        <div>{salesSlip.code}</div>
                     </div>
                     <div className='flex items-center pb-2'>
-                        <div className='w-40'>発注日付</div>
-                        <div>202-08-27</div>
-                    </div>
-                    <div className='flex items-center pb-2'>
-                        <div className='w-40'>処理種別</div>
-                        <div></div>
-                    </div>
-                    <div className='flex items-center pb-2'>
-                        <div className='w-40'>出庫元倉庫</div>
-                        <div></div>
-                    </div>
-                    <div className='flex items-center pb-2'>
-                        <div className='w-40'>入庫先倉庫</div>
-                        <div></div>
-                    </div>
-                    <div className='flex items-center pb-2'>
-                        <div className='w-40'>担当者</div>
-                        <div></div>
+                        <div className='w-40'>売上日付</div>
+                        <div>{salesSlip.sales_date}</div>
                     </div>
                     <div className='py-3'>
                         <hr className='' />
+                    </div>
+                    <div className='py-2.5 font-bold text-xl'>取引先情報</div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>宛名</div>
+                        <div>{salesSlip.vender_name}御中</div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>得意先コード</div>
+                        <div>{salesSlip.vender_id}</div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>郵便番号</div>
+                        <div>1040031(Temp)</div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>市区町村・番地</div>
+                        <div>東京都中央区銀座6丁目10-1建物名・部屋番号などGINZA SIX 13階(TEMP)</div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>担当者</div>
+                        <div>{salesSlip.vender_contact_person}</div>
+                    </div>
+                    <div className='py-3'>
+                        <hr className='' />
+                    </div>
+                    <div className='py-2.5 font-bold text-xl'>自社情報</div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>自社名</div>
+                        <div></div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>担当者名</div>
+                        <div></div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>電話番号</div>
+                        <div>(Temp)</div>
+                    </div>
+                    <div className='py-3'>
+                        <hr className='' />
+                    </div>
+                    <div className='py-2.5 font-bold text-xl'>受注伝票</div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>受注伝票番号</div>
+                        <div>{salesSlip.order_slip_id}</div>
+                    </div>
+                    <div className='py-3'>
+                        <hr className='' />
+                    </div>
+                    <div className='py-2.5 font-bold text-xl'>受注番号</div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>受注番号</div>
+                        <div>{salesSlip.order_id}</div>
                     </div>
                     <div className='py-2.5 font-bold text-xl'>明細</div>
                     <table className="w-full mt-8 table-auto">
                         <thead className=''>
                             <tr className='border-b'>
                                 <th className='text-left py-2'>商品コード</th>
-                                <th className='text-left py-2 w-72'>商品名</th>
-                                <th className='text-left py-2'>数量</th>
-                                <th className='text-left py-2'>単位</th>
-                                <th className='text-left py-2'>ロット番号</th>
-                                <th className='text-left py-2'>単価</th>
-                                <th className='text-left py-2'>金額</th>
+                                <th className='text-left py-2'>商品名</th>
+                                <th className='text-left py-2 w-72'>数量</th>
+                                <th className='text-left py-2 w-72'>単位</th>
+                                <th className='text-left py-2 w-72'>ロット番号</th>
+                                <th className='text-left py-2 w-72'>単価</th>
+                                <th className='text-left py-2 w-72'>粗利益</th>
+                                <th className='text-left py-2 w-72'>粗利率</th>
+                                <th className='text-left py-2 w-72'>税率</th>
+                                <th className='text-left py-2 w-72'>倉庫</th>
+                                <th className='text-left py-2 w-72'>金額</th>
+                                <th className='text-left py-2'>税額</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr className='border-b'>
-                                <td className='py-2'>1234</td>
-                                <td className='py-2'>商品名が入ります。商品名が入ります。商品名が入ります。商品名が入ります。入ります</td>
-                                <td className='py-2'>200</td>
-                                <td className='py-2'>個</td>
-                                <td className='py-2'>122</td>
-                                <td className='py-2'>10個</td>
-                                <td className='py-2'>0円</td>
+                        {
+                        salesSlipDetails.map((salesSlipDetail, index) => (
+                            <tr className='border-b' key={index}>
+                                <td className='py-2'>{salesSlipDetail.product_id}</td>
+                                <td className='py-2'>{salesSlipDetail.product_name}</td>
+                                <td className='py-2'>{salesSlipDetail.number}</td>
+                                <td className='py-2'>{salesSlipDetail.unit}</td>
+                                <td className='py-2'>{salesSlipDetail.lot_number}</td>
+                                <td className='py-2'>{salesSlipDetail.unit_price}</td>
+                                <td className='py-2'>{salesSlipDetail.gross_profit}%</td>
+                                <td className='py-2'>{salesSlipDetail.gross_margin_rate}</td>
+                                <td className='py-2'>{salesSlipDetail.tax_rate}</td>
+                                <td className='py-2'>{salesSlipDetail.storage_facility}</td>
+                                <td className='py-2'>{parseInt(salesSlipDetail.unit_price) * parseInt(salesSlipDetail.number)}円</td>
+                                <td className='py-2'>{parseInt(salesSlipDetail.unit_price) * parseInt(salesSlipDetail.number) * parseInt(salesSlipDetail.tax_rate)}円</td>
                             </tr>
+                        ))}
                         </tbody>
                     </table>
+                    <div className='py-6 flex'>
+                        <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>税抜合計</div>
+                                <div>{handleSumPrice().subtotal.toFixed(0).toLocaleString()}円</div>
+                            </div>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>消費税(8%)</div>
+                                <div>{handleSumPrice().consumptionTaxEight.toFixed(0).toLocaleString()}円</div>
+                            </div>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>消費税(10%)</div>
+                                <div>{handleSumPrice().consumptionTaxTen.toFixed(0).toLocaleString()}円</div>
+                            </div>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>消費税合計</div>
+                                <div>{handleSumPrice().totalConsumptionTax.toFixed(0).toLocaleString()}円</div>
+                            </div>
+                            <div className='flex'>
+                                <div className='w-40'>税込合計</div>
+                                <div>{handleSumPrice().Total.toFixed(0).toLocaleString()}円</div>
+                            </div>
+                        </div>
+                    </div>
+
+
                     <div className='py-3'>
                         <hr className='' />
                     </div>
                     <div className='py-2.5 font-bold text-xl'>備考</div>
                     <div className='flex items-center pb-2'>
-                        恐れいりますが、振込手数料は貴社にてご負担ください。
+                    {salesSlip.remarks}
+                    </div>
+                    <div className='py-3'>
+                        <hr className='' />
+                    </div>
+                    <div className='py-2.5 font-bold text-xl'>支払い情報</div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>ステータス</div>
+                        <div>????????????</div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>入金期日</div>
+                        <div>{salesSlip.deposit_due_date}</div>
+                    </div>
+                    <div className='flex items-center pb-2'>
+                        <div className='w-40'>入金方法</div>
+                        <div>{salesSlip.deposit_method}</div>
                     </div>
                 </div>
             </div>

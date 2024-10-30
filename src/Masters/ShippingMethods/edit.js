@@ -9,8 +9,9 @@ function ShippingMethodsEdit() {
     const { id } = useParams();  // URLから配送方法IDを取得
 
     const [shippingMethod, setShippingMethod] = useState({
-        id: '',
+        id: id,
         name: '',
+        code: '',
         remarks: '',
     });
 
@@ -79,8 +80,8 @@ function ShippingMethodsEdit() {
                             type='text' 
                             className='border rounded px-4 py-2.5 bg-white w-2/3' 
                             placeholder='配送方法コードを入力' 
-                            name="id" 
-                            value={shippingMethod.id} 
+                            name="code" 
+                            value={shippingMethod.code} 
                             onChange={handleChange} 
                         />
                     </div>

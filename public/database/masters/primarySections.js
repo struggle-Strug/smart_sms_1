@@ -12,6 +12,7 @@ function initializeDatabase() {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name VARCHAR(255) NOT NULL,
             remarks VARCHAR(255) DEFAULT NULL,
+            code VARCHAR(255) DEFAULT NULL,
             created DATE DEFAULT (datetime('now')),
             updated DATE DEFAULT (datetime('now'))
         )
@@ -33,18 +34,18 @@ function getPrimarySectionById(id, callback) {
 }
 
 function savePrimarySection(primarySectionData, callback) {
-    const { id, name, remarks } = primarySectionData;
+    const { id, name, code, remarks } = primarySectionData;
 
     if (id) {
         db.run(
-            `UPDATE primary_sections SET name = ?, remarks = ?, updated = datetime('now') WHERE id = ?`,
-            [name, remarks, id],
+            `UPDATE primary_sections SET name = ?, code = ?, remarks = ?, updated = datetime('now') WHERE id = ?`,
+            [name, code, remarks, id],
             callback
         );
     } else {
         db.run(
-            `INSERT INTO primary_sections (name, remarks, created, updated) VALUES (?, ?, datetime('now'), datetime('now'))`,
-            [name, remarks],
+            `INSERT INTO primary_sections (name, code, remarks, created, updated) VALUES (?, ?, ?, datetime('now'), datetime('now'))`,
+            [name, code, remarks],
             callback
         );
     }

@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip';
 import CustomSelect from '../../Components/CustomSelect';
 import Validator from '../../utils/validator';
+import { useNavigate } from 'react-router-dom';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -10,6 +11,7 @@ function VendorAdd() {
     const [vendor, setVendor] = useState({
         name_primary: '',
         name_secondary: '',
+        code: '',
         name_kana: '',
         phone_number: '',
         fax_number: '',
@@ -18,13 +20,26 @@ function VendorAdd() {
         contact_person: '',
         email: '',
         terms_of_trade: '',
-        remarks: ''
+        remarks: '',
+        classification1: '',     // 区分１
+        classification2: '',     // 区分２
+        tax_calculation: '',     // 消費税計算
+        closing_date: '',        // 締日
+        payment_date: '',        // 支払日
+        payment_method: '',
     });
 
     const options = [
         { value: '現金', label: '現金' },
         { value: 'クレジット', label: 'クレジット' },
     ];
+    const taxCalculationOptions = [
+        { value: '明細毎', label: '明細毎' },
+        { value: '伝票毎', label: '伝票毎' },
+        { value: '請求時一括', label: '請求時一括' },
+    ];
+
+    const navigate = useNavigate();
 
     const [errors, setErrors] = useState({});
 
@@ -48,6 +63,7 @@ function VendorAdd() {
             setVendor({
                 name_primary: '',
                 name_secondary: '',
+                code: '',
                 name_kana: '',
                 phone_number: '',
                 fax_number: '',
@@ -56,28 +72,86 @@ function VendorAdd() {
                 contact_person: '',
                 email: '',
                 terms_of_trade: '',
-                remarks: ''
+                remarks: '',
+                classification1: '',     // 区分１
+                classification2: '',     // 区分２
+                tax_calculation: '',     // 消費税計算
+                closing_date: '',        // 締日
+                payment_date: '',        // 支払日
+                payment_method: '',      // 支払方法
             });
             alert('仕入先が正常に追加されました。');
+            navigate("/master/vendors");
         }
     };
+
+    const [termsOfTrade, setTermsOfTrade] = useState([]);
+    const [primarySections, setPrimarySections] = useState([]);
+    const [secondarySections, setSecondarySections] = useState([]);
+
+    useEffect(() => {
+        ipcRenderer.send('load-payment-methods');
+        ipcRenderer.on('load-payment-methods', (event, data) => {
+            let arr = [];
+            for (let i = 0; i < data.length; i++) {
+                const taxRateTemplate = {
+                    value: data[i].name,
+                    label: data[i].name,
+                }
+                arr.push(taxRateTemplate)
+            }
+            setTermsOfTrade(arr);
+        });
+        ipcRenderer.send('load-primary-sections');
+        ipcRenderer.on('load-primary-sections', (event, data) => {
+            let arr = [];
+            for (let i = 0; i < data.length; i++) {
+                const taxRateTemplate = {
+                    value: data[i].name,
+                    label: data[i].name,
+                }
+                arr.push(taxRateTemplate)
+            }
+            setPrimarySections(arr);
+        });
+
+        ipcRenderer.send('load-secondary-sections');
+        ipcRenderer.on('load-secondary-sections', (event, data) => {
+            setSecondarySections(data);
+            let arr = [];
+            for (let i = 0; i < data.length; i++) {
+                const taxRateTemplate = {
+                    value: data[i].name,
+                    label: data[i].name,
+                }
+                arr.push(taxRateTemplate)
+            }
+            setPrimarySections(arr);
+        });
+
+        return () => {
+            ipcRenderer.removeAllListeners('load-payment-methods');
+            ipcRenderer.removeAllListeners('load-primary-sections');
+            ipcRenderer.removeAllListeners('load-secondary-sections');
+        };
+    }, []);
 
     return (
         <div className='w-full'>
             <div className='p-8 mb-16'>
-                <div className='text-2xl font-bold mb-8'>新しい仕入先を追加</div>
+                <div className='text-2xl font-bold mb-8'>新規追加</div>
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
                         <div className='p-4'>仕入先名1 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input 
-                            type='text' 
-                            className='border rounded px-4 py-2.5 bg-white w-2/3' 
-                            placeholder='仕入先名1を入力' 
-                            name="name_primary" 
-                            value={vendor.name_primary} 
-                            onChange={handleChange} 
+                        <input
+                            type='text'
+                            className='border rounded px-4 py-2.5 bg-white w-2/3'
+                            placeholder='仕入先名1を入力'
+                            name="name_primary"
+                            value={vendor.name_primary}
+                            onChange={handleChange}
                         />
                     </div>
                 </div>
@@ -87,13 +161,13 @@ function VendorAdd() {
                         <div className='p-4'>仕入れ先名（カタカナ）</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input 
-                            type='text' 
-                            className='border rounded px-4 py-2.5 bg-white w-2/3' 
-                            placeholder='カナ検索を入力' 
-                            name="name_kana" 
-                            value={vendor.name_kana} 
-                            onChange={handleChange} 
+                        <input
+                            type='text'
+                            className='border rounded px-4 py-2.5 bg-white w-2/3'
+                            placeholder='カナ検索を入力'
+                            name="name_kana"
+                            value={vendor.name_kana}
+                            onChange={handleChange}
                         />
                     </div>
                 </div>
@@ -110,28 +184,28 @@ function VendorAdd() {
                         </div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input 
-                            type='text' 
-                            className='border rounded px-4 py-2.5 bg-white w-2/3' 
-                            placeholder='仕入先名2を入力' 
-                            name="name_secondary" 
-                            value={vendor.name_secondary} 
-                            onChange={handleChange} 
+                        <input
+                            type='text'
+                            className='border rounded px-4 py-2.5 bg-white w-2/3'
+                            placeholder='仕入先名2を入力'
+                            name="name_secondary"
+                            value={vendor.name_secondary}
+                            onChange={handleChange}
                         />
                     </div>
                 </div>
                 <div className="flex bg白">
                     <div className="w-1/5">
-                        <div className='p-4'>仕入れ先コード <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
+                        <div className='p-4'>仕入先コード <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input 
-                            type='text' 
-                            className='border rounded px-4 py-2.5 bg白 w-2/3' 
-                            placeholder='仕入れ先コードを入力' 
-                            name="id" 
-                            value={vendor.id} 
-                            onChange={handleChange} 
+                        <input
+                            type='text'
+                            className='border rounded px-4 py-2.5 bg白 w-2/3'
+                            placeholder='仕入先コードを入力'
+                            name="code"
+                            value={vendor.code}
+                            onChange={handleChange}
                         />
                     </div>
                 </div>
@@ -140,13 +214,13 @@ function VendorAdd() {
                         <div className='p-4'>電話番号 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input 
-                            type='text' 
-                            className='border rounded px-4 py-2.5 bg-white w-2/3' 
-                            placeholder='電話番号を入力' 
-                            name="phone_number" 
-                            value={vendor.phone_number} 
-                            onChange={handleChange} 
+                        <input
+                            type='text'
+                            className='border rounded px-4 py-2.5 bg-white w-2/3'
+                            placeholder='電話番号を入力'
+                            name="phone_number"
+                            value={vendor.phone_number}
+                            onChange={handleChange}
                         />
                     </div>
                 </div>
@@ -156,13 +230,13 @@ function VendorAdd() {
                         <div className='p-4'>FAX</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input 
-                            type='text' 
-                            className='border rounded px-4 py-2.5 bg白 w-2/3' 
-                            placeholder='FAX番号を入力' 
-                            name="fax_number" 
-                            value={vendor.fax_number} 
-                            onChange={handleChange} 
+                        <input
+                            type='text'
+                            className='border rounded px-4 py-2.5 bg白 w-2/3'
+                            placeholder='FAX番号を入力'
+                            name="fax_number"
+                            value={vendor.fax_number}
+                            onChange={handleChange}
                         />
                     </div>
                 </div>
@@ -171,13 +245,13 @@ function VendorAdd() {
                         <div className='p-4'>担当者名</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input 
-                            type='text' 
-                            className='border rounded px-4 py-2.5 bg-white w-2/3' 
-                            placeholder='担当者名を入力' 
-                            name="contact_person" 
-                            value={vendor.contact_person} 
-                            onChange={handleChange} 
+                        <input
+                            type='text'
+                            className='border rounded px-4 py-2.5 bg-white w-2/3'
+                            placeholder='担当者名を入力'
+                            name="contact_person"
+                            value={vendor.contact_person}
+                            onChange={handleChange}
                         />
                     </div>
                 </div>
@@ -186,13 +260,13 @@ function VendorAdd() {
                         <div className='p-4'>メールアドレス</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input 
-                            type='email' 
-                            className='border rounded px-4 py-2.5 bg白 w-2/3' 
-                            placeholder='メールアドレスを入力' 
-                            name="email" 
-                            value={vendor.email} 
-                            onChange={handleChange} 
+                        <input
+                            type='email'
+                            className='border rounded px-4 py-2.5 bg白 w-2/3'
+                            placeholder='メールアドレスを入力'
+                            name="email"
+                            value={vendor.email}
+                            onChange={handleChange}
                         />
                     </div>
                 </div>
@@ -201,13 +275,13 @@ function VendorAdd() {
                         <div className='p-4'>郵便番号</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input 
-                            type='text' 
-                            className='border rounded px-4 py-2.5 bg-white w-2/3' 
-                            placeholder='郵便番号を入力' 
-                            name="zip_code" 
-                            value={vendor.zip_code} 
-                            onChange={handleChange} 
+                        <input
+                            type='text'
+                            className='border rounded px-4 py-2.5 bg-white w-2/3'
+                            placeholder='郵便番号を入力'
+                            name="zip_code"
+                            value={vendor.zip_code}
+                            onChange={handleChange}
                         />
                     </div>
                 </div>
@@ -216,13 +290,13 @@ function VendorAdd() {
                         <div className='p-4'>住所 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input 
-                            type='text' 
-                            className='border rounded px-4 py-2.5 bg白 w-2/3' 
-                            placeholder='住所を入力' 
-                            name="address" 
-                            value={vendor.address} 
-                            onChange={handleChange} 
+                        <input
+                            type='text'
+                            className='border rounded px-4 py-2.5 bg白 w-2/3'
+                            placeholder='住所を入力'
+                            name="address"
+                            value={vendor.address}
+                            onChange={handleChange}
                         />
                     </div>
                 </div>
@@ -232,7 +306,69 @@ function VendorAdd() {
                         <div className='p-4'>取引条件</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <CustomSelect options={options} placeholder={"1つ選んでください"} name={"terms_of_trade"} data={vendor} setData={setVendor} />
+                        <CustomSelect options={termsOfTrade} placeholder={"1つ選んでください"} name={"terms_of_trade"} data={vendor} setData={setVendor} />
+                    </div>
+                </div>
+                <div className="flex bg-white">
+                    <div className="w-1/5">
+                        <div className='p-4'>区分1</div>
+                    </div>
+                    <div className="w-4/5 py-1.5">
+                        <CustomSelect options={primarySections} placeholder={"1つ選んでください"} name={"classification1"} data={vendor} setData={setVendor} />
+                    </div>
+                </div>
+                <div className="flex bg-white">
+                    <div className="w-1/5">
+                        <div className='p-4'>区分2</div>
+                    </div>
+                    <div className="w-4/5 py-1.5">
+                        <CustomSelect options={secondarySections} placeholder={"1つ選んでください"} name={"classification2"} data={vendor} setData={setVendor} />
+                    </div>
+                </div>
+                <div className="flex bg-white">
+                    <div className="w-1/5">
+                        <div className='p-4'>消費税計算</div>
+                    </div>
+                    <div className="w-4/5 py-1.5">
+                        <CustomSelect options={taxCalculationOptions} placeholder={"1つ選んでください"} name={"tax_calculation"} data={vendor} setData={setVendor} />
+                    </div>
+                </div>
+                <div className="flex bg-gray-100">
+                    <div className="w-1/5">
+                        <div className='p-4'>締日</div>
+                    </div>
+                    <div className="w-4/5 py-1.5">
+                        <input
+                            type='text'
+                            className='border rounded px-4 py-2.5 bg白 w-2/3'
+                            placeholder='住所を入力'
+                            name="closing_date"
+                            value={vendor.closing_date}
+                            onChange={handleChange}
+                        />
+                    </div>
+                </div>
+                <div className="flex bg-white">
+                    <div className="w-1/5">
+                        <div className='p-4'>支払日</div>
+                    </div>
+                    <div className="w-4/5 py-1.5">
+                        <input
+                            type='text'
+                            className='border rounded px-4 py-2.5 bg白 w-2/3'
+                            placeholder='住所を入力'
+                            name="payment_date"
+                            value={vendor.payment_date}
+                            onChange={handleChange}
+                        />
+                    </div>
+                </div>
+                <div className="flex bg-white">
+                    <div className="w-1/5">
+                        <div className='p-4'>支払い方法</div>
+                    </div>
+                    <div className="w-4/5 py-1.5">
+                        <CustomSelect options={options} placeholder={"1つ選んでください"} name={"payment_method"} data={vendor} setData={setVendor} />
                     </div>
                 </div>
                 <div className="flex bg白">
@@ -240,18 +376,18 @@ function VendorAdd() {
                         <div className='p-4'>備考</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <input 
-                            type='text' 
-                            className='border rounded px-4 py-2.5 bg白 w-2/3' 
-                            placeholder='備考を入力' 
-                            name="remarks" 
-                            value={vendor.remarks} 
-                            onChange={handleChange} 
+                        <input
+                            type='text'
+                            className='border rounded px-4 py-2.5 bg白 w-2/3'
+                            placeholder='備考を入力'
+                            name="remarks"
+                            value={vendor.remarks}
+                            onChange={handleChange}
                         />
                     </div>
                 </div>
             </div>
-            <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg白'>
+            <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
                 <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>新規登録</div>
                 <Link to={`/master/vendors`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
             </div>

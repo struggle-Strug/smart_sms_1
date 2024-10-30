@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Validator from '../../utils/validator'; // バリデーション用のクラスをインポート
+import { useNavigate } from 'react-router-dom';
 
 const { ipcRenderer } = window.require('electron');
 
 function ContactPersonAdd() {
     const [contactPerson, setContactPerson] = useState({
         name: '',
+        code: '',
         department: '',
         position: '',
         phone_number: '',
         email: '',
         remarks: ''
     });
+    const navigate = useNavigate();
 
     const [errors, setErrors] = useState({}); // エラーメッセージ用の状態
 
@@ -36,6 +39,7 @@ function ContactPersonAdd() {
             ipcRenderer.send('save-contact-person', contactPerson);
             setContactPerson({
                 name: '',
+                code: '',
                 department: '',
                 position: '',
                 phone_number: '',
@@ -43,6 +47,7 @@ function ContactPersonAdd() {
                 remarks: ''
             });
             alert('新規登録が完了しました。');
+            navigate("/master/customers");
         }
     };
 
@@ -92,8 +97,8 @@ function ContactPersonAdd() {
                             type='text'
                             className='border rounded px-4 py-2.5 bg-white w-2/3'
                             placeholder='担当者コードを入力'
-                            name="id"
-                            value={contactPerson.id}
+                            name="code"
+                            value={contactPerson.code}
                             onChange={handleChange}
                         />
                     </div>

@@ -12,6 +12,7 @@ function Index() {
     const [customers, setCustomers] = useState([]);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [customerIdToDelete, setCustomerIdToDelete] = useState(null);
+    const [messageToDelete, setMessageToDelete] = useState('');
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
     const location = useLocation();
@@ -38,7 +39,7 @@ function Index() {
     }, []);
 
     const toggleDropdown = (id) => {
-        console.log(id)
+        
         if (!isOpen) setIsOpen(id);
         else setIsOpen(false);
     };
@@ -49,8 +50,9 @@ function Index() {
         }
     };
 
-    const handleDelete = (id) => {
+    const handleDelete = (id, name) => {
         setCustomerIdToDelete(id);
+        setMessageToDelete(name);
         setIsDialogOpen(true);
     };
 
@@ -80,12 +82,13 @@ function Index() {
         };
     }, []);
 
-    const DropDown = (id) => {
+    const DropDown = (id, name) => {
+        console.log(id)
         return (
             <div ref={dropdownRef} className='absolute right-0 origin-top-right mt-6 rounded shadow-lg z-50 bg-white p-3' style={{ top: "50px", width: "120px" }}>
                 <div className='px-3 py-1 hover:text-blue-600 hover:underline'><Link to={`detail/${id.id}`} className={``}>詳細</Link></div>
                 <div className='px-3 py-1 hover:text-blue-600 hover:underline'><Link to={`edit/${id.id}`} className={``}>編集</Link></div>
-                <div className='px-3 py-1 hover:text-blue-600 hover:underline' onClick={() => handleDelete(id.id)}>削除</div>
+                <div className='px-3 py-1 hover:text-blue-600 hover:underline' onClick={() => handleDelete(id.id, id.name)}>削除</div>
             </div>
         )
     }
@@ -133,13 +136,13 @@ function Index() {
                         {customers.map((customer) => (
                             <tr className='border-b' key={customer.id}>
                                 <td>{customer.name_primary || <div className='border w-4'></div>}</td>
-                                <td>{customer.name_primary || <div className='border w-4'></div>}</td>
-                                <td>{customer.billing_code || <div className='border w-4'></div>}</td>
+                                <td>{customer.name_secondary || <div className='border w-4'></div>}</td>
+                                <td>{customer.code || <div className='border w-4'></div>}</td>
                                 <td>{customer.phone_number || <div className='border w-4'></div>}</td>
                                 <td>{customer.email}</td>
                                 <td className='flex justify-center relative'>
                                     <div className='border rounded px-4 py-3 relative hover:cursor-pointer' onClick={(e) => toggleDropdown(customer.id)}>
-                                    {isOpen === customer.id && <DropDown id={customer.id} />}
+                                    {isOpen === customer.id && <DropDown id={customer.id} name={customer.name_primary} />}
                                         <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M6.30664 10.968C5.20664 10.968 4.30664 11.868 4.30664 12.968C4.30664 14.068 5.20664 14.968 6.30664 14.968C7.40664 14.968 8.30664 14.068 8.30664 12.968C8.30664 11.868 7.40664 10.968 6.30664 10.968ZM18.3066 10.968C17.2066 10.968 16.3066 11.868 16.3066 12.968C16.3066 14.068 17.2066 14.968 18.3066 14.968C19.4066 14.968 20.3066 14.068 20.3066 12.968C20.3066 11.868 19.4066 10.968 18.3066 10.968ZM12.3066 10.968C11.2066 10.968 10.3066 11.868 10.3066 12.968C10.3066 14.068 11.2066 14.968 12.3066 14.968C13.4066 14.968 14.3066 14.068 14.3066 12.968C14.3066 11.868 13.4066 10.968 12.3066 10.968Z" fill="#1A1A1A" />
                                         </svg>
@@ -152,7 +155,7 @@ function Index() {
             </div>
             <ConfirmDialog
                 isOpen={isDialogOpen}
-                message="｛マスタ名タイトル｝を削除しますか？"
+                message={messageToDelete + "を削除しますか？"}
                 additionalMessage={
                     <>
                        この操作は取り消しできません。<br />

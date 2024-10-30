@@ -12,6 +12,7 @@ function initializeDatabase() {
         CREATE TABLE IF NOT EXISTS products (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name VARCHAR(255) NOT NULL,
+            code VARCHAR(255) DEFAULT NULL,
             classification_primary VARCHAR(255) NOT NULL,
             classification_secondary VARCHAR(255) DEFAULT NULL,
             jan_code VARCHAR(255) NOT NULL,
@@ -24,6 +25,7 @@ function initializeDatabase() {
             storage_location VARCHAR(255) DEFAULT NULL,
             storage_method VARCHAR(255) DEFAULT NULL,
             threshold INTEGER DEFAULT NULL,
+            tax_rate VARCHAR(255) DEFAULT NULL,
             created DATE DEFAULT (datetime('now')),
             updated DATE DEFAULT (datetime('now'))
         )
@@ -39,18 +41,18 @@ function getProductById(id, callback) {
 }
 
 function saveProduct(productData, callback) {
-    const { id, name, classification_primary, classification_secondary, jan_code, standard_retail_price, procurement_cost, manufacturer_name, specification, unit, country_of_origin, storage_location, storage_method, threshold } = productData;
+    const { id, name, code, classification_primary, classification_secondary, jan_code, standard_retail_price, procurement_cost, manufacturer_name, specification, unit, country_of_origin, storage_location, storage_method, threshold, tax_rate } = productData;
 
     if (id) {
         db.run(
-            `UPDATE products SET name = ?, classification_primary = ?, classification_secondary = ?, jan_code = ?, standard_retail_price = ?, procurement_cost = ?, manufacturer_name = ?, specification = ?, unit = ?, country_of_origin = ?, storage_location = ?, storage_method = ?, threshold = ?, updated = datetime('now') WHERE id = ?`,
-            [name, classification_primary, classification_secondary, jan_code, standard_retail_price, procurement_cost, manufacturer_name, specification, unit, country_of_origin, storage_location, storage_method, threshold, id],
+            `UPDATE products SET name = ?, code = ?, classification_primary = ?, classification_secondary = ?, jan_code = ?, standard_retail_price = ?, procurement_cost = ?, manufacturer_name = ?, specification = ?, unit = ?, country_of_origin = ?, storage_location = ?, storage_method = ?, threshold = ?, tax_rate = ?, updated = datetime('now') WHERE id = ?`,
+            [name, code, classification_primary, classification_secondary, jan_code, standard_retail_price, procurement_cost, manufacturer_name, specification, unit, country_of_origin, storage_location, storage_method, threshold, tax_rate, id],
             callback
         );
     } else {
         db.run(
-            `INSERT INTO products (name, classification_primary, classification_secondary, jan_code, standard_retail_price, procurement_cost, manufacturer_name, specification, unit, country_of_origin, storage_location, storage_method, threshold, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
-            [name, classification_primary, classification_secondary, jan_code, standard_retail_price, procurement_cost, manufacturer_name, specification, unit, country_of_origin, storage_location, storage_method, threshold],
+            `INSERT INTO products (name, code, classification_primary, classification_secondary, jan_code, standard_retail_price, procurement_cost, manufacturer_name, specification, unit, country_of_origin, storage_location, storage_method, threshold, tax_rate, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+            [name, code,  classification_primary, classification_secondary, jan_code, standard_retail_price, procurement_cost, manufacturer_name, specification, unit, country_of_origin, storage_location, storage_method, threshold, tax_rate],
             callback
         );
     }
@@ -87,6 +89,50 @@ function searchProducts(query, callback) {
     });
 }
 
+function searchIdProducts(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM products 
+        WHERE id LIKE ?
+        `;
+        params = [
+            `%${query}%`
+        ];
+    } else {
+        // クエリが空の場合はすべてのデータを返す
+        sql = `SELECT * FROM products`;
+    }
+
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
+function searchNameProducts(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM products 
+        WHERE name LIKE ?
+        `;
+        params = [
+            `%${query}%`
+        ];
+    } else {
+        // クエリが空の場合はすべてのデータを返す
+        sql = `SELECT * FROM products`;
+    }
+
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
 
 module.exports = {
     initializeDatabase,
@@ -94,6 +140,8 @@ module.exports = {
     getProductById,
     saveProduct,
     deleteProductById,
-    searchProducts
+    searchProducts,
+    searchIdProducts,
+    searchNameProducts
 };
 

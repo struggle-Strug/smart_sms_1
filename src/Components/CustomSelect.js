@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 
 const CustomSelect = ({ options, placeholder = "Select an option", data, setData, name }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(null);
+  const [selectedOption, setSelectedOption] = useState(data[name] !== "" ? data[name] : null);
   const dropdownRef = useRef(null);
 
   const toggleDropdown = () => {
@@ -11,7 +11,7 @@ const CustomSelect = ({ options, placeholder = "Select an option", data, setData
 
   const selectOption = (option) => {
     setSelectedOption(option);
-    setData({ ...data, [name]: option });
+    setData({ ...data, [name]: option.value });
     setIsOpen(false);
   };
 
@@ -29,12 +29,12 @@ const CustomSelect = ({ options, placeholder = "Select an option", data, setData
   }, []);
 
   return (
-    <div className="relative w-2/3" ref={dropdownRef}>
+    <div className="relative w-2/3 z-1" ref={dropdownRef}>
       <div
         className="bg-white border rounded-md p-2 cursor-pointer flex justify-between items-center"
         onClick={toggleDropdown}
       >
-        <span>{selectedOption ? selectedOption.label : placeholder}</span>
+        <span>{selectedOption ? selectedOption : placeholder}</span>
         <svg
           className={`w-4 h-4 transform transition-transform ${isOpen ? 'rotate-180' : ''}`}
           xmlns="http://www.w3.org/2000/svg"

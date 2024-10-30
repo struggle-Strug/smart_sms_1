@@ -6,13 +6,82 @@ import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 const { ipcRenderer } = window.require('electron');
 
 function QuotationSlipDetail() {
+    const [estimationSlip, setEstimationSlip] = useState({
+        id: '', 
+        estimation_date: '',
+        estimation_due_date: '',
+        estimation_id: '',
+        vender_id: '',
+        vender_name: '',
+        honorific: '',
+        vender_contact_person: '',
+        remarks: '',
+        estimated_delivery_date: '',
+        closing_date: '',
+        deposit_due_date: '',
+        deposit_method: '',
+    });
+
+    const { id } = useParams();
+
+    useEffect(() => {
+        ipcRenderer.send('get-estimation-slip-detail', id);
+        ipcRenderer.on('estimation-slip-detail-data', (event, data) => {
+            setEstimationSlip(data);
+        });
+
+        ipcRenderer.send('search-estimation-slip-details-by-vender-id', id);
+
+        
+        ipcRenderer.on('search-estimation-slip-details-by-vender-id-result', (event, data) => {
+            setEstimationSlipDetails(data);
+        });
+
+        return () => {
+            ipcRenderer.removeAllListeners('estimation-slip-data');
+            ipcRenderer.removeAllListeners('search-estimation-slip-details-by-vender-id');
+        };
+    }, [id]);
+
+    const [estimationSlipDetails, setEstimationSlipDetails] = useState([
+        {
+            id: '', //idにすべき？
+            estimation_slip_id: '',
+            product_id: '',
+            product_name: '',
+            number: '',
+            unit: '',
+            unit_price: '',
+            price: '',
+            tax_rate: '',
+            lot_number: '',
+            storage_facility: '',
+            stock: '',
+            gross_profit: '',
+            gross_margin_rate: '',
+        }
+    ]);
+
+    const handleSumPrice = () => {
+        let SumPrice = 0
+
+        for (let i = 0; i < estimationSlipDetails.length; i++) {
+            SumPrice += estimationSlipDetails[i].price * estimationSlipDetails[i].number;
+        }
+
+        return { "subtotal": SumPrice, "consumptionTaxEight": SumPrice * 0.08, "consumptionTaxTen": 0, "totalConsumptionTax": SumPrice * 0.08, "Total": SumPrice * 1.08 }
+    }
+
+
+
+
     return (
         <div className='w-full'>
             <div className=''>
                 <div className='pt-8 pb-6 flex border-b px-8 items-center'>
                     <div className='text-2xl font-bold'>{'株式会社テスト'}</div>
                     <div className='flex ml-auto'>
-                        <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
+                        <Link to={`/sales-management/voucher-entries/quotation-slips/edit/` + id} className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
                             <div className='pr-1.5 pl-1 flex items-center'>
                                 <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg" className=''>
                                     <path d="M0.391357 18.7308H4.14136L15.2014 7.67077L11.4514 3.92077L0.391357 14.9808V18.7308ZM2.39136 15.8108L11.4514 6.75077L12.3714 7.67077L3.31136 16.7308H2.39136V15.8108Z" fill="#1F2937" />
@@ -44,11 +113,11 @@ function QuotationSlipDetail() {
                     <div className='py-2.5 font-bold text-xl'>伝票番号</div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>伝票番号</div>
-                        <div>PO-0000000001</div>
+                        <div>{estimationSlip.id}</div>
                     </div>
                     <div className='flex items-center pb-2'>
-                        <div className='w-40'>発注日付</div>
-                        <div>202-08-27</div>
+                        <div className='w-40'>見積日</div>
+                        <div>{estimationSlip.estimation_date}</div>
                     </div>
                     <div className='py-3'>
                         <hr className='' />
@@ -56,39 +125,39 @@ function QuotationSlipDetail() {
                     <div className='py-2.5 font-bold text-xl'>取引先情報</div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>宛名</div>
-                        <div>株式会社御中</div>
+                        <div>{estimationSlip.vender_name}御中</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>仕入先コード</div>
-                        <div></div>
+                        <div>{estimationSlip.vender_id}</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>郵便番号</div>
-                        <div>1040031</div>
+                        <div>1040031 (Temp)</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>市区町村・番地</div>
-                        <div>東京都中央区銀座6丁目10-1建物名・部屋番号などGINZA SIX 13階</div>
+                        <div>東京都中央区銀座6丁目10-1建物名・部屋番号などGINZA SIX 13階(Temp)</div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>担当者</div>
-                        <div></div>
+                        <div>{estimationSlip.vender_contact_person}</div>
                     </div>
                     <div className='py-3'>
                         <hr className='' />
                     </div>
                     <div className='py-2.5 font-bold text-xl'>自社情報</div>
                     <div className='flex items-center pb-2'>
-                        <div className='w-40'>自社名</div>
+                        <div className='w-40'>自社名(Temp)</div>
                         <div></div>
                     </div>
                     <div className='flex items-center pb-2'>
-                        <div className='w-40'>担当者名</div>
+                        <div className='w-40'>担当者名(Temp)</div>
                         <div></div>
                     </div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>電話番号</div>
-                        <div>088040760246</div>
+                        <div>088040760246(Temp)</div>
                     </div>
                     <div className='py-3'>
                         <hr className='' />
@@ -110,41 +179,45 @@ function QuotationSlipDetail() {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr className='border-b'>
-                                <td className='py-2'>1234</td>
-                                <td className='py-2'>商品名が入ります。商品名が入ります。商品名が入ります。商品名が入ります。入ります</td>
-                                <td className='py-2'>200</td>
-                                <td className='py-2'>200</td>
-                                <td className='py-2'>20</td>
-                                <td className='py-2'>200</td>
-                                <td className='py-2'>10個</td>
-                                <td className='py-2'>倉庫</td>
-                                <td className='py-2'>0円</td>
-                                <td className='py-2'>0円</td>
+                        {
+                                estimationSlipDetails.map((estimationSlipDetail, index) => (
+                            <tr className='border-b' key={index}>
+                                <td className='py-2'>{estimationSlipDetail.product_id}商品名が入ります。商品名が入ります。商品名が入ります。商品名が入ります。入ります</td>
+                                <td className='py-2'>{estimationSlipDetail.product_name}</td>
+                                <td className='py-2'>{estimationSlipDetail.number}</td>
+                                <td className='py-2'>{estimationSlipDetail.unit}</td>
+                                <td className='py-2'>200????</td>
+                                <td className='py-2'>{estimationSlipDetail.unit_price}</td>
+                                <td className='py-2'>{estimationSlipDetail.tax_rate}</td>
+                                <td className='py-2'>{estimationSlipDetail.storage_facility}</td>
+                                <td className='py-2'>{parseInt(estimationSlipDetail.price) * parseInt(estimationSlipDetail.number)}円</td>
+                                <td className='py-2'>{parseInt(estimationSlipDetail.price) * parseInt(estimationSlipDetail.number) * parseInt(estimationSlipDetail.tax_rate)}円</td>
                             </tr>
+                        ))}
+
                         </tbody>
                     </table>
                     <div className='py-6 flex'>
                         <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
                             <div className='flex pb-2'>
                                 <div className='w-40'>税抜合計</div>
-                                <div>5,000円</div>
+                                <div>{handleSumPrice().subtotal.toFixed(0).toLocaleString()}円</div>
                             </div>
                             <div className='flex pb-2'>
                                 <div className='w-40'>消費税(8%)</div>
-                                <div>5,000円</div>
+                                <div>{handleSumPrice().consumptionTaxEight.toFixed(0).toLocaleString()}円</div>
                             </div>
                             <div className='flex pb-2'>
                                 <div className='w-40'>消費税(10%)</div>
-                                <div>5,000円</div>
+                                <div>{handleSumPrice().consumptionTaxTen.toFixed(0).toLocaleString()}円</div>
                             </div>
                             <div className='flex pb-2'>
                                 <div className='w-40'>消費税合計</div>
-                                <div>5,000円</div>
+                                <div>{handleSumPrice().totalConsumptionTax.toFixed(0).toLocaleString()}円</div>
                             </div>
                             <div className='flex'>
                                 <div className='w-40'>税込合計</div>
-                                <div>5,000円</div>
+                                <div>{handleSumPrice().Total.toFixed(0).toLocaleString()}円</div>
                             </div>
                         </div>
                     </div>
@@ -153,7 +226,7 @@ function QuotationSlipDetail() {
                     </div>
                     <div className='py-2.5 font-bold text-xl'>備考</div>
                     <div className='flex items-center pb-2'>
-                    恐れいりますが、振込手数料は貴社にてご負担ください。
+                    {estimationSlip.remarks}
                     </div>
                     <div className='py-3'>
                         <hr className='' />
@@ -161,28 +234,28 @@ function QuotationSlipDetail() {
                     <div className='py-2.5 font-bold text-xl'>支払情報</div>
                     <div className='flex items-center pb-2'>
                         <div className='w-40'>締日</div>
-                        <div></div>
+                        <div>{estimationSlip.closing_date}</div>
                     </div>
                     <div className='flex items-center pb-2'>
-                        <div className='w-40'>支払期日</div>
-                        <div></div>
+                        <div className='w-40'>入金期日</div>
+                        <div>{estimationSlip.deposit_due_date}</div>
                     </div>
                     <div className='flex items-center pb-2'>
-                        <div className='w-40'>支払方法</div>
-                        <div></div>
+                        <div className='w-40'>入金方法</div>
+                        <div>{estimationSlip.deposit_method}</div>
                     </div>
                     <div className='py-3'>
                         <hr className='' />
                     </div>
                     <div className='py-2.5 font-bold text-xl'>納品情報</div>
                     <div className='flex items-center pb-2'>
-                        <div className='w-40'>入荷予定日</div>
-                        <div></div>
+                        <div className='w-40'>納品予定日</div>
+                        <div>{estimationSlip.estimated_delivery_date}</div>
                     </div>
-                    <div className='flex items-center pb-2'>
+                    {/* <div className='flex items-center pb-2'>
                         <div className='w-40'>ステータス</div>
-                        <div></div>
-                    </div>
+                        <div>{estimationSlip.vender_contact_person}</div>
+                    </div> */}
                 </div>
             </div>
         </div>

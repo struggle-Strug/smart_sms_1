@@ -8,7 +8,8 @@ function ContactPersonsEdit() {
     const { id } = useParams();  // URLから担当者IDを取得
 
     const [contactPerson, setContactPerson] = useState({
-        id: '',
+        id: id,
+        code: '',
         name: '',
         department: '',
         position: '',
@@ -99,8 +100,8 @@ function ContactPersonsEdit() {
                             type='text'
                             className='border rounded px-4 py-2.5 bg-white w-2/3'
                             placeholder='担当者コードを入力'
-                            name="id"
-                            value={contactPerson.id}
+                            name="code"
+                            value={contactPerson.code}
                             onChange={handleChange}
                         />
                     </div>

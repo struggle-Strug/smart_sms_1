@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import CustomSelect from '../../Components/CustomSelect';
 import Validator from '../../utils/validator';
+import { useNavigate } from 'react-router-dom';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -11,8 +12,17 @@ function StorageFacilityAdd() {
         { value: '社内', label: '社内' },
     ];
 
+    const storageMethodOptions = [
+        { value: '常温', label: '常温' },
+        { value: '冷蔵', label: '冷蔵' },
+        { value: '冷凍', label: '冷凍' },
+    ];
+
+    const navigate = useNavigate();
+
     const [facility, setFacility] = useState({
         name: '',
+        code: '',
         address: '',
         phone_number: '',
         fax_number: '',
@@ -42,6 +52,7 @@ function StorageFacilityAdd() {
             // フォームのリセット
             setFacility({
                 name: '',
+                code: '',
                 address: '',
                 phone_number: '',
                 fax_number: '',
@@ -51,13 +62,14 @@ function StorageFacilityAdd() {
                 remarks: ''
             });
             alert('倉庫が正常に追加されました。');
+            navigate("/master/customers");
         }
     };
 
     return (
         <div className='w-full'>
             <div className='p-8'>
-                <div className='text-2xl font-bold mb-8'>新しい倉庫を追加</div>
+                <div className='text-2xl font-bold mb-8'>新規追加</div>
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
                         <div className='p-4'>倉庫名 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
@@ -83,8 +95,8 @@ function StorageFacilityAdd() {
                             type='text' 
                             className='border rounded px-4 py-2.5 bg-white w-2/3' 
                             placeholder='倉庫コードを入力' 
-                            name="id" 
-                            value={facility.id} 
+                            name="code" 
+                            value={facility.code} 
                             onChange={handleChange} 
                         />
                     </div>
@@ -92,7 +104,7 @@ function StorageFacilityAdd() {
                 {errors.id && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.id}</div>}
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
-                        <div className='p-4'>所在地 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
+                        <div className='p-4'>倉庫所在地 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
                     </div>
                     <div className="w-4/5 py-1.5">
                         <input 
@@ -175,7 +187,7 @@ function StorageFacilityAdd() {
                         <div className='p-4'>保管方法</div>
                     </div>
                     <div className="w-4/5 py-1.5">
-                        <CustomSelect placeholder={"1つお選びください"} options={options} name={"storage_method"} data={facility} setData={setFacility} />
+                        <CustomSelect placeholder={"1つお選びください"} options={storageMethodOptions} name={"storage_method"} data={facility} setData={setFacility} />
                     </div>
                 </div>
                 {errors.email && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.email}</div>}
