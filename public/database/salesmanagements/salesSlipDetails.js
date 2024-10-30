@@ -6,7 +6,10 @@ const dbPath = path.join(app.getPath('userData'), 'database.db');
 const db = new sqlite3.Database(dbPath);
 
 function loadSalesSlipDetails(callback) {
-    const sql = `SELECT * FROM sales_slip_details`;
+    const sql = `SELECT * FROM sales_slip_details ssd
+    LEFT JOIN sales_slips ss ON ssd.sales_slip_id = ss.id
+    LEFT JOIN products p ON ssd.product_id = p.id
+`;
     db.all(sql, [], (err, rows) => {
         callback(err, rows);
     });
@@ -163,6 +166,41 @@ function initializeDatabase() {
     db.run(sql);
 }
 
+function searchSalesSlipDetails(conditions, callback) {
+    let sql = `SELECT * FROM sales_slip_details ssd
+    LEFT JOIN sales_slips ss ON ssd.sales_slip_id = ss.id
+    LEFT JOIN products p ON ssd.product_id = p.id
+    `;
+
+    let whereClauses = [];
+    let params = [];
+
+    // 条件オブジェクトのキーと値を動的にWHERE句に追加
+    if (conditions && Object.keys(conditions).length > 0) {
+        for (const [column, value] of Object.entries(conditions)) {
+            // pod.created_start と pod.created_end の特別な扱い
+            if (column === 'ssd.created_start') {
+                whereClauses.push(`ssd.created >= ?`);
+                params.push(value); // created_startの日付をそのまま使用
+            } else if (column === 'ssd.created_end') {
+                whereClauses.push(`ssd.created <= ?`);
+                params.push(value); // created_endの日付をそのまま使用
+            } else {
+                whereClauses.push(`${column} LIKE ?`);
+                params.push(`%${value}%`);
+            }
+        }
+    }
+
+    if (whereClauses.length > 0) {
+        sql += ` WHERE ` + whereClauses.join(" AND ");
+    }
+
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
 module.exports = {
     loadSalesSlipDetails,
     getSalesSlipDetailById,
@@ -171,6 +209,6 @@ module.exports = {
     editSalesSlipDetail,
     initializeDatabase,
     deleteSalesSlipDetailsBySlipId,
-    searchSalesSlipsBySalesSlipId
-
+    searchSalesSlipsBySalesSlipId,
+    searchSalesSlipDetails
 };

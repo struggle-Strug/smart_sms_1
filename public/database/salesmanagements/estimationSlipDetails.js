@@ -6,7 +6,10 @@ const dbPath = path.join(app.getPath('userData'), 'database.db');
 const db = new sqlite3.Database(dbPath);
 
 function loadEstimationSlipDetails(callback) {
-    const sql = `SELECT * FROM estimation_slip_details`;
+    const sql = `SELECT * FROM estimation_slip_details esd
+                 LEFT JOIN estimation_slips es ON esd.estimation_slip_id = es.id
+                 LEFT JOIN products p ON esd.product_id = p.id
+    `;
     db.all(sql, [], (err, rows) => {
         callback(err, rows);
     });
@@ -154,6 +157,52 @@ function searchEstimationSlipsByEstimationSlipId(query, callback) {
     });
 }
 
+function searchEstimationSlipDetails(conditions, callback) {
+    let sql = `SELECT * FROM estimation_slip_details esd
+                 LEFT JOIN estimation_slips es ON esd.estimation_slip_id = es.id
+                 LEFT JOIN products p ON esd.product_id = p.id
+    `;
+
+    let whereClauses = [];
+    let params = [];
+
+    // 条件オブジェクトのキーと値を動的にWHERE句に追加
+    if (conditions && Object.keys(conditions).length > 0) {
+        for (const [column, value] of Object.entries(conditions)) {
+            // pod.created_start と pod.created_end の特別な扱い
+            if (column === 'esd.created_start') {
+                whereClauses.push(`esd.created >= ?`);
+                params.push(value); // created_startの日付をそのまま使用
+            } else if (column === 'esd.created_end') {
+                whereClauses.push(`esd.created <= ?`);
+                params.push(value); // created_endの日付をそのまま使用
+            } else {
+                whereClauses.push(`${column} LIKE ?`);
+                params.push(`%${value}%`);
+            }
+        }
+    }
+
+    // WHERE句がある場合はSQL文に追加
+    if (whereClauses.length > 0) {
+        sql += ` WHERE ` + whereClauses.join(" AND ");
+    }
+
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
+function deleteEstimationSlipDetailsByEsId(EstimationSlip, callback) {
+    const sql = `
+        DELETE FROM estimation_slip_details
+        WHERE estimation_slip_id = ?
+    `;
+    db.run(sql, [OrderSlipId], (err) => {
+        callback(err);
+    });
+}
+
 module.exports = {
     loadEstimationSlipDetails,
     getEstimationSlipDetailById,
@@ -161,5 +210,7 @@ module.exports = {
     deleteEstimationSlipDetailById,
     editEstimationSlipDetail,
     initializeDatabase,
-    searchEstimationSlipsByEstimationSlipId
+    searchEstimationSlipsByEstimationSlipId,
+    searchEstimationSlipDetails,
+    deleteEstimationSlipDetailsByEsId
 };

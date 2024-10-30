@@ -304,7 +304,7 @@ function Index() {
                                 type='text'
                                 className='border rounded px-4 py-2.5 bg-white w-full'
                                 placeholder=''
-                                name="pvd."
+                                name="detail_payment_method"
                                 value={searchQueryList["detail_payment_method"]}
                                 onChange={handleInputChange}
                             />
