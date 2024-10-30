@@ -7,7 +7,8 @@ const {
     editSalesSlipDetail, 
     searchSalesSlipDetails,
     searchSalesSlipsBySalesSlipId,
-    deleteSalesSlipDetailsBySlipId
+    deleteSalesSlipDetailsBySlipId,
+    getMonthlySalesWithJoin
 } = require('../../database/salesmanagements/salesSlipDetails');
 
 // 売上伝票明細のデータをロード
@@ -22,12 +23,22 @@ ipcMain.on('load-sales-slip-details', (event) => {
 });
 
 // 売上伝票明細の詳細を取得
-ipcMain.on('get-sales-slip-detail-data', (event, id) => {
-    getSalesSlipDetailById(id, (err, row) => {
+ipcMain.on('get-sales-slip-detail-data', (event, query) => {
+    getSalesSlipDetailById(query, (err, row) => {
         if (err) {
             console.error(err.message);
         } else {
             event.sender.send('sales-slip-detail-data-result', row);
+        }
+    });
+});
+
+ipcMain.on('get-monthly-sales-slip-detail-data', (event, id) => {
+    getMonthlySalesWithJoin(id, (err, row) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('monthly-sales-slip-detail-data-result', row);
         }
     });
 });
