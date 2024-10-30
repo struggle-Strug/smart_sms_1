@@ -1,15 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
-import PaymentStatementsIndex from './PaymentStatements';
+import InvoiceProcessingsIndex from './InvoiceProcessings';
 import OrderSummarySheetsIndex from './OrderSummarySheets';
 import SalesSummarySheetsIndex from './SalesSummarySheets';
 import MoneySalesTrendsIndex from './MoneySalesTrends';
+import IncomingPaymentScheduleIndex from './IncomingPaymentSchedule';
+import AccountsReceivableBalanceIndex from './AccountsReceivableBalance';
+import AccountsReceivableLedgerIndex from './AccountsReceivableLedger';
 
 
 function VoucherEntries() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const locatioIncomingPaymentSchedulen = useLocation();
   const location = useLocation();
 
   const toggleDropdown = () => {
@@ -47,14 +51,20 @@ function VoucherEntries() {
         <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/statements/order-summary-sheets") && "font-bold border-l-4 border-blue-600"}`}><Link to="order-summary-sheets" className={``}>受注集計表</Link></div>
         <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/statements/sales-summary-sheets") && "font-bold border-l-4 border-blue-600"}`}><Link to="sales-summary-sheets" className={``}>売上集計表</Link></div>
         <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/statements/money-sales-trends") && "font-bold border-l-4 border-blue-600"}`}><Link to="money-sales-trends" className={``}>月次売上推移</Link></div>
-        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/statements/payment-statement") && "font-bold border-l-4 border-blue-600"}`}><Link to="payment-statement" className={``}>支払明細表</Link></div>
+        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/statements/invoice-processings") && "font-bold border-l-4 border-blue-600"}`}><Link to="invoice-processings" className={``}>請求処理</Link></div>
+        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/statements/incoming-payment-schedule") && "font-bold border-l-4 border-blue-600"}`}><Link to="incoming-payment-schedule" className={``}>入金予定表</Link></div>
+        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/statements/accounts-receivable-balance") && "font-bold border-l-4 border-blue-600"}`}><Link to="accounts-receivable-balance" className={``}>売掛金残高</Link></div>
+        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/statements/accounts-receivable-ledger") && "font-bold border-l-4 border-blue-600"}`}><Link to="accounts-receivable-ledger" className={``}>得意先元帳</Link></div>
       </div>
       <Routes>
-        <Route path="" element={<PaymentStatementsIndex />}/>
+        <Route path="" element={<OrderSummarySheetsIndex />}/>
         <Route path="order-summary-sheets/*" element={<OrderSummarySheetsIndex />}/>
         <Route path="sales-summary-sheets/*" element={<SalesSummarySheetsIndex />}/>
         <Route path="money-sales-trends/*" element={<MoneySalesTrendsIndex />}/>
-        <Route path="payment-statement/*" element={<PaymentStatementsIndex />}/>
+        <Route path="invoice-processings/*" element={<InvoiceProcessingsIndex />}/>
+        <Route path="incoming-payment-schedule/*" element={<IncomingPaymentScheduleIndex />}/>
+        <Route path="accounts-receivable-balance/*" element={<AccountsReceivableBalanceIndex />}/>
+        <Route path="accounts-receivable-ledger/*" element={<AccountsReceivableLedgerIndex />}/>
       </Routes>
     </div>)
 }
