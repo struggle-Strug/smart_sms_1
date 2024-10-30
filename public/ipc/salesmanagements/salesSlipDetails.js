@@ -71,6 +71,17 @@ ipcMain.on('delete-sales-slip-detail', (event, id) => {
     });
 });
 
+// 売上伝票明細を削除 (編集画面用)
+ipcMain.on('sales-slip-details-deleted-by-slip-id', (event, id) => {
+    deleteSalesSlipDetailById(id, (err) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('sales-slip-detail-deleted', id);
+        }
+    });
+});
+
 // 売上伝票明細を編集
 ipcMain.on('edit-sales-slip-detail', (event, id) => {
     editSalesSlipDetail(id, (err, row) => {

@@ -7,7 +7,6 @@ const { ipcRenderer } = window.require('electron');
 
 function SalesSlipsDetail() {
     const [salesSlip, setSalesSlip] = useState({
-        id: '',
         code: '',
         sales_date: '',
         delivery_due_date: '',
@@ -80,9 +79,9 @@ function SalesSlipsDetail() {
         <div className='w-full'>
             <div className=''>
                 <div className='pt-8 pb-6 flex border-b px-8 items-center'>
-                    <div className='text-2xl font-bold'>{'株式会社テスト'}</div>
+                    <div className='text-2xl font-bold'>{'売上伝票の編集'}</div>
                     <div className='flex ml-auto'>
-                        <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
+                        <Link to={`edit/id`} className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
                             <div className='pr-1.5 pl-1 flex items-center'>
                                 <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg" className=''>
                                     <path d="M0.391357 18.7308H4.14136L15.2014 7.67077L11.4514 3.92077L0.391357 14.9808V18.7308ZM2.39136 15.8108L11.4514 6.75077L12.3714 7.67077L3.31136 16.7308H2.39136V15.8108Z" fill="#1F2937" />
