@@ -50,6 +50,13 @@ function deleteDepositSlipById(id, callback) {
     });
 }
 
+function deleteDepositSlipDetailsBySlipId(depositSlipId, callback) {
+    const sql = `DELETE FROM deposit_slips WHERE deposit_slip_id = ?`;
+    db.run(sql, [depositSlipId], (err) => {
+        callback(err);
+    });
+}
+
 function editDepositSlip(id, callback) {
     const sql = `SELECT * FROM deposit_slips WHERE id = ?`;
     db.get(sql, [id], (err, row) => {
@@ -95,7 +102,7 @@ function saveDepositSlipDetail(detailData, callback) {
         deposit_method,
         deposits,
         commission_fee,
-        data_category
+        data_category,
     } = detailData;
 
     if (id) {
@@ -161,6 +168,24 @@ function editDepositSlipDetail(id, callback) {
     });
 }
 
+function searchDepositSlipsByDepositSlipId(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM deposit_slip_details 
+        WHERE deposit_slip_id LIKE ?
+        `;
+        params = [`%${query}%`];
+    } else {
+        sql = `SELECT * FROM deposit_slip_details`;
+    }
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
 function initializeDatabase() {
     const sql = `
     CREATE TABLE IF NOT EXISTS deposit_slip_details (
@@ -193,5 +218,7 @@ module.exports = {
     saveDepositSlipDetail,
     deleteDepositSlipDetailById,
     editDepositSlipDetail,
-    initializeDatabase
+    initializeDatabase,
+    searchDepositSlipsByDepositSlipId,
+    deleteDepositSlipDetailsBySlipId
 };

@@ -159,7 +159,9 @@ function searchSalesSlips(query, callback) {
     if (query && query.trim() !== '') {
         sql = `
         SELECT * FROM sales_slips 
-        WHERE vender_name LIKE ? OR vender_contact_person LIKE ?
+        WHERE code LIKE ?
+        OR vender_name LIKE ? 
+        OR vender_id LIKE ?
         `;
         // params = [`%${query}%`, `%${query}%`, `%${query}%`];
         params = Array(2).fill(`%${query}%`);
