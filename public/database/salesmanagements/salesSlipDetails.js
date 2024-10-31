@@ -6,7 +6,11 @@ const dbPath = path.join(app.getPath('userData'), 'database.db');
 const db = new sqlite3.Database(dbPath);
 
 function loadSalesSlipDetails(callback) {
-    const sql = `SELECT * FROM sales_slip_details`;
+    const sql = `SELECT ssd.*, ss.*, p.*, p.created AS product_created, ss.created AS ss_created, ssd.created AS ssd_created
+    FROM sales_slip_details ssd
+    LEFT JOIN sales_slips ss ON ssd.sales_slip_id = ss.id
+    LEFT JOIN products p ON ssd.product_id = p.id
+`;
     db.all(sql, [], (err, rows) => {
         callback(err, rows);
     });
@@ -163,6 +167,86 @@ function initializeDatabase() {
     db.run(sql);
 }
 
+function searchSalesSlipDetails(conditions, callback) {
+    let sql = `SELECT ssd.*, ss.*, p.*, p.created AS product_created, ss.created AS ss_created, ssd.created AS ssd_created
+    FROM sales_slip_details ssd
+    LEFT JOIN sales_slips ss ON ssd.sales_slip_id = ss.id
+    LEFT JOIN products p ON ssd.product_id = p.id
+    `;
+
+    let whereClauses = [];
+    let params = [];
+
+    console.log(conditions);
+
+    // 条件オブジェクトのキーと値を動的にWHERE句に追加
+    if (conditions && Object.keys(conditions).length > 0) {
+        for (const [column, value] of Object.entries(conditions)) {
+            if (column === 'ssd.created_start') {
+                whereClauses.push(`ssd_created >= ?`);
+                params.push(value); // created_startの日付をそのまま使用
+            } else if (column === 'ssd.created_end') {
+                whereClauses.push(`ssd_created <= ?`);
+                params.push(value); // created_endの日付をそのまま使用
+            } else {
+                whereClauses.push(`${column} LIKE ?`);
+                params.push(`%${value}%`);
+            }
+        }
+    }
+
+    if (whereClauses.length > 0) {
+        sql += ` WHERE ` + whereClauses.join(" AND ");
+    }
+
+    console.log(sql);
+    console.log(params)
+
+    db.all(sql, params, (err, rows) => {
+        console.log(rows)
+        callback(err, rows);
+    });
+}
+
+
+function getMonthlySalesWithJoin(conditions, callback) {
+    searchSalesSlipDetails(conditions, (err, rows) => {
+        if (err) {
+            callback(err);
+            return;
+        }
+
+        // 月ごとの売上を格納するオブジェクト
+        const monthlySales = {};
+
+        rows.forEach(row => {
+            // 月単位でデータをグループ化
+            const month = row.created ? row.created.substring(0, 7) : null; // "YYYY-MM"形式
+
+            if (month) {
+                // 単価 × 数量で売上を計算
+                const saleAmount = row.unit_price * row.number;
+
+                if (!monthlySales[month]) {
+                    monthlySales[month] = saleAmount;
+                } else {
+                    monthlySales[month] += saleAmount;
+                }
+            }
+        });
+
+        // 月ごとの売上データを配列に変換
+        const result = Object.keys(monthlySales).map(month => ({
+            month,
+            total_sales: monthlySales[month]
+        }));
+
+        callback(null, result);
+    });
+}
+
+
+
 module.exports = {
     loadSalesSlipDetails,
     getSalesSlipDetailById,
@@ -171,6 +255,7 @@ module.exports = {
     editSalesSlipDetail,
     initializeDatabase,
     deleteSalesSlipDetailsBySlipId,
-    searchSalesSlipsBySalesSlipId
-
+    searchSalesSlipsBySalesSlipId,
+    searchSalesSlipDetails,
+    getMonthlySalesWithJoin
 };

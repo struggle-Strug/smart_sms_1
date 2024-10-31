@@ -6,7 +6,10 @@ const dbPath = path.join(app.getPath('userData'), 'database.db');
 const db = new sqlite3.Database(dbPath);
 
 function loadOrderSlipDetails(callback) {
-    const sql = `SELECT * FROM order_slip_details`;
+    const sql = `SELECT * FROM order_slip_details osd
+                 LEFT JOIN order_slips os ON osd.order_slip_id = os.id
+                 LEFT JOIN products p ON osd.product_id = p.id
+    `;
     db.all(sql, [], (err, rows) => {
         callback(err, rows);
     });
@@ -164,6 +167,71 @@ function initializeDatabase() {
     db.run(sql);
 }
 
+
+function searchOrderSlipDetails(conditions, callback) {
+    let sql = `SELECT * FROM order_slip_details osd
+                 LEFT JOIN order_slips os ON osd.order_slip_id = os.id
+                 LEFT JOIN products p ON osd.product_id = p.id
+    `;
+
+    let whereClauses = [];
+    let params = [];
+
+    // 条件オブジェクトのキーと値を動的にWHERE句に追加
+    if (conditions && Object.keys(conditions).length > 0) {
+        for (const [column, value] of Object.entries(conditions)) {
+            // pod.created_start と pod.created_end の特別な扱い
+            if (column === 'osd.created_start') {
+                whereClauses.push(`osd.created >= ?`);
+                params.push(value); // created_startの日付をそのまま使用
+            } else if (column === 'osd.created_end') {
+                whereClauses.push(`osd.created <= ?`);
+                params.push(value); // created_endの日付をそのまま使用
+            } else {
+                whereClauses.push(`${column} LIKE ?`);
+                params.push(`%${value}%`);
+            }
+        }
+    }
+
+    // WHERE句がある場合はSQL文に追加
+    if (whereClauses.length > 0) {
+        sql += ` WHERE ` + whereClauses.join(" AND ");
+    }
+
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
+function searchOrderSlipByOrderSlipId(query, callback) {
+    let sql;
+    let params = [];
+
+    if (query && query.trim() !== '') {
+        sql = `
+        SELECT * FROM order_slip_details
+        WHERE order_slip_id LIKE ?
+        `;
+        params = [`%${query}%`];
+    } else {
+        sql = `SELECT * FROM order_slip_details`;
+    }
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
+function deleteOrderSlipDetailsBySoId(OrderSlipId, callback) {
+    const sql = `
+        DELETE FROM order_slip_details
+        WHERE order_slip_id = ?
+    `;
+    db.run(sql, [OrderSlipId], (err) => {
+        callback(err);
+    });
+}
+
 module.exports = {
     loadOrderSlipDetails,
     getOrderSlipDetailById,
@@ -172,6 +240,8 @@ module.exports = {
     editOrderSlipDetail,
     initializeDatabase,
     deleteOrderSlipDetailsBySlipId,
-    searchOrderSlipsByOrderSlipId
-
+    searchOrderSlipsByOrderSlipId,
+    searchOrderSlipDetails,
+    searchOrderSlipByOrderSlipId,
+    deleteOrderSlipDetailsBySoId
 };

@@ -8,7 +8,7 @@ const {
     searchOrderSlipDetails,
     searchOrderSlipsByOrderSlipId,
     deleteOrderSlipDetailsBySlipId,
-    deleteOrderSlipDetailsByPoId
+    deleteOrderSlipDetailsBySoId
 } = require('../../database/salesmanagements/orderSlipDetails');
 
 // 購入注文明細のデータをロード
@@ -95,7 +95,7 @@ ipcMain.on('search-order-slip-details-by-vender-id', (event, query) => {
 });
 
 ipcMain.on('delete-order-slip-details-by-slip-id', (event, orderSlipId) => {
-    deleteOrderSlipDetailsBySlipId(orderSlipId, (err) => {
+    deleteOrderSlipDetailsBySoId(orderSlipId, (err) => {
         if (err) {
             console.error(err.message);
         } else {

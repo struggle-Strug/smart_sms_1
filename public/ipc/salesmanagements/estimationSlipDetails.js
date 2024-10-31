@@ -7,7 +7,7 @@ const {
     editEstimationSlipDetail,
     searchEstimationSlipsByEstimationSlipId,
     searchEstimationSlipDetails,
-    searchEstimationSlipDetailsOnPV
+    deleteEstimationSlipDetailsByEsId
 } = require('../../database/salesmanagements/estimationSlipDetails');
 
 // 見積書のデータをロード
@@ -75,7 +75,6 @@ ipcMain.on('edit-estimation-slip-detail', (event, id) => {
 // 見積書の検索（オプション）
 ipcMain.on('search-estimation-slip-details', (event, query) => {
     searchEstimationSlipDetails(query, (err, results) => {
-
         if (err) {
             console.error(err.message);
         } else {
@@ -96,13 +95,13 @@ ipcMain.on('search-estimation-slip-details-by-vender-id', (event, query) => {
     });
 });
 
-ipcMain.on('search-estimation-slip-detail-on-pv', (event, query) => {
-    searchEstimationSlipDetailsOnPV(query, (err, results) => {
+// ipcMain.on('search-estimation-slip-detail-on-pv', (event, query) => {
+//     searchEstimationSlipDetailsOnPV(query, (err, results) => {
 
-        if (err) {
-            console.error(err.message);
-        } else {
-            event.sender.send('search-estimation-slip-detail-on-pv-result', results);
-        }
-    });
-});
+//         if (err) {
+//             console.error(err.message);
+//         } else {
+//             event.sender.send('search-estimation-slip-detail-on-pv-result', results);
+//         }
+//     });
+// });
