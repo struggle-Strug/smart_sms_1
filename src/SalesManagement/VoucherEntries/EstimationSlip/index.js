@@ -123,7 +123,7 @@ function Index() {
                         {estimationSlips.map((slip) => (
                             <tr className='border-b' key={slip.id}>
                                 <td>{slip.estimation_date || <div className='border w-4'></div>}</td>
-                                <td>{slip.id || <div className='border w-4'></div>}</td>
+                                <td>{slip.code || <div className='border w-4'></div>}</td>
                                 <td>{slip.vender_name || <div className='border w-4'></div>}</td>
                                 <td>{slip.vender_id || <div className='border w-4'></div>}</td>
                                 <td>{slip.remarks}</td>

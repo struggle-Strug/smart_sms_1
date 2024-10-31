@@ -7,7 +7,7 @@ import { useLocation } from 'react-router-dom';
 // import ProductsIndex from './Masters/Products';
 // import VendorsIndex from './Masters/Vendors';
 // import StorageFacilitiesIndex from './Masters/StorageFacilities';
-// import PaymentMethodsIndex from './Masters/PaymentMethods';
+// import DepositMethodsIndex from './Masters/DepositMethods';
 // import ContactPersonsIndex from './Masters/ContactPersons';
 // import ShippingMethodsIndex from './Masters/ShippingMethods';
 // import CompaniesIndex from './Masters/Companies';
@@ -15,7 +15,7 @@ import { useLocation } from 'react-router-dom';
 // import SecondarySectionsIndex from './Masters/SecondarySections';
 // import ShopsIndex from './Masters/Shops';
 import EstimationSlipIndex from './EstimationSlip';
-import PaymentSlipsIndex from './PaymentSlips';
+import DepositSlipsIndex from './DepositSlips';
 import SalesSlipsIndex from './SalesSlips';
 import OrderSlipsIndex from './OrderSlips';
 
@@ -66,7 +66,7 @@ function VoucherEntries() {
         <Route path="estimation-slip/*" element={<EstimationSlipIndex />}/>
         <Route path="order-slips/*" element={<OrderSlipsIndex />}/>
         <Route path="sales-slips/*" element={<SalesSlipsIndex />}/>
-        <Route path="payment-slips/*" element={<PaymentSlipsIndex />}/>
+        <Route path="payment-slips/*" element={<DepositSlipsIndex />}/>
       </Routes>
     </div>)
 }

@@ -57,7 +57,6 @@ function OrderSlipsEdit() {
     };
 
     const [orderSlip, setOrderSlip] = useState({
-        id: '',
         code: '',
         order_id: '',
         order_date: '',
