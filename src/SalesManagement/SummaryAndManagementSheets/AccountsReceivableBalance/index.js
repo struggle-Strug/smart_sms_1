@@ -209,7 +209,6 @@ function Index() {
                             <th className='text-left pb-2.5'>入金予定金額</th>
                             <th className='text-left pb-2.5'>入金方法</th>
                             <th className='text-left pb-2.5'>担当者</th>
-                            <th className='text-right'></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -220,14 +219,6 @@ function Index() {
                                 <td>{customer.billing_code || <div className='border w-4'></div>}</td>
                                 <td>{customer.phone_number || <div className='border w-4'></div>}</td>
                                 <td>{customer.email}</td>
-                                <td className='flex justify-center relative'>
-                                    <div className='border rounded px-4 py-3 relative hover:cursor-pointer' onClick={(e) => toggleDropdown(customer.id)}>
-                                        {isOpen === customer.id && <DropDown id={customer.id} />}
-                                        <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M6.30664 10.968C5.20664 10.968 4.30664 11.868 4.30664 12.968C4.30664 14.068 5.20664 14.968 6.30664 14.968C7.40664 14.968 8.30664 14.068 8.30664 12.968C8.30664 11.868 7.40664 10.968 6.30664 10.968ZM18.3066 10.968C17.2066 10.968 16.3066 11.868 16.3066 12.968C16.3066 14.068 17.2066 14.968 18.3066 14.968C19.4066 14.968 20.3066 14.068 20.3066 12.968C20.3066 11.868 19.4066 10.968 18.3066 10.968ZM12.3066 10.968C11.2066 10.968 10.3066 11.868 10.3066 12.968C10.3066 14.068 11.2066 14.968 12.3066 14.968C13.4066 14.968 14.3066 14.068 14.3066 12.968C14.3066 11.868 13.4066 10.968 12.3066 10.968Z" fill="#1A1A1A" />
-                                        </svg>
-                                    </div>
-                                </td>
                             </tr>
                         ))}
                     </tbody>

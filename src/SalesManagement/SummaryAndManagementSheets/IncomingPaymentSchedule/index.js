@@ -3,40 +3,41 @@ import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import CustomSelect from '../../../Components/CustomSelect';
 import { BarChart } from '@mui/x-charts/BarChart';
+import DatePicker from 'react-datepicker';
 
 const { ipcRenderer } = window.require('electron');
 
 export function SimpleBarCharts() {
     return (
-      <BarChart
-        xAxis={[
-          {
-            id: 'barCategories',
-            data: ['株式会社A', '株式会社B', '株式会社C', '株式会社D', '株式会社E', '株式会社F', '株式会社G', '株式会社H', '株式会社I', '株式会社J', '株式会社K', '株式会社L'],
-            scaleType: 'band',
-          },
-        ]}
-        yAxis={[
-            {
-              id: 'yAxisId',
-              label: '円',
-              min: 0,
-              max: 10,
-              tickCount: 10,
-            },
-          ]}
-        series={[
-          {
-            data: [2, 5, 3, 4, 7, 8, 5, 2, 3, 9, 5, 6],
-            color: '#2563EB'
-          },
-        ]}
-        width={1216}
-        height={644}
-        barWidth={5}
-      />
+        <BarChart
+            xAxis={[
+                {
+                    id: 'barCategories',
+                    data: ['株式会社A', '株式会社B', '株式会社C', '株式会社D', '株式会社E', '株式会社F', '株式会社G', '株式会社H', '株式会社I', '株式会社J', '株式会社K', '株式会社L'],
+                    scaleType: 'band',
+                },
+            ]}
+            yAxis={[
+                {
+                    id: 'yAxisId',
+                    label: '円',
+                    min: 0,
+                    max: 10,
+                    tickCount: 10,
+                },
+            ]}
+            series={[
+                {
+                    data: [2, 5, 3, 4, 7, 8, 5, 2, 3, 9, 5, 6],
+                    color: '#2563EB'
+                },
+            ]}
+            width={1216}
+            height={644}
+            barWidth={5}
+        />
     );
-  }
+}
 
 
 function Index() {
@@ -45,50 +46,186 @@ function Index() {
         { value: '貴社', label: '貴社' },
     ];
 
-    const [customer, setCustomer] = useState({
-        id: '',
-        name_primary: '',
-        name_secondary: '',
-        name_kana: '',
-        honorific: '',
-        phone_number: '',
-        fax_number: '',
-        zip_code: '',
-        address: '',
-        email: '',
-        remarks: '',
-        billing_code: '',
-        billing_information: '',
-        monthly_sales_target: ''
-    });
-    const [customers, setCustomers] = useState([]);
+    const [depositSlipDetails, setDepositSlipDetails] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
     const location = useLocation();
-    const [searchQuery, setSearchQuery] = useState('');
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [customerIdToDelete, setCustomerIdToDelete] = useState(null);
+    const [searchQueryList, setSearchQueryList] = useState({
+        "dsd.created_start": "",
+        "dsd.created_end": "",
+        "p.category": "",
+        "p.subcategory": "",
+        "dsd.code": "",
+        "dsd.vender_name": "",
+        "dsd.product_name": "",
+        "dsd.contact_person": "",
+        "dsd.storage_facility": "",
+        "dsd.status": "",
+        "dsd.lot_number": "",
+        "dsd.classification_primary": "",
+        "dsd.classification_secondary": ""
+    });
+
+    const header = [
+        "入金日付",
+        "伝票番号",
+        "得意先",
+        "入金方法",
+        "入金額",
+        "手数料等",
+        "請求番号",
+        "データ区分",
+        "ステータス"
+    ];
+
+
+
+
+
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // 月は0から始まるため+1し、2桁にする
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+
+    const fileName = `支払明細表_${year}${month}${day}_${hours}${minutes}${seconds}`;
+    const [dataForExport, setDataForExport] = useState({
+        header: header,
+        data: [],
+        fileName: fileName
+    })
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setSearchQueryList((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleDateChange = (date, name) => {
+        const formattedDate = date ? date.toISOString().split('T')[0] : '';
+        setSearchQueryList({ ...searchQueryList, [name]: formattedDate });
+    };
 
     useEffect(() => {
-        ipcRenderer.send('get-customers');
-        ipcRenderer.on('customers-data', (event, data) => {
-            setCustomers(data);
-        });
+        ipcRenderer.send('load-deposit-slip-details');
 
-        ipcRenderer.on('customer-deleted', (event, id) => {
-            setCustomers((prevCustomers) => prevCustomers.filter(customer => customer.id !== id));
-        });
+        const handleLoadDetails = (event, data) => {
+            setDepositSlipDetails(data)
+            const arr = [];
+            for (let i = 0; i < data.length; i++) {
+                const value = [
+                    data[i].deposit_date,       // 入金日付
+                    data[i].code,               // 伝票番号
+                    data[i].vender_name,        // 得意先
+                    data[i].deposit_method,     // 入金方法
+                    data[i].deposits,           // 入金額
+                    data[i].commission_fee,     // 手数料等
+                    data[i].claim_id,           // 請求番号
+                    data[i].data_category,      // データ区分
+                    data[i].status              // ステータス
+                ];
+                arr.push(value);
+            }
 
-        ipcRenderer.on('search-customers-result', (event, data) => {
-            setCustomers(data);
-        });
+            const dataForSet = {
+                header: header,
+                data: arr,
+                fileName: fileName
+            };
+            setDataForExport(dataForSet);
+        };
+        const handleSearchResult = (event, data) => {
+            setDepositSlipDetails(data)
+            const arr = [];
+            for (let i = 0; i < data.length; i++) {
+                const value = [
+                    data[i].deposit_date,       // 入金日付
+                    data[i].code,               // 伝票番号
+                    data[i].vender_name,        // 得意先
+                    data[i].deposit_method,     // 入金方法
+                    data[i].deposits,           // 入金額
+                    data[i].commission_fee,     // 手数料等
+                    data[i].claim_id,           // 請求番号
+                    data[i].data_category,      // データ区分
+                    data[i].status              // ステータス
+                ];
+                arr.push(value);
+            }
+
+            const dataForSet = {
+                header: header,
+                data: arr,
+                fileName: fileName
+            };
+            setDataForExport(dataForSet);
+        };
+
+        ipcRenderer.on('load-deposit-slip-details', handleLoadDetails);
+        ipcRenderer.on('search-deposit-slip-details-result', handleSearchResult);
 
         return () => {
-            ipcRenderer.removeAllListeners('customers-data');
-            ipcRenderer.removeAllListeners('search-customers-result');
+            ipcRenderer.removeListener('load-deposit-slip-details', handleLoadDetails);
+            ipcRenderer.removeListener('search-deposit-slip-details-result', handleSearchResult);
         };
     }, []);
 
+    const [outputFormat, setOutputFormat] = useState('csv');
+    const [remarks, setRemarks] = useState('');
+    const [settingId, setSettingId] = useState(1)
+
+    useEffect(() => {
+        if (settingId) {
+            ipcRenderer.send('get-statement-setting-detail', settingId);
+            ipcRenderer.once('statement-setting-detail-data', (event, data) => {
+                if (data) {
+                    setOutputFormat(data.output_format || 'csv');
+                    setRemarks(data.remarks || '');
+                }
+            });
+        }
+    }, [settingId]);
+
+    const [message, setMessage] = useState('');
+
+    useEffect(() => {
+        ipcRenderer.on('export-success', (event, successMessage) => {
+            setMessage(successMessage);
+            alert(successMessage);
+        });
+
+        ipcRenderer.on('export-failure', (event, errorMessage) => {
+            setMessage(errorMessage);
+            alert(errorMessage);
+        });
+
+        return () => {
+            ipcRenderer.removeAllListeners('export-success');
+            ipcRenderer.removeAllListeners('export-failure');
+        };
+    }, []);
+
+    const handleSave = () => {
+        if (outputFormat === 'print') {
+
+        } else if (outputFormat === 'csv') {
+            exportToCSV();
+        } else if (outputFormat === 'Excel') {
+            exportToExcel();
+        } else if (outputFormat === 'PDF') {
+            exportPDF();
+        }
+        setIsDialogOpen(false);
+    };
+
+
     const toggleDropdown = (id) => {
-        console.log(id)
+
         if (!isOpen) setIsOpen(id);
         else setIsOpen(false);
     };
@@ -106,13 +243,14 @@ function Index() {
     };
 
     const handleSearch = () => {
-        ipcRenderer.send('search-customers', searchQuery);
-    };
-
-    const handleKeyDown = (event) => {
-        if (event.key === 'Enter') {
-            handleSearch();
+        const searchColums = {}
+        setDepositSlipDetails([])
+        for (let key in searchQueryList) {
+            if (searchQueryList[key] !== "") {
+                searchColums[key] = searchQueryList[key]
+            }
         }
+        ipcRenderer.send('search-deposit-slip-details', searchColums);
     };
 
     useEffect(() => {
@@ -122,21 +260,44 @@ function Index() {
         };
     }, []);
 
-    const [showFilters, setShowFilters] = useState(false);
-
-    const toggleFilters = () => {
-        setShowFilters(prev => !prev);
+    const handleConfirmDelete = () => {
+        ipcRenderer.send('delete-customer', customerIdToDelete);
+        setIsDialogOpen(false);
     };
 
-    const DropDown = (id) => {
-        return (
-            <div ref={dropdownRef} className='absolute right-0 origin-top-right mt-6 rounded shadow-lg z-50 bg-white p-3' style={{ top: "50px", width: "120px" }}>
-                <div className='px-3 py-1 hover:text-blue-600 hover:underline'><Link to={`detail/${id.id}`} className={``}>詳細</Link></div>
-                <div className='px-3 py-1 hover:text-blue-600 hover:underline'><Link to={`edit/${id.id}`} className={``}>編集</Link></div>
-                <div className='px-3 py-1 hover:text-blue-600 hover:underline' onClick={() => handleDelete(id.id)}>削除</div>
-            </div>
-        )
-    }
+    const handleCancelDelete = () => {
+        setIsDialogOpen(false);
+    };
+
+
+
+    const exportToCSV = () => {
+        ipcRenderer.send('export-to-csv', dataForExport);
+    };
+
+    const exportToExcel = () => {
+        ipcRenderer.send('export-to-excel', dataForExport);
+    };
+
+    const exportPDF = () => {
+        ipcRenderer.send('export-to-pdf', dataForExport);
+    };
+
+    const handlePurchaseOrderNumberSum = (orderSlipDetails) => {
+        let sum = 0;
+        for (let i = 0; i < orderSlipDetails.length; i++) {
+            sum += parseInt(orderSlipDetails[i].number);
+        }
+        return sum;
+    };
+
+    const handlePurchaseOrderNumberPrice = (orderSlipDetails) => {
+        let purchaseOrderSumPrice = 0;
+        for (let i = 0; i < orderSlipDetails.length; i++) {
+            purchaseOrderSumPrice += parseInt(orderSlipDetails[i].number) * parseInt(orderSlipDetails[i].unit_price);
+        }
+        return purchaseOrderSumPrice;
+    };
 
     return (
         <div className='w-full'>
@@ -157,7 +318,13 @@ function Index() {
                             <div className='flex items-center'>
                                 <div>
                                     <div className='text-sm pb-1.5'>期間 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
-                                    <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                                    <DatePicker
+                                        selected={searchQueryList["dsd.created_start"] ? new Date(searchQueryList["dsd.created_start"]) : null}
+                                        onChange={(date) => handleDateChange(date, "dsd.created_start")}
+                                        dateFormat="yyyy-MM-dd"
+                                        className='border rounded px-4 py-2.5 bg-white  w-full'
+                                        placeholderText='期間を選択'
+                                    />
                                 </div>
                                 <div>
                                     <div className='w-1'>&nbsp;</div>
@@ -166,25 +333,58 @@ function Index() {
 
                                 <div>
                                     <div className='text-sm pb-1.5 text-gray-100'>期間</div>
-                                    <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                                    <DatePicker
+                                        selected={searchQueryList["dsd.created_end"] ? new Date(searchQueryList["dsd.created_end"]) : null}
+                                        onChange={(date) => handleDateChange(date, "dsd.created_end")}
+                                        dateFormat="yyyy-MM-dd"
+                                        className='border rounded px-4 py-2.5 bg-white  w-full'
+                                        placeholderText='期間を選択'
+                                    />
                                 </div>
                             </div>
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>締日</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <DatePicker
+                                selected={searchQueryList["dsd.closing_date"] ? new Date(searchQueryList["dsd.closing_date"]) : null}
+                                onChange={(date) => handleDateChange(date, "dsd.closing_date")}
+                                dateFormat="yyyy-MM-dd"
+                                className='border rounded px-4 py-2.5 bg-white  w-full'
+                                placeholderText='期間を選択'
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>入金ステータス</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="dsd.status"
+                                value={searchQueryList["dsd.status"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>入金方法</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="dsd.deposit_method"
+                                value={searchQueryList["dsd.deposit_method"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>担当者</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="ds.contact_person"
+                                value={searchQueryList["ds.contact_person"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
                     </div>
                     <div className='flex mt-6'>
@@ -200,50 +400,34 @@ function Index() {
                         </Link>
                     </div>
                 </div>
-                <table className="w-full mt-8 table-auto">
-                    <thead className=''>
-                        <tr className='border-b'>
-                            <th className='text-left pb-2.5'>得意先</th>
-                            <th className='text-left pb-2.5'>入金ステータス</th>
-                            <th className='text-left pb-2.5'>入金予定日</th>
-                            <th className='text-left pb-2.5'>入金予定金額</th>
-                            <th className='text-left pb-2.5'>入金方法</th>
-                            <th className='text-left pb-2.5'>担当者</th>
-                            <th className='text-right'></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {customers.map((customer) => (
-                            <tr className='border-b' key={customer.id}>
-                                <td>{customer.name_primary || <div className='border w-4'></div>}</td>
-                                <td>{customer.name_primary || <div className='border w-4'></div>}</td>
-                                <td>{customer.billing_code || <div className='border w-4'></div>}</td>
-                                <td>{customer.phone_number || <div className='border w-4'></div>}</td>
-                                <td>{customer.email}</td>
-                                <td className='flex justify-center relative'>
-                                    <div className='border rounded px-4 py-3 relative hover:cursor-pointer' onClick={(e) => toggleDropdown(customer.id)}>
-                                        {isOpen === customer.id && <DropDown id={customer.id} />}
-                                        <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M6.30664 10.968C5.20664 10.968 4.30664 11.868 4.30664 12.968C4.30664 14.068 5.20664 14.968 6.30664 14.968C7.40664 14.968 8.30664 14.068 8.30664 12.968C8.30664 11.868 7.40664 10.968 6.30664 10.968ZM18.3066 10.968C17.2066 10.968 16.3066 11.868 16.3066 12.968C16.3066 14.068 17.2066 14.968 18.3066 14.968C19.4066 14.968 20.3066 14.068 20.3066 12.968C20.3066 11.868 19.4066 10.968 18.3066 10.968ZM12.3066 10.968C11.2066 10.968 10.3066 11.868 10.3066 12.968C10.3066 14.068 11.2066 14.968 12.3066 14.968C13.4066 14.968 14.3066 14.068 14.3066 12.968C14.3066 11.868 13.4066 10.968 12.3066 10.968Z" fill="#1A1A1A" />
-                                        </svg>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-                <div className='flex items-end justify-end py-4'>
-                                <div className=''>
-                                    <div className='flex items-center'>
-                                        <div className='mr-4'>数量</div>
-                                        <div className='mr-12 font-bold text-lg'>200</div>
-                                        <div className='mr-4'>金額</div>
-                                        <div className='mr-12 font-bold text-lg'>20,000円</div>
-                                        <div className='mr-4'>構成比</div>
-                                        <div className='font-bold text-lg'>100％</div>
-                                    </div>
-                                </div>
-                            </div>
+                <div className='pb-8 px-8 overflow-x-scroll'>
+                    <div className='pb-8 overflow-x-scroll'>
+                        <table className="w-full mt-8 table-auto">
+                            <thead className="border-b">
+                                <tr>
+                                    <th className='text-left pb-2.5'>得意先</th>
+                                    <th className='text-left pb-2.5'>入金ステータス</th>
+                                    <th className='text-left pb-2.5'>入金予定日</th>
+                                    <th className='text-left pb-2.5'>入金予定金額</th>
+                                    <th className='text-left pb-2.5'>入金方法</th>
+                                    <th className='text-left pb-2.5'>担当者</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {depositSlipDetails.map((depositSlipDetail, index) => (
+                                    <tr className="border-b" key={index}>
+                                        <td className="py-4">{depositSlipDetail.vender_name || '-'}</td>
+                                        <td className="py-4">{depositSlipDetail.status || '-'}</td>
+                                        <td className="py-4">{depositSlipDetail.deposit_date || '-'}</td>
+                                        <td className="py-4">{depositSlipDetail.deposits || '-'}</td>
+                                        <td className="py-4">{depositSlipDetail.deposit_method || '-'}</td>
+                                        <td className="py-4">{depositSlipDetail.product_name || '-'}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     )

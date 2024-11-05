@@ -4,6 +4,9 @@ import { useLocation } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip'
 import CustomSelect from '../../../Components/CustomSelect';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import DatePicker from 'react-datepicker';
+
 const { ipcRenderer } = window.require('electron');
 
 function ProcessRegistrationIndex() {
@@ -12,22 +15,214 @@ function ProcessRegistrationIndex() {
     { value: '貴社', label: '貴社' },
   ];
 
-  const [customer, setCustomer] = useState({
-    id: '',
-    name_primary: '',
-    name_secondary: '',
-    name_kana: '',
-    honorific: '',
-    phone_number: '',
-    fax_number: '',
-    zip_code: '',
-    address: '',
-    email: '',
-    remarks: '',
-    billing_code: '',
-    billing_information: '',
-    monthly_sales_target: ''
+  const navigate = useNavigate();
+
+  const [searchQueryList, setSearchQueryList] = useState({
+    "os.vender_name": "",
+    "os.closing_date": "",
+    "delivery_customer": "",
   });
+
+
+  const handleDateChange = (date, name) => {
+    const formattedDate = date ? date.toISOString().split('T')[0] : '';
+    setSearchQueryList({ ...searchQueryList, [name]: formattedDate });
+  };
+
+
+  const generatePDF = async () => {
+
+    const html_content = `
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>請求書</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .header, .client-info, .summary, .footer {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .header {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .address {
+            font-size: 14px;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .table th, .table td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .right-align {
+            text-align: right;
+        }
+        .total-section {
+            text-align: right;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>請求書</h1>
+
+    <!-- Header Section -->
+    <div class="header">
+        <div>
+            <div class="section-title">請求先</div>
+            <div>株式会社A</div>
+            <div class="address">
+                〒100-0001<br>
+                東京都千代田区千代田1-1 サンプルビル1F
+            </div>
+            <p>下記の通り、ご請求申し上げます。</p>
+        </div>
+        <div>
+            <div>請求番号　INV-2023001</div>
+            <div>発行日　2023年5月31日</div>
+            <div>お支払期限　2023年6月30日</div>
+            <br>
+            <div>株式会社Smart_SmS</div>
+            <div class="address">
+                〒150-0002<br>
+                東京都渋谷区渋谷2-2スマートビル3F<br>
+                TEL 03-1234-5678
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail Section -->
+    <div class="section-title">納品先A</div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>日付</th>
+                <th>伝票番号</th>
+                <th>商品名</th>
+                <th>数量</th>
+                <th>単価</th>
+                <th>金額</th>
+                <th>税率</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>2023/05/01</td>
+                <td>INV-001</td>
+                <td>商品A</td>
+                <td>2</td>
+                <td>¥5,000</td>
+                <td>¥10,000</td>
+                <td>8%</td>
+            </tr>
+            <tr>
+                <td>2023/05/01</td>
+                <td>INV-002</td>
+                <td>商品B</td>
+                <td>2</td>
+                <td>¥5,000</td>
+                <td>¥10,000</td>
+                <td>10%</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="total-section">小計 ¥25,000</div>
+
+    <div class="section-title">納品先B</div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>日付</th>
+                <th>伝票番号</th>
+                <th>商品名</th>
+                <th>数量</th>
+                <th>単価</th>
+                <th>金額</th>
+                <th>税率</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>2023/05/01</td>
+                <td>INV-001</td>
+                <td>商品A</td>
+                <td>2</td>
+                <td>¥5,000</td>
+                <td>¥10,000</td>
+                <td>8%</td>
+            </tr>
+            <tr>
+                <td>2023/05/01</td>
+                <td>INV-002</td>
+                <td>商品B</td>
+                <td>2</td>
+                <td>¥5,000</td>
+                <td>¥10,000</td>
+                <td>10%</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="total-section">小計 ¥149,000</div>
+
+    <!-- Summary Section -->
+    <div class="summary">
+        <div class="right-align">
+            <p>税抜合計　¥5,000</p>
+            <p>消費税(8%)　¥500</p>
+            <p>消費税(10%)　¥500</p>
+            <p>消費税合計　¥1,000</p>
+            <p>税込合計　¥5,500</p>
+        </div>
+    </div>
+
+    <!-- Final Total Section -->
+    <div class="total-section">
+        <strong>合計金額(税込)　¥190,700</strong>
+    </div>
+
+</body>
+</html>
+`;
+
+
+    try {
+      const filePath = await ipcRenderer.invoke('generate-pdf', html_content);
+      alert(`PDFが作成されました: ${filePath}`);
+    } catch (error) {
+      console.error('PDF生成エラー:', error);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setSearchQueryList((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   return (
     <div className='w-full'>
       <div className=''>
@@ -49,7 +244,13 @@ function ProcessRegistrationIndex() {
           <div className='flex items-center pb-2'>
             <div>
               <div className='text-sm pb-1.5'>請求期間 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
-              <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+              <DatePicker
+                selected={searchQueryList["osd.created_start"] ? new Date(searchQueryList["osd.created_start"]) : null}
+                onChange={(date) => handleDateChange(date, "osd.created_start")}
+                dateFormat="yyyy-MM-dd"
+                className='border rounded px-4 py-2.5 bg-white  w-full'
+                placeholderText='期間を選択'
+              />
             </div>
             <div>
               <div className='w-1'>&nbsp;</div>
@@ -58,28 +259,61 @@ function ProcessRegistrationIndex() {
 
             <div>
               <div className='text-sm pb-1.5 text-white'>期間指定</div>
-              <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+              <DatePicker
+                selected={searchQueryList["osd.created_end"] ? new Date(searchQueryList["osd.created_end"]) : null}
+                onChange={(date) => handleDateChange(date, "osd.created_end")}
+                dateFormat="yyyy-MM-dd"
+                className='border rounded px-4 py-2.5 bg-white  w-full'
+                placeholderText='期間を選択'
+              />
             </div>
           </div>
           <div className='flex'>
             <div className='pb-2 mr-8'>
-              <div className='w-40 text-sm pb-1.5'>伝票番号 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
-              <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+              <div className='w-40 text-sm pb-1.5'>得意先 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
+              <input
+                type='text'
+                className='border rounded px-4 py-2.5 bg-white w-full'
+                placeholder='得意先'
+                name="os.vender_name"
+                value={searchQueryList["os.vender_name"]}
+                onChange={handleInputChange}
+              />
             </div>
             <div className='pb-2'>
-              <div className='w-40 text-sm pb-1.5'>受注日付 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
-              <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+              <div className='w-40 text-sm pb-1.5'>締日 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
+              <DatePicker
+                selected={searchQueryList["os.closing_date"] ? new Date(searchQueryList["os.closing_date"]) : null}
+                onChange={(date) => handleDateChange(date, "os.closing_date")}
+                dateFormat="yyyy-MM-dd"
+                className='border rounded px-4 py-2.5 bg-white  w-full'
+                placeholderText='締日'
+              />
             </div>
           </div>
-          <div className='pb-2'>
-            <div className='w-40 text-sm pb-1.5'>納品先 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
-            <CustomSelect className="w-full" options={options} placeholder={"2024"} name={"honorific"} data={customer} setData={setCustomer} />
+          <div className='flex'>
+            <div className='pb-2'>
+              <div className='w-40 text-sm pb-1.5'>納品先 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
+              <input
+                type='text'
+                className='border rounded px-4 py-2.5 bg-white w-full'
+                placeholder='納品先'
+                name="delivery_customer"
+                value={searchQueryList["delivery_customer"]}
+                onChange={handleInputChange}
+              />
+            </div>
           </div>
         </div>
       </div>
       <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
-        <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' >請求計算</div>
-        <Link to={`/master/payment-methods`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
+        <Link
+          to={{
+            pathname: "/invoice-export",
+            search: `?closing_date=${searchQueryList["os.closing_date"]}&vender_name=${searchQueryList["os.vender_name"]}&delivery_customer=${searchQueryList["delivery_customer"]}`
+          }}
+          className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' >請求計算</Link>
+        <div onClick={() => navigate(-1)} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</div>
       </div>
     </div>
   );

@@ -92,7 +92,6 @@ function Index() {
         ipcRenderer.send('load-sales-slip-details');
 
         const handleLoadDetails = (event, data) => {
-            console.log(data)
             setSalesSlipDetails(data)
             const arr = []
             for (let i = 0; i < data.length; i++) {

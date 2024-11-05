@@ -40,6 +40,7 @@ require('./ipc/procurements/posPvsMappings');
 
 //ツール
 require('./ipc/utilis/export');
+require('./ipc/utilis/exportInvoice');
 
 //売上管理
 require('./ipc/salesmanagements/estimationSlips');

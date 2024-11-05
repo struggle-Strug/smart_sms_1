@@ -10,6 +10,7 @@ import Procurement from './Procurement';
 import Master from './Master';
 import InvoiceSettings from './Components/InvoiceSettings/InvoiceSettings';
 import StockInOutputInvoiceSettings from './Components/InvoiceSettings/StockInOutputInvoiceSettings';
+import InvoiceExportSettings from './Components/InvoiceSettings/InvoiceExportSettings';
 import SalesMagement from './SalesManagement';
 
 
@@ -127,6 +128,7 @@ function App() {
           <Route path="/procurement/*" element={<Procurement />} />
           <Route path="/invoice-settings" element={<InvoiceSettings />} />
           <Route path="/stock-in-output-invoice-settings" element={<StockInOutputInvoiceSettings />} />
+          <Route path="/invoice-export" element={<InvoiceExportSettings />} />
         </Routes>
       </div>
     </div>

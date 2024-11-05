@@ -5,9 +5,9 @@ const {
     saveDepositSlipDetail, 
     deleteDepositSlipDetailById, 
     editDepositSlipDetail, 
-    searchDepositSlipDetails,
     searchDepositSlipsByDepositSlipId,
-    deleteDepositSlipDetailsBySlipId
+    deleteDepositSlipDetailsBySlipId,
+    searchDepositSlipsDetails
 } = require('../../database/salesmanagements/depositSlipDetails');
 
 // 購入注文明細のデータをロード
@@ -84,7 +84,7 @@ ipcMain.on('edit-deposit-slip-detail', (event, id) => {
 
 // 購入注文明細の検索
 ipcMain.on('search-deposit-slip-details', (event, query) => {
-    searchDepositSlipDetails(query, (err, results) => {
+    searchDepositSlipsDetails(query, (err, results) => {
         if (err) {
             console.error(err.message);
         } else {

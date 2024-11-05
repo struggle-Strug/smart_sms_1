@@ -204,6 +204,42 @@ function searchOrderSlipDetails(conditions, callback) {
     });
 }
 
+function searchOrderSlipDepositDetails(conditions, callback) {
+    let sql = `SELECT * FROM order_slip_details osd
+                 LEFT JOIN order_slips os ON osd.order_slip_id = os.id
+                 LEFT JOIN products p ON osd.product_id = p.id
+    `;
+
+    let whereClauses = [];
+    let params = [];
+
+    // 条件オブジェクトのキーと値を動的にWHERE句に追加
+    if (conditions && Object.keys(conditions).length > 0) {
+        for (const [column, value] of Object.entries(conditions)) {
+            // pod.created_start と pod.created_end の特別な扱い
+            if (column === 'os.deposit_start') {
+                whereClauses.push(`os.deposit_due_date >= ?`);
+                params.push(value); // created_startの日付をそのまま使用
+            } else if (column === 'os.deposit_end') {
+                whereClauses.push(`os.deposit_due_date <= ?`);
+                params.push(value); // created_endの日付をそのまま使用
+            } else {
+                whereClauses.push(`${column} LIKE ?`);
+                params.push(`%${value}%`);
+            }
+        }
+    }
+
+    // WHERE句がある場合はSQL文に追加
+    if (whereClauses.length > 0) {
+        sql += ` WHERE ` + whereClauses.join(" AND ");
+    }
+
+    db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
 function searchOrderSlipByOrderSlipId(query, callback) {
     let sql;
     let params = [];
@@ -243,5 +279,6 @@ module.exports = {
     searchOrderSlipsByOrderSlipId,
     searchOrderSlipDetails,
     searchOrderSlipByOrderSlipId,
-    deleteOrderSlipDetailsBySoId
+    deleteOrderSlipDetailsBySoId,
+    searchOrderSlipDepositDetails
 };

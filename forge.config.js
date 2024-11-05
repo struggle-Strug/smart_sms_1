@@ -31,7 +31,7 @@ module.exports = {
       config: {
         repository: {
           owner: 'esakiryota',
-          name: 'smart-sms'
+          name: 'smart-sms-staging'
         },
         prerelease: false,
         draft: true

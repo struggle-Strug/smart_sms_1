@@ -3,40 +3,41 @@ import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import CustomSelect from '../../../Components/CustomSelect';
 import { BarChart } from '@mui/x-charts/BarChart';
+import DatePicker from 'react-datepicker';
 
 const { ipcRenderer } = window.require('electron');
 
 export function SimpleBarCharts() {
     return (
-      <BarChart
-        xAxis={[
-          {
-            id: 'barCategories',
-            data: ['株式会社A', '株式会社B', '株式会社C', '株式会社D', '株式会社E', '株式会社F', '株式会社G', '株式会社H', '株式会社I', '株式会社J', '株式会社K', '株式会社L'],
-            scaleType: 'band',
-          },
-        ]}
-        yAxis={[
-            {
-              id: 'yAxisId',
-              label: '円',
-              min: 0,
-              max: 10,
-              tickCount: 10,
-            },
-          ]}
-        series={[
-          {
-            data: [2, 5, 3, 4, 7, 8, 5, 2, 3, 9, 5, 6],
-            color: '#2563EB'
-          },
-        ]}
-        width={1216}
-        height={644}
-        barWidth={5}
-      />
+        <BarChart
+            xAxis={[
+                {
+                    id: 'barCategories',
+                    data: ['株式会社A', '株式会社B', '株式会社C', '株式会社D', '株式会社E', '株式会社F', '株式会社G', '株式会社H', '株式会社I', '株式会社J', '株式会社K', '株式会社L'],
+                    scaleType: 'band',
+                },
+            ]}
+            yAxis={[
+                {
+                    id: 'yAxisId',
+                    label: '円',
+                    min: 0,
+                    max: 10,
+                    tickCount: 10,
+                },
+            ]}
+            series={[
+                {
+                    data: [2, 5, 3, 4, 7, 8, 5, 2, 3, 9, 5, 6],
+                    color: '#2563EB'
+                },
+            ]}
+            width={1216}
+            height={644}
+            barWidth={5}
+        />
     );
-  }
+}
 
 
 function Index() {
@@ -67,6 +68,22 @@ function Index() {
     const location = useLocation();
     const [searchQuery, setSearchQuery] = useState('');
 
+    const [searchQueryList, setSearchQueryList] = useState({
+        "esd.created_start": "",
+        "esd.created_end": "",
+        "p.category": "",
+        "p.subcategory": "",
+        "esd.code": "",
+        "esd.vender_name": "",
+        "esd.product_name": "",
+        "esd.contact_person": "",
+        "esd.storage_facility": "",
+        "esd.status": "",
+        "esd.lot_number": "",
+        "esd.classification_primary": "",
+        "esd.classification_secondary": ""
+    });
+
     useEffect(() => {
         ipcRenderer.send('get-customers');
         ipcRenderer.on('customers-data', (event, data) => {
@@ -87,10 +104,166 @@ function Index() {
         };
     }, []);
 
+    const [displayData, setDisplayData] = useState([]);
+
+
+
+    useEffect(() => {
+        ipcRenderer.send('load-deposit-slip-details');
+        const handleLoadDetails = (event, data) => {
+            for (let i = 0; i < data.length; i++) {
+                // if (slipsData[data[i].deposit_slip_id]) {
+                //     slipsData[data[i].deposit_slip_id].arr.push({deposits: data[i].deposits, deposit_method: data[i].deposit_method, deposit_date: data[i].deposit_date,});
+                // } else {
+                //     slipsData[data[i].deposit_slip_id] = { deposit_slip_id: data[i].deposit_slip_id, code: data[i].code, vendor_name: data[i].vender_name, data_category: data[i].data_category, arr: [{deposits: data[i].deposits, deposit_method: data[i].deposit_method}] };    
+                // }
+                // displayData.push({ id:  data[i].ds_id, code: data[i].code, vendor_name: data[i].vender_name, data_category: data[i].data_category, price: data[i].deposits, consumption_tax_amount: data[i].deposits * 1.1,  deposit_method: data[i].deposit_method, deposit_date: data[i].deposit_date, payment_method: data[i].deposit_method, slip: '入金伝票', status: data[i].status });
+                setDisplayData((prevItems) => [...prevItems, { id:  data[i].ds_id, payment_date: data[i].deposit_date, code: data[i].code, vendor_name: data[i].vender_name, data_category: data[i].data_category, price: data[i].deposits, consumption_tax_amount: data[i].deposits * 1.1,  deposit_method: data[i].deposit_method, deposit_date: data[i].deposit_date, payment_method: data[i].deposit_method, slip: '入金伝票', status: data[i].status }]);
+            }
+            // setDepositSlipDetails(data)
+            // const arr = [];
+            // for (let i = 0; i < data.length; i++) {
+            //     const value = [
+            //         data[i].deposit_date,       // 入金日付
+            //         data[i].code,               // 伝票番号
+            //         data[i].vender_name,        // 得意先
+            //         data[i].deposit_method,     // 入金方法
+            //         data[i].deposits,           // 入金額
+            //         data[i].commission_fee,     // 手数料等
+            //         data[i].claim_id,           // 請求番号
+            //         data[i].data_category,      // データ区分
+            //         data[i].status              // ステータス
+            //     ];
+            //     arr.push(value);
+            // }
+
+            // const dataForSet = {
+            //     header: header,
+            //     data: arr,
+            //     fileName: fileName
+            // };
+            // setDataForExport(dataForSet);
+        };
+        const handleSearchResult = (event, data) => {
+            // setDepositSlipDetails(data)
+            // const arr = [];
+            // for (let i = 0; i < data.length; i++) {
+            //     const value = [
+            //         data[i].deposit_date,       // 入金日付
+            //         data[i].code,               // 伝票番号
+            //         data[i].vender_name,        // 得意先
+            //         data[i].deposit_method,     // 入金方法
+            //         data[i].deposits,           // 入金額
+            //         data[i].commission_fee,     // 手数料等
+            //         data[i].claim_id,           // 請求番号
+            //         data[i].data_category,      // データ区分
+            //         data[i].status              // ステータス
+            //     ];
+            //     arr.push(value);
+            // }
+
+            // const dataForSet = {
+            //     header: header,
+            //     data: arr,
+            //     fileName: fileName
+            // };
+            // setDataForExport(dataForSet);
+        };
+
+        ipcRenderer.on('load-deposit-slip-details', handleLoadDetails);
+        ipcRenderer.on('search-deposit-slip-details-result', handleSearchResult);
+
+        ipcRenderer.send('load-sales-slip-details');
+
+        const handleSalesLoadDetails = (event, data) => {
+            for (let i = 0; i < data.length; i++) {
+                // displayData.push({ id: data[i].sales_slip_id, code: data[i].code, vendor_name: data[i].vender_name, data_category: data[i].data_category, price: data[i].price, consumption_tax_amount: data[i].price * 1.1,  deposit_method: data[i].payment_method, deposit_date: data[i].payment_date, payment_method: data[i].payment_method, slip: '売上伝票', status: data[i].status });
+                setDisplayData((prevItems) => [...prevItems, { id: data[i].sales_slip_id, code: data[i].code, vendor_name: data[i].vender_name, data_category: data[i].data_category, price: data[i].price, consumption_tax_amount: data[i].price * 1.1,  deposit_method: data[i].payment_method, deposit_date: data[i].payment_date, payment_date: data[i].payment_date, payment_method: data[i].payment_method, slip: '売上伝票', status: data[i].status }]);
+            }
+
+
+            // setSalesSlipDetails(data)
+            // const arr = []
+            // for (let i = 0; i < data.length; i++) {
+            //     const value = [
+            //         data[i].order_date,               // 売上日付
+            //         data[i].code,                     // 伝票番号
+            //         data[i].order_slip_code,          // 受注伝票番号
+            //         data[i].order_slip_code,          // 受注番号
+            //         data[i].vender_name,              // 得意先
+            //         data[i].product_id,               // 商品コード
+            //         data[i].product_name,             // 商品名
+            //         data[i].category,                 // カテゴリー
+            //         data[i].subcategory,              // サブカテゴリー
+            //         data[i].number,                   // 数量
+            //         data[i].price,                    // 単価
+            //         parseInt(data[i].number) * parseInt(data[i].price), // 金額
+            //         data[i].gross_margin_rate,        // 粗利率
+            //         data[i].gross_profit,             // 粗利益
+            //         data[i].lot_number,               // ロット番号
+            //         data[i].storage_facility,         // 倉庫
+            //         data[i].contact_person,           // 担当者
+            //         data[i].classification_primary,   // 区分1
+            //         data[i].classification_secondary, // 区分2
+            //         data[i].status         // 区分2
+            //     ];
+            //     arr.push(value)
+            // }
+            // const dataForSet = {
+            //     header: header,
+            //     data: arr,
+            //     fileName: fileName
+            // }
+            // setDataForExport(dataForSet)
+        };
+        const handleSalesSearchResult = (event, data) => {
+            // setSalesSlipDetails(data);
+            // const arr = []
+            // for (let i = 0; i < data.length; i++) {
+            //     const value = [
+            //         data[i].payment_voucher_id,
+            //         data[i].vender_name,
+            //         data[i].payment_method,
+            //         data[i].payment_price,
+            //         data[i].payment_price, // 支払金額税込と同じ値
+            //         data[i].contact_person,
+            //         data[i].classification1,
+            //         data[i].classification2,
+            //         data[i].status
+            //     ];
+            //     arr.push(value)
+            // }
+            // const dataForSet = {
+            //     header: header,
+            //     data: arr,
+            //     fileName: fileName
+            // }
+            // setDataForExport(dataForSet)
+        };
+
+        ipcRenderer.on('load-sales-slip-details', handleSalesLoadDetails);
+        ipcRenderer.on('search-sales-slip-details-result', handleSalesSearchResult);
+
+        return () => {
+            ipcRenderer.removeListener('load-deposit-slip-details', handleLoadDetails);
+            ipcRenderer.removeListener('search-deposit-slip-details-result', handleSearchResult);
+            ipcRenderer.removeListener('load-payment-voucher-details', handleLoadDetails);
+            ipcRenderer.removeListener('search-payment-voucher-details-result', handleSearchResult);
+        };
+    }, []);
+
     const toggleDropdown = (id) => {
         console.log(id)
         if (!isOpen) setIsOpen(id);
         else setIsOpen(false);
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setSearchQueryList((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
     };
 
     const handleClickOutside = (event) => {
@@ -138,6 +311,11 @@ function Index() {
         )
     }
 
+    const handleDateChange = (date, name) => {
+        const formattedDate = date ? date.toISOString().split('T')[0] : '';
+        setSearchQueryList({ ...searchQueryList, [name]: formattedDate });
+    };
+
     return (
         <div className='w-full'>
             <div className='p-8'>
@@ -157,7 +335,13 @@ function Index() {
                             <div className='flex items-center'>
                                 <div>
                                     <div className='text-sm pb-1.5'>期間 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
-                                    <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                                    <DatePicker
+                                        selected={searchQueryList["esd.created_start"] ? new Date(searchQueryList["esd.created_start"]) : null}
+                                        onChange={(date) => handleDateChange(date, "esd.created_start")}
+                                        dateFormat="yyyy-MM-dd"
+                                        className='border rounded px-4 py-2.5 bg-white  w-full'
+                                        placeholderText='期間を選択'
+                                    />
                                 </div>
                                 <div>
                                     <div className='w-1'>&nbsp;</div>
@@ -166,13 +350,26 @@ function Index() {
 
                                 <div>
                                     <div className='text-sm pb-1.5 text-gray-100'>期間</div>
-                                    <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                                    <DatePicker
+                                        selected={searchQueryList["esd.created_start"] ? new Date(searchQueryList["esd.created_start"]) : null}
+                                        onChange={(date) => handleDateChange(date, "esd.created_start")}
+                                        dateFormat="yyyy-MM-dd"
+                                        className='border rounded px-4 py-2.5 bg-white  w-full'
+                                        placeholderText='期間を選択'
+                                    />
                                 </div>
                             </div>
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>得意先</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                             <input
+                                type='text'
+                                className='border rounded px-4 py-2.5 bg-white w-full'
+                                placeholder=''
+                                name="esd.vender_name"
+                                value={searchQueryList["esd.vender_name"]}
+                                onChange={handleInputChange}
+                            />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>取引区分</div>
@@ -195,6 +392,7 @@ function Index() {
                 <table className="w-full mt-8 table-auto">
                     <thead className=''>
                         <tr className='border-b'>
+                            <th className='text-left pb-2.5'>得意先</th>
                             <th className='text-left pb-2.5'>取引日</th>
                             <th className='text-left pb-2.5'>取引区分</th>
                             <th className='text-left pb-2.5'>伝票番号</th>
@@ -204,30 +402,21 @@ function Index() {
                             <th className='text-left pb-2.5'>入金予定日</th>
                             <th className='text-left pb-2.5'>残高</th>
                             <th className='text-left pb-2.5'>入金ステータス</th>
-                            <th className='text-right'></th>
                         </tr>
                     </thead>
                     <tbody>
-                        {customers.map((customer) => (
-                            <tr className='border-b' key={customer.id}>
-                                <td>{customer.name_primary || <div className='border w-4'></div>}</td>
-                                <td>{customer.name_primary || <div className='border w-4'></div>}</td>
-                                <td>{customer.billing_code || <div className='border w-4'></div>}</td>
-                                <td>{customer.phone_number || <div className='border w-4'></div>}</td>
-                                <td>{customer.phone_number || <div className='border w-4'></div>}</td>
-                                <td>{customer.phone_number || <div className='border w-4'></div>}</td>
-                                <td>{customer.phone_number || <div className='border w-4'></div>}</td>
-                                <td>{customer.phone_number || <div className='border w-4'></div>}</td>
-                                <td>{customer.phone_number || <div className='border w-4'></div>}</td>
-                                <td>{customer.email}</td>
-                                <td className='flex justify-center relative'>
-                                    <div className='border rounded px-4 py-3 relative hover:cursor-pointer' onClick={(e) => toggleDropdown(customer.id)}>
-                                        {isOpen === customer.id && <DropDown id={customer.id} />}
-                                        <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M6.30664 10.968C5.20664 10.968 4.30664 11.868 4.30664 12.968C4.30664 14.068 5.20664 14.968 6.30664 14.968C7.40664 14.968 8.30664 14.068 8.30664 12.968C8.30664 11.868 7.40664 10.968 6.30664 10.968ZM18.3066 10.968C17.2066 10.968 16.3066 11.868 16.3066 12.968C16.3066 14.068 17.2066 14.968 18.3066 14.968C19.4066 14.968 20.3066 14.068 20.3066 12.968C20.3066 11.868 19.4066 10.968 18.3066 10.968ZM12.3066 10.968C11.2066 10.968 10.3066 11.868 10.3066 12.968C10.3066 14.068 11.2066 14.968 12.3066 14.968C13.4066 14.968 14.3066 14.068 14.3066 12.968C14.3066 11.868 13.4066 10.968 12.3066 10.968Z" fill="#1A1A1A" />
-                                        </svg>
-                                    </div>
-                                </td>
+                        {displayData.map((data, index) => (
+                            <tr className='border-b' key={index}>
+                                <td className='py-4'>{data.vender_name || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{data.payment_date || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{data.data_category || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{data.code || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{data.price || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{data.consumption_tax_amount || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{data.price || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{data.payment_date || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{"残高" || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{data.status || <div className='border w-4'></div>}</td>
                             </tr>
                         ))}
                     </tbody>
