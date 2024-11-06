@@ -1,12 +1,40 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import SalesTaxSettingsIndex from './Home/SalesTaxSettings';
-import BackupsSettingsIndex from './Home/BackupsSettings';
 import { useLocation } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 
-function Home() {
-    const location = useLocation();
+function HomesIndex() {
+	const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const location = useLocation();
+
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const handleClickOutside = (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const dropDown = (id) => {
+    return (
+      <div className='absolute left-0 origin-top-right rounded shadow bg-white' style={{ top: "50px" }}>
+        <div className='text-center py-2 hover:bg-gray-100 mt-2'>詳細</div>
+        <div className='px-4 py-2 hover:bg-gray-100'>編集</div>
+        <div className='px-4 py-2 mb-2 hover:bg-gray-100'>削除</div>
+      </div>
+    )
+  }
+
     return (
         <>
             {
@@ -114,81 +142,8 @@ function Home() {
                     </>
                 </div>
             }
-            <Routes>
-                <Route path="sales-tax-settings/*" element={<SalesTaxSettingsIndex />} />
-                <Route path="backups-settings/*" element={<BackupsSettingsIndex />} />
-            </Routes>
         </>
     )
 }
 
-export default Home;
-
-
-
-
-
-// import React, { useState, useRef, useEffect } from 'react';
-// import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-// import { useLocation } from 'react-router-dom';
-// import BackupsSettingsIndex from './Home/BackupsSettings';
-// import SalesTaxSettingsIndex from './Home/SalesTaxSettings';
-// import HomesIndex from './Home';
-
-// function Home() {
-//   const [isOpen, setIsOpen] = useState(false);
-//   const dropdownRef = useRef(null);
-//   const location = useLocation();
-
-//   const toggleDropdown = () => {
-//     setIsOpen(!isOpen);
-//   };
-
-//   const handleClickOutside = (event) => {
-//     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-//       setIsOpen(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     document.addEventListener('mousedown', handleClickOutside);
-//     return () => {
-//       document.removeEventListener('mousedown', handleClickOutside);
-//     };
-//   }, []);
-
-//   const dropDown = (id) => {
-//     return (
-//       <div className='absolute left-0 origin-top-right rounded shadow bg-white' style={{ top: "50px" }}>
-//         <div className='text-center py-2 hover:bg-gray-100 mt-2'>詳細</div>
-//         <div className='px-4 py-2 hover:bg-gray-100'>編集</div>
-//         <div className='px-4 py-2 mb-2 hover:bg-gray-100'>削除</div>
-//       </div>
-//     )
-//   }
-
-// 	return (
-//     <div className='flex'>
-//       {location.pathname !== '/master' && (
-//         <div className='border-r w-48 h-[92vh] overflow-y-scroll'>
-//           <div>
-//             <div className='text-center py-2 pt-4'></div>
-//             <div className='text-center py-2 pt-4 text-lg'></div>
-//             <div className={`text-center py-2 text-lg ${location.pathname.includes("/home/backup-settings") && "font-bold border-l-4 border-blue-600"}`}><Link to="backup-settings" className={``}>バックアップ設定</Link></div>
-// 						<div className={`text-center py-2 text-lg ${location.pathname.includes("/home/seles-tax-settings") && "font-bold border-l-4 border-blue-600"}`}><Link to="seles-tax-settings" className={``}>消費税設定</Link></div>
-//           </div>
-//         </div>
-//       )}
-//       <div className='overflow-y-scroll h-[92vh] w-full'>
-//       <Routes>
-//         <Route path="" element={<HomesIndex />} />
-//         <Route path="backup-settings/*" element={<BackupsSettingsIndex />} />
-// 				<Route path="seles-tax-settings/*" element={<SalesTaxSettingsIndex />} />
-//       </Routes>
-//       </div>
-//     </div>
-// 	)
-
-// }
-
-// export default Home;
+export default HomesIndex;
