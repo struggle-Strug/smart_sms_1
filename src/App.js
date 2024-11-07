@@ -41,6 +41,8 @@ function App() {
     };
   })
 
+  console.log(location.pathname);
+
   return (
     <div className="App">
       <div className='fixed w-full'>
@@ -49,7 +51,7 @@ function App() {
             Smart_SMS
           </div>
           <div className='absolute' style={{ top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
-            <Link to="/" className={`py-6 px-4 mx-2  ${location.pathname === "/" && "font-bold border-b-4 border-blue-600"}`}>ダッシュボード</Link>
+            <Link to="/dashboards" className={`py-6 px-4 mx-2  ${location.pathname.includes ("/dashboards") && "font-bold border-b-4 border-blue-600"}`}>ダッシュボード</Link>
             <Link to="/contact" className={`py-6 px-4 mx-2  ${location.pathname === "/contact" && "font-bold border-b-4 border-blue-600"}`} activeClassName=''>検索</Link>
             <Link to="/sales-management" className={`py-6 px-4 mx-2  ${location.pathname === "/about" && "font-bold border-b-4 border-blue-600"}`} activeClassName=''>売上管理</Link>
             <Link to="/procurement" className={`py-6 px-4 mx-2  ${location.pathname.includes("/procurement") && "font-bold border-b-4 border-blue-600"} relative`}
@@ -122,6 +124,7 @@ function App() {
       <div className='pt-16'>
         <Routes>
           <Route path="/*" element={<Home />} />
+          <Route path="/dashboards/*" element={<Home />} />
           <Route path="/sales-management/*" element={<SalesManagement />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/master/*" element={<Master />} />
