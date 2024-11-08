@@ -40,7 +40,6 @@ function App() {
       ipcRenderer.removeAllListeners('load-companies');
     };
   })
-  console.log(location.pathname);
 
   return (
     <div className="App">
@@ -50,10 +49,10 @@ function App() {
             Smart_SMS
           </div>
           <div className='absolute' style={{ top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
-            <Link to="/dashboards" className={`py-6 px-4 mx-2  ${location.pathname.includes ("/dashboards") && "font-bold border-b-4 border-blue-600"}`}>ダッシュボード</Link>
-            <Link to="/contact" className={`py-6 px-4 mx-2  ${location.pathname === "/contact" && "font-bold border-b-4 border-blue-600"}`} activeClassName=''>検索</Link>
-            <Link to="/sales-management" className={`py-6 px-4 mx-2  ${location.pathname === "/about" && "font-bold border-b-4 border-blue-600"}`} activeClassName=''>売上管理</Link>
-            <Link to="/procurement" className={`py-6 px-4 mx-2  ${location.pathname.includes("/procurement") && "font-bold border-b-4 border-blue-600"} relative`}
+            <Link to="/" className={`pt-6 pb-5 px-4 mx-2  ${(location.pathname.includes("/dashboards") || location.pathname === "/" )&& "font-bold border-b-4 border-blue-600"}`}>ダッシュボード</Link>
+            <Link to="/contact" className={`pt-6 pb-5 px-4 mx-2  ${location.pathname === "/contact" && "font-bold border-b-4 border-blue-600"}`} activeClassName=''>検索</Link>
+            <Link to="/sales-management" className={`pt-6 pb-5 px-4 mx-2  ${location.pathname === "/about" && "font-bold border-b-4 border-blue-600"}`} activeClassName=''>売上管理</Link>
+            <Link to="/procurement" className={`pt-6 pb-5 px-4 mx-2  ${location.pathname.includes("/procurement") && "font-bold border-b-4 border-blue-600"} relative`}
               activeClassName=''
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}>
@@ -115,14 +114,14 @@ function App() {
                 </div>
               )}
             </Link>
-            <Link to="/master" className={`py-6 px-4 mx-2  ${location.pathname.includes("/master") && "font-bold border-b-4 border-blue-600"}`} activeClassName=''>マスタ管理</Link>
+            <Link to="/master" className={`pt-6 pb-5 px-4 mx-2  ${location.pathname.includes("/master") && "font-bold border-b-4 border-blue-600"}`} activeClassName=''>マスタ管理</Link>
           </div>
           <div className='ml-auto text-xl py-3 pr-10'>{companyName}</div>
         </div>
       </div>
       <div className='pt-16'>
         <Routes>
-          <Route path="/dashboards/*" element={<Home />} />
+          <Route path="/*" element={<Home />} />
           <Route path="/sales-management/*" element={<SalesManagement />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/master/*" element={<Master />} />
