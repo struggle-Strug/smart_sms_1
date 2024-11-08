@@ -8,6 +8,9 @@ import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Validator from '../../../utils/validator';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+
+import axios from 'axios'; // 追加
+
 const { ipcRenderer } = window.require('electron');
 
 function PaymentSlipsAdd() {
@@ -288,6 +291,64 @@ function PaymentSlipsAdd() {
 
 
 
+
+
+    const [error, setError] = useState('');
+
+    // handleGetBankData メソッドの定義
+    const handleGetBankData = async () => {
+        try {
+            const response = await axios({
+                method: 'GET',
+                url: 'https://developer.api.bk.mufg.jp/btmu/retail/trial/v2/me/accounts/001001110001/transactions?inquiryDateFrom=2021-12-20&inquiryDateTo=2021-12-27',
+                headers: {
+                    'X-IBM-Client-Id': 'APIキーを入力', // APIキー
+                    'X-BTMU-Seq-No': '20200514-0000000123456789', // ランダムな値
+                    Accept: 'application/json',
+                },
+            });
+
+            // APIレスポンスからデータを格納
+            const data = response.data;
+            setDepositSlip(prevState => ({
+                ...prevState,
+                deposit_date: data.transactions[0].settlementDate,
+            }));
+
+            const newDetails = data.transactions.map(transaction => ({
+                id: '',
+                deposit_slip_id: '',
+                deposit_date: transaction.settlementDate,
+                vender_id: '', // 必要に応じて値を設定
+                vender_name: data.accountInfo.accountName, // 必要に応じて値を設定
+                claim_id: '',
+                deposit_method: transaction.transactionType, // 取引タイプをセット
+                deposits: transaction.amount, // 取引額をセット
+                commission_fee: '',
+                data_category: '',
+            }));
+
+    
+            // 取得した銀行データを depositSlipDetails に格納
+            setDepositSlipDetails(newDetails);
+    
+
+
+            console.log('データ取得成功:', data);
+
+            console.log('depositSlip', depositSlip);
+            console.log('depositSlipDetails', depositSlipDetails);
+        } catch (error) {
+            // エラーメッセージを表示
+            setError('データの取得に失敗しました。再度お試しください。');
+            console.error('エラー:', error);
+        }
+    };
+
+
+
+
+
     return (
         <div className='w-full'>
             <div className=''>
@@ -324,7 +385,7 @@ function PaymentSlipsAdd() {
                                             <div className='ml-4'>
                                                 <div className='w-30 text-sm pb-1.5'>入金日付 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
                                                 <DatePicker
-                                                    selected={depositSlip.deposit_date ? new Date(depositSlip.deposit_date) : null}
+                                                    selected={depositSlipDetail.deposit_date ? new Date(depositSlipDetail.deposit_date) : null}
                                                     onChange={(date) => handleDateChange(date, "deposit_date")}
                                                     dateFormat="yyyy-MM-dd"
                                                     className='w-40 border rounded px-4 py-2.5 bg-white w-[180px]'
@@ -438,7 +499,7 @@ function PaymentSlipsAdd() {
                             <div className='ml-4 text-lg font-semibold'>0円</div>
                         </div>
                     </div>
-                    <div className='w-36 bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' >銀行データ取込</div>
+                    <div className='w-36 bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleGetBankData}>銀行データ取込</div>
                     <div className='py-3'>
                         <hr className='' />
                     </div>
