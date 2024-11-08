@@ -56,7 +56,7 @@ function VoucherEntries() {
       <div className='border-r w-48 h-[100vh]'>
         <div className='text-center py-2 pt-4'></div>
         <div className='text-center py-2 pt-4 text-lg'></div>
-        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/voucher-entries/estimation-slip") && "font-bold border-l-4 border-blue-600"}`}><Link to="estimation-slip" className={``}>見積伝票</Link></div>
+        <div className={`text-center py-2 text-lg ${(location.pathname.includes("/sales-management/voucher-entries/estimation-slip") || location.pathname === "/sales-management/voucher-entries") && "font-bold border-l-4 border-blue-600"}`}><Link to="estimation-slip" className={``}>見積伝票</Link></div>
         <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/voucher-entries/order-slips") && "font-bold border-l-4 border-blue-600"}`}><Link to="order-slips" className={``}>受注伝票</Link></div>
         <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/voucher-entries/sales-slips") && "font-bold border-l-4 border-blue-600"}`}><Link to="sales-slips" className={``}>売上伝票</Link></div>
         <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/voucher-entries/payment-slips") && "font-bold border-l-4 border-blue-600"}`}><Link to="payment-slips" className={``}>入金伝票</Link></div>

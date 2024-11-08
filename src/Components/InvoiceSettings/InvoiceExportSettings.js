@@ -349,7 +349,7 @@ function InvoiceExportSettings() {
                             </div>
                             <div className='ml-12'>
                                 <Link to="/document-settings" className='py-3 px-4 border rounded-lg text-base font-bold flex'>
-                                    プレビュー生成
+                                    保存
                                 </Link>
                             </div>
                             <div className='ml-6'>

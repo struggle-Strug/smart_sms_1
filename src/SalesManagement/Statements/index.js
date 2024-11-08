@@ -44,7 +44,7 @@ function VoucherEntries() {
       <div className='border-r w-48 h-[100vh]'>
         <div className='text-center py-2 pt-4'></div>
         <div className='text-center py-2 pt-4 text-lg'></div>
-        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/statements/quotation-detail-sheets") && "font-bold border-l-4 border-blue-600"}`}><Link to="quotation-detail-sheets" className={``}>見積明細表</Link></div>
+        <div className={`text-center py-2 text-lg ${(location.pathname.includes("/sales-management/statements/quotation-detail-sheets") || location.pathname === "/sales-management/statements") &&  "font-bold border-l-4 border-blue-600"}`}><Link to="quotation-detail-sheets" className={``}>見積明細表</Link></div>
         <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/statements/order-detail-sheets") && "font-bold border-l-4 border-blue-600"}`}><Link to="order-detail-sheets" className={``}>受注明細表</Link></div>
         <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/statements/sales-detail-sheets") && "font-bold border-l-4 border-blue-600"}`}><Link to="sales-detail-sheets" className={``}>売上明細表</Link></div>
         <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/statements/payment-detail-sheets") && "font-bold border-l-4 border-blue-600"}`}><Link to="payment-detail-sheets" className={``}>入金明細表</Link></div>

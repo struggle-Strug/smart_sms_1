@@ -48,13 +48,13 @@ function VoucherEntries() {
       <div className='border-r w-48 h-[100vh]'>
         <div className='text-center py-2 pt-4'></div>
         <div className='text-center py-2 pt-4 text-lg'></div>
-        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/statements/order-summary-sheets") && "font-bold border-l-4 border-blue-600"}`}><Link to="order-summary-sheets" className={``}>受注集計表</Link></div>
-        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/statements/sales-summary-sheets") && "font-bold border-l-4 border-blue-600"}`}><Link to="sales-summary-sheets" className={``}>売上集計表</Link></div>
-        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/statements/money-sales-trends") && "font-bold border-l-4 border-blue-600"}`}><Link to="money-sales-trends" className={``}>月次売上推移</Link></div>
-        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/statements/invoice-processings") && "font-bold border-l-4 border-blue-600"}`}><Link to="invoice-processings" className={``}>請求処理</Link></div>
-        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/statements/incoming-payment-schedule") && "font-bold border-l-4 border-blue-600"}`}><Link to="incoming-payment-schedule" className={``}>入金予定表</Link></div>
-        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/statements/accounts-receivable-balance") && "font-bold border-l-4 border-blue-600"}`}><Link to="accounts-receivable-balance" className={``}>売掛金残高</Link></div>
-        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/statements/accounts-receivable-ledger") && "font-bold border-l-4 border-blue-600"}`}><Link to="accounts-receivable-ledger" className={``}>得意先元帳</Link></div>
+        <div className={`text-center py-2 text-lg ${(location.pathname.includes("/sales-management/summary-and-management-sheets/order-summary-sheets")  || location.pathname === "/sales-management/summary-and-management-sheets") && "font-bold border-l-4 border-blue-600"}`}><Link to="order-summary-sheets" className={``}>受注集計表</Link></div>
+        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/summary-and-management-sheets/sales-summary-sheets") && "font-bold border-l-4 border-blue-600"}`}><Link to="sales-summary-sheets" className={``}>売上集計表</Link></div>
+        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/summary-and-management-sheets/money-sales-trends") && "font-bold border-l-4 border-blue-600"}`}><Link to="money-sales-trends" className={``}>月次売上推移</Link></div>
+        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/summary-and-management-sheets/invoice-processings") && "font-bold border-l-4 border-blue-600"}`}><Link to="invoice-processings" className={``}>請求処理</Link></div>
+        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/summary-and-management-sheets/incoming-payment-schedule") && "font-bold border-l-4 border-blue-600"}`}><Link to="incoming-payment-schedule" className={``}>入金予定表</Link></div>
+        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/summary-and-management-sheets/accounts-receivable-balance") && "font-bold border-l-4 border-blue-600"}`}><Link to="accounts-receivable-balance" className={``}>売掛金残高</Link></div>
+        <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/summary-and-management-sheets/accounts-receivable-ledger") && "font-bold border-l-4 border-blue-600"}`}><Link to="accounts-receivable-ledger" className={``}>得意先元帳</Link></div>
       </div>
       <Routes>
         <Route path="" element={<OrderSummarySheetsIndex />}/>

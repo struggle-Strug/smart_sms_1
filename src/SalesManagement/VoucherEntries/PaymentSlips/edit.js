@@ -340,7 +340,7 @@ function PaymentSlipsEdit() {
                                         <div className='flex items-center'>
                                             <div className=''>
                                                 <div className='text-sm pb-1.5'>入金伝票番号 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                                <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="deposit_slip_id" value={depositSlipDetail.deposit_slip_id} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
+                                                <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="deposit_slip_id" value={depositSlipDetail.deposit_slip_id} onChange={(e) => handleInputChange(index, e)} style={{ width: "120px" }} />
                                                 {errors.deposit_slip_id && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.deposit_slip_id}</div>}
 
                                             </div>
@@ -350,14 +350,14 @@ function PaymentSlipsEdit() {
                                                     selected={depositSlip.deposit_date ? new Date(depositSlip.deposit_date) : null}
                                                     onChange={(date) => handleDateChange(date, "deposit_date")}
                                                     dateFormat="yyyy-MM-dd"
-                                                    className='w-40 border rounded px-4 py-2.5 bg-white w-[240px]'
+                                                    className='w-40 border rounded px-4 py-2.5 bg-white w-[180px]'
                                                     placeholderText='入金日付を選択'
                                                 />
                                                 {errors.deposit_date && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.deposit_date}</div>}
                                             </div>
                                             <div className='ml-4 relative'>
                                                 <div className='w-40 text-sm pb-1.5'>得意先コード <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="vender_id" value={depositSlipDetail.vender_id} onChange={handleChange} onFocus={handleFocus} onBlur={handleBlur} />
+                                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="vender_id" value={depositSlipDetail.vender_id} onChange={handleChange} onFocus={handleFocus} onBlur={handleBlur}  style={{ width: "180px" }} />
                                                 {
                                                     isVendorIdFocused &&
                                                     <div className='absolute top-20 left-0 z-10' onMouseDown={(e) => e.preventDefault()}>
@@ -378,7 +378,7 @@ function PaymentSlipsEdit() {
                                             </div>
                                             <div className='ml-4 relative'>
                                                 <div className='w-40 text-sm pb-1.5'>得意先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="vender_name" value={depositSlipDetail.vender_name} onChange={handleChange} onFocus={handleVendorNameFocus} onBlur={handleVendorNameBlur} />
+                                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="vender_name" value={depositSlipDetail.vender_name} onChange={handleChange} onFocus={handleVendorNameFocus} onBlur={handleVendorNameBlur} style={{ width: "180px" }} />
                                                 {
                                                     isVendorNameFocused &&
                                                     <div className='absolute top-20 left-0 z-10' onMouseDown={(e) => e.preventDefault()}>
@@ -400,7 +400,7 @@ function PaymentSlipsEdit() {
 
                                             <div className='ml-4'>
                                                 <div className='text-sm pb-1.5'>請求番号</div>
-                                                <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="claim_id" value={depositSlipDetail.claim_id} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
+                                                <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="claim_id" value={depositSlipDetail.claim_id} onChange={(e) => handleInputChange(index, e)} style={{ width: "120px" }} />
                                             </div>
                                             <div className='ml-4'>
                                                 <div className='text-sm pb-1.5'>入金方法<span className='text-sm font-bold text-red-600'>必須</span></div>
@@ -408,7 +408,7 @@ function PaymentSlipsEdit() {
                                             </div>
                                             <div className='ml-4'>
                                                 <div className='text-sm pb-1.5'>入金額 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                                <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="deposits" value={depositSlipDetail.deposits} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
+                                                <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="deposits" value={depositSlipDetail.deposits} onChange={(e) => handleInputChange(index, e)}  style={{ width: "120px" }}  />
                                             </div>
                                         </div>
                                         {errors["vender_id" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["vender_id" + index]}</div>}
