@@ -1,16 +1,48 @@
 import React, { useState } from 'react';
 import { Link, Route, Routes } from 'react-router-dom';
+import Validator from '../../utils/validator';
+
 
 function Index() {
-  const [facility, setFacility] = useState({
+  const [bank, setBank] = useState({
     api_key: '',
     sync_interval: ''
   });
 
+  const { ipcRenderer } = window.require('electron');
+
+  const validator = new Validator();
+
+  const [errors, setErrors] = useState({}); // エラーメッセージ用の状態
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFacility({ ...facility, [name]: value });
+    setBank({ ...bank, [name]: value });
   };
+
+  const handleSubmit = () => {
+    validator.required(bank.api_key, 'api_key', 'APIキー');
+
+    setErrors(validator.getErrors());
+
+    if(!validator.getErrors()) {
+      ipcRenderer.send('save-bank', bank);
+
+      ipcRenderer.once('save-bank-response', (event, response) => {
+        if (response.success) {
+          console.log('送信が成功しました:', response.message);
+          alert('APIキーが保存されました(仮)');
+        } else {
+          console.log('送信に失敗しました:', response.message);
+        }
+      });
+      // フォームのリセット
+      setBank({
+        api_key: '',
+      });
+      alert('APIキーが保存されました(仮)');
+    }
+  }
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -34,7 +66,7 @@ function Index() {
               className='border rounded px-4 py-2.5 bg-white w-full' 
               placeholder='APIキーを入力' 
               name="api_key" 
-              value={facility.api_key} 
+              value={bank.api_key} 
               onChange={handleChange} 
             />
             <button 
@@ -51,9 +83,8 @@ function Index() {
 
       {/* フッターのボタン */}
       <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
-        <button className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer'>
-          <Link to="add">設定を保存</Link>
-        </button>
+        <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>設定を保存
+        </div>
         <Link to={`/master/shipping-methods`} className='border rounded px-4 py-3 font-bold cursor-pointer'>戻る</Link>
       </div>
     </div>
