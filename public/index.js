@@ -37,6 +37,7 @@ require('./ipc/procurements/stockInOutSlipDetails');
 require('./ipc/procurements/paymentVoucherDetails');
 require('./ipc/procurements/statementSettings');
 require('./ipc/procurements/posPvsMappings');
+require('./ipc/procurements/inventories');
 
 //ツール
 require('./ipc/utilis/export');
@@ -127,6 +128,8 @@ function createWindow() {
   statementSettingsDB.initializeDatabase();
   const posPvsMappingsDB = require('./database/procurements/posPvsMappings');
   posPvsMappingsDB.initializeDatabase();
+  const inventoriesDB = require('./database/procurements/inventories');
+  inventoriesDB.initializeDatabase();
 
   //集計管理
 
