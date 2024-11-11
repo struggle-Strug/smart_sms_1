@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import BackupsSettingsIndex from './BackupsSettings';
 import DataConversionsIndex from './DataConversions';
-import AdminSettingsIndex from './AdminManagement';
+import AdminSettingsIndex from './AdminManament';
 import PosCoordinationSettingsIndex from './PosCoordinationSettings';
 import SalesTaxSettingsIndex from './SalesTaxSettings';
 import BanksApiSettingsIndex from './BanksApiSettings';
@@ -43,9 +43,9 @@ function Dashboards() {
         <Routes>
           <Route path="backups-settings" element={<BackupsSettingsIndex />} />
           <Route path="data-conversions" element={<DataConversionsIndex />} />
-          <Route path="admin-settings" element={<AdminSettingsIndex />} />
+          <Route path="admin-settings/*" element={<AdminSettingsIndex />} />
           <Route path="pos-coordination-settings" element={<PosCoordinationSettingsIndex />} />
-          <Route path="sales-tax-settings" element={<SalesTaxSettingsIndex />} />
+          <Route path="sales-tax-settings/*" element={<SalesTaxSettingsIndex />} />
           <Route path="banks-api-settings" element={<BanksApiSettingsIndex />} />
         </Routes>
       </div>

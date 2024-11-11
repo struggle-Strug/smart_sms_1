@@ -32,6 +32,7 @@ ipcMain.on('edit-storage-facility', (event, id) => {
 });
 
 ipcMain.on('save-storage-facility', (event, facilityData) => {
+  console.log("受け取ったデータ", facilityData)
     saveStorageFacility(facilityData, (err) => {
         if (err) {
             console.error(err.message);

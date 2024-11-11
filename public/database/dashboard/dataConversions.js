@@ -19,4 +19,11 @@ function initializeDatabase() {
   `);
 }
 
-module.exports = { initializeDatabase };
+function loadDataConversions(callback) {
+  db.all('SELECT * FROM data_conversions', [], callback);
+}
+
+module.exports = { 
+  initializeDatabase,
+  loadDataConversions
+};

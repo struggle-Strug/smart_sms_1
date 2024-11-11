@@ -2,20 +2,24 @@ import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import DataConversionsAdd from './add';
+
 const { ipcRenderer } = window.require('electron');
+
 function Index() {
 
-  const mockData = [
-    {
-      id: 1,
-      file_name: 'products_2023.csv',
-      complete_time: '2023-06-15 15:30:45',
-      total_line_count: 1000,
-      updated_record: 850,
-      imported_line_count: 1000,
-      new_record: '',
-    },
-  ];
+  const [dataConversions, setDataConversions] = useState([]);
+
+
+  useEffect(() => {
+    ipcRenderer.send('load-data-conversions');
+    ipcRenderer.on('data-conversions-data',(event, data) => {
+      console.log("受信したデータ",data);
+      setDataConversions(data); 
+    });
+    return () => {
+      ipcRenderer.removeAllListeners('data-conversions-data');
+    };
+  }, []);
 
   return (
     <div>
@@ -36,7 +40,7 @@ function Index() {
             </tr>
           </thead>
           <tbody>
-            {mockData.map((data) => (
+            {dataConversions.map((data) => (
               <tr className='border-b' key={data.id}>
                 <td className='py-2.5'>{data.file_name || <div className='border w-4'></div>}</td>
                 <td className='py-2.5'>{data.complete_time || <div className='border w-4'></div>}</td>

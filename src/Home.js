@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import BackupsSettingsIndex from './DashBoards/BackupsSettings';
 import DataConversionsIndex from './DashBoards/DataConversions';
-import AdminSettingsIndex from './DashBoards/AdminManagement';
+import AdminSettingsIndex from './DashBoards/AdminManament';
 import PosCoordinationSettingsIndex from './DashBoards/PosCoordinationSettings';
 import SalesTaxSettingsIndex from './DashBoards/SalesTaxSettings';
 import BanksApiSettingsIndex from './DashBoards/BanksApiSettings';

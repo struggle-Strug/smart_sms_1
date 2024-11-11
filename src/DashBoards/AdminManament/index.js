@@ -2,15 +2,26 @@ import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import AdminSettingsAdd from './add';
+import AdminSettingsEdit from'./edit';
 
 const { ipcRenderer } = window.require('electron');
 
 function Index() {
 
-  const mockData = [
-    { id: 1, user_name: '山田太郎', access_level: 'マスター管理者', action: '編集' },
-    { id: 2, user_name: '佐藤花子', access_level: '管理者', action: '編集' },
-  ];
+  const [admin, setAdmin] = useState([]);
+
+  useEffect(() => {
+    ipcRenderer.send('load-admin-settings');
+    ipcRenderer.on('admin-settings-data',(event, data) => {
+      console.log("受信したデータ",data);
+      setAdmin(data); 
+    });
+    return () => {
+      ipcRenderer.removeAllListeners('admin-settings-data');
+    };
+  }, []);
+
+
 
   return (
     <div>
@@ -28,12 +39,14 @@ function Index() {
             </tr>
           </thead>
           <tbody>
-            {mockData.map((data) => (
+            {admin.map((data) => (
               <tr className='border-b' key={data.id}>
                 <td className='py-2.5 px-2'>{data.user_name}</td>
-                <td className='py-2.5 px-2'>{data.access_level}</td>
                 <td className='py-2.5 px-2'>
-                  <a href="#" className="text-blue-500 underline">{data.action}</a>
+                  {data.access_level === '1' ? '管理者' : data.access_level === '0' ? 'マスター管理者' : '未定義'}
+                </td>
+                <td className='py-2.5 px-2'>
+                <Link to={`edit/${data.id}`} className="text-blue-500 underline">編集</Link>
                 </td>
               </tr>
             ))}
@@ -46,11 +59,11 @@ function Index() {
 
 function AdminSettingsIndex() {
   return (
-    <>
       <Routes>
         <Route path="" element={<Index />} />
+        <Route path="add" element={<AdminSettingsAdd />} />
+        <Route path="edit/:id" element={<AdminSettingsEdit />} />
       </Routes>
-    </>
   )
 }
 

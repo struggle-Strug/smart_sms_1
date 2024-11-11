@@ -29,7 +29,7 @@ function saveBankApiSetting(bankApiSettingData, callback) {
   if (id) {
     db.run(
       `UPDATE bank_apis SET api_key = ? WHERE id = ?`,
-      [api_key],
+      [api_key, id],
       callback
     );
   } else {
@@ -46,7 +46,7 @@ function deleteBankApiSettingById(id, callback) {
 }
 
 module.exports = { 
-  initializeDatabase ,
+  initializeDatabase,
   loadBnakApiSettings,
   getBankApiSettingById,
   saveBankApiSetting,

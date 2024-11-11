@@ -1,54 +1,40 @@
 import React, { useState } from 'react';
 import { Link, Route, Routes } from 'react-router-dom';
-import Validator from '../../utils/validator';
 
+const { ipcRenderer } = window.require('electron');
 
 function Index() {
-  const [bank, setBank] = useState({
+
+  const [bankApi, setBankApi] = useState({
     api_key: '',
-    sync_interval: ''
+    // sync_interval: ''
   });
-
-  const { ipcRenderer } = window.require('electron');
-
-  const validator = new Validator();
-
-  const [errors, setErrors] = useState({}); // エラーメッセージ用の状態
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setBank({ ...bank, [name]: value });
+    setBankApi({ ...bankApi, [name]: value });
   };
 
   const handleSubmit = () => {
-    validator.required(bank.api_key, 'api_key', 'APIキー');
-
-    setErrors(validator.getErrors());
-
-    if(!validator.getErrors()) {
-      ipcRenderer.send('save-bank', bank);
-
-      ipcRenderer.once('save-bank-response', (event, response) => {
-        if (response.success) {
-          console.log('送信が成功しました:', response.message);
-          alert('APIキーが保存されました(仮)');
-        } else {
-          console.log('送信に失敗しました:', response.message);
-        }
-      });
+    if (!bankApi.api_key) {
+      alert('APIキーは必須項目です。');
+      return;
+    }
+      ipcRenderer.send('save-bank-api-setting', bankApi);
       // フォームのリセット
-      setBank({
+      setBankApi({
         api_key: '',
       });
       alert('APIキーが保存されました(仮)');
-    }
-  }
+  };
 
   const [showPassword, setShowPassword] = useState(false);
-
+  // パスワードの表示・非表示
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
+  console.log(bankApi);
 
   return (
     <div>
@@ -66,7 +52,7 @@ function Index() {
               className='border rounded px-4 py-2.5 bg-white w-full' 
               placeholder='APIキーを入力' 
               name="api_key" 
-              value={bank.api_key} 
+              value={bankApi.api_key} 
               onChange={handleChange} 
             />
             <button 

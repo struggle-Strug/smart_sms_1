@@ -1,22 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, Route, Routes } from 'react-router-dom';
 import CustomSelect from '../../Components/CustomSelect';
+  
+const { ipcRenderer } = window.require('electron');
 
 function Index() {
-  const storageMethodOptions = [
+
+  const posCoordinationOptions = [
     { value: '30min', label: '30分' },
     { value: '1hour', label: '1時間' },
     { value: '6hours', label: '6時間' },
   ];
 
-  const [facility, setFacility] = useState({
+  const [posCoordination, setPosCoordination] = useState({
     api_key: '',
     sync_interval: ''
   });
 
+  const [lastSync, setLastSync] = useState('');
+
+
+  useEffect(() => {
+    ipcRenderer.send('load-pos-coodination-settings');
+    ipcRenderer.on('pos-coodination-settings-data', (event, data) => {
+      console.log("受信したデータ:", data[0].created);
+      if (data.length > 0) {
+        setLastSync(data[0].created); // 最終同期日時を更新
+      }
+    });
+    return () => {
+        ipcRenderer.removeAllListeners('pos-coodination-settings-data ');
+    };
+}, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFacility({ ...facility, [name]: value });
+    setPosCoordination({ ...posCoordination, [name]: value });
+  };
+
+  const handleSubmit = () => {
+    if (!posCoordination.api_key) {
+      alert('APIキーは必須項目です。');
+      return;
+    }
+    ipcRenderer.send('save-pos-coodination-setting',posCoordination);
+    setPosCoordination({
+      api_key: '',
+    });
+    alert('APIキーが保存されました(仮)');
   };
 
   const [showPassword, setShowPassword] = useState(false);
@@ -24,6 +55,8 @@ function Index() {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
+  console.log(posCoordination);
 
   return (
     <div>
@@ -41,7 +74,7 @@ function Index() {
               className='border rounded px-4 py-2.5 bg-white w-full' 
               placeholder='APIキーを入力' 
               name="api_key" 
-              value={facility.api_key} 
+              value={posCoordination.api_key} 
               onChange={handleChange} 
             />
             <button 
@@ -58,25 +91,24 @@ function Index() {
         {/* データ同期 */}
         <div className='pt-6 pb-4 mt-6 text-lg font-bold border-t w-full bg-white'>データ同期</div>
         <div className="w-4/5">
-          <p className="text-sm text-gray-600">最終同期: 2023-06-15 15:30:00</p>
+        <p className="text-sm text-gray-600">最終同期: {lastSync || '同期されていません'}</p>
         </div>
         <div className="w-4/5">
           <label className="block text-sm font-semibold pt-4 pb-1.5">同期間隔</label>
           <CustomSelect 
             placeholder="" 
-            options={storageMethodOptions} 
+            options={posCoordinationOptions} 
             name="sync_interval" 
-            data={facility} 
-            setData={setFacility} 
+            data={posCoordination} 
+            setData={setPosCoordination} 
           />
         </div>
       </div>
 
       {/* フッターのボタン */}
       <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
-        <button className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer'>
-          <Link to="add">設定を保存</Link>
-        </button>
+        <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>設定を保存
+        </div>
         <Link to={`/master/shipping-methods`} className='border rounded px-4 py-3 font-bold cursor-pointer'>戻る</Link>
       </div>
     </div>

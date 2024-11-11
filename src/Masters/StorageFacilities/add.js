@@ -66,6 +66,8 @@ function StorageFacilityAdd() {
         }
     };
 
+    console.log(validator.required);
+
     return (
         <div className='w-full'>
             <div className='p-8'>

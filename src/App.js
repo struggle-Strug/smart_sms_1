@@ -41,6 +41,8 @@ function App() {
     };
   })
 
+  console.log(location.pathname);
+
   return (
     <div className="App">
       <div className='fixed w-full'>
