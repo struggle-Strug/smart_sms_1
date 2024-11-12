@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import CustomSelect from '../../Components/CustomSelect';
+import SimpleSelect from '../../Components/Procurements/DashBoardCustomSelect';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -63,7 +64,7 @@ function AdminSettingsEdit() {
       password: '',
       confirmPassword: '',
     });
-    alert('管理者が登録されました(仮)');
+    alert('管理者情報が変更されました。(仮)');
   };
 
   const [showPassword, setShowPassword] = useState(false);
@@ -98,7 +99,7 @@ function AdminSettingsEdit() {
         <div className="w-4/5 mb-4">
           <label className="block text-sm font-normal pb-1.5">アクセスレベル </label>
           <div className="w-45 py-150">
-          <CustomSelect
+          <SimpleSelect
             className='border rounded px-4 py-40 bg-white w-full h-12'
             placeholder=""
             options={accessLevelOptions}
