@@ -18,9 +18,25 @@ function ProcessRegistrationIndex() {
   const navigate = useNavigate();
 
   const [searchQueryList, setSearchQueryList] = useState({
-    "os.vender_name": "",
-    "os.closing_date": "",
+    "ss.vender_name": "",
+    "ss.closing_date": "",
+    "ss.sales_date_start": "",
+    "ss.sales_date_end": "",
   });
+
+  const [company, setCompany] = useState({});
+
+  useEffect(() => {
+    ipcRenderer.send('load-companies');
+    ipcRenderer.on('load-companies', (event, data) => {
+        if (data.length === 0) return;
+        setCompany(data[0]);
+    });
+
+    return () => {
+      ipcRenderer.removeAllListeners('load-companies');
+  }
+  }, [])
 
 
   const handleDateChange = (date, name) => {
@@ -58,8 +74,8 @@ function ProcessRegistrationIndex() {
             <div>
               <div className='text-sm pb-1.5'>請求期間 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
               <DatePicker
-                selected={searchQueryList["osd.created_start"] ? new Date(searchQueryList["osd.created_start"]) : null}
-                onChange={(date) => handleDateChange(date, "osd.created_start")}
+                selected={searchQueryList["ss.sales_date_start"] ? new Date(searchQueryList["ss.sales_date_start"]) : null}
+                onChange={(date) => handleDateChange(date, "ss.sales_date_start")}
                 dateFormat="yyyy-MM-dd"
                 className='border rounded px-4 py-2.5 bg-white  w-full'
                 placeholderText='期間を選択'
@@ -88,16 +104,16 @@ function ProcessRegistrationIndex() {
                 type='text'
                 className='border rounded px-4 py-2.5 bg-white w-full'
                 placeholder='得意先'
-                name="os.vender_name"
-                value={searchQueryList["os.vender_name"]}
+                name="ss.vender_name"
+                value={searchQueryList["ss.vender_name"]}
                 onChange={handleInputChange}
               />
             </div>
             <div className='pb-2'>
               <div className='w-40 text-sm pb-1.5'>締日</div>
               <DatePicker
-                selected={searchQueryList["os.closing_date"] ? new Date(searchQueryList["os.closing_date"]) : null}
-                onChange={(date) => handleDateChange(date, "os.closing_date")}
+                selected={searchQueryList["ss.closing_date"] ? new Date(searchQueryList["ss.closing_date"]) : null}
+                onChange={(date) => handleDateChange(date, "ss.closing_date")}
                 dateFormat="yyyy-MM-dd"
                 className='border rounded px-4 py-2.5 bg-white  w-full'
                 placeholderText='締日'
@@ -110,7 +126,7 @@ function ProcessRegistrationIndex() {
         <Link
           to={{
             pathname: "/invoice-export",
-            search: `?closing_date=${searchQueryList["os.closing_date"]}&vender_name=${searchQueryList["os.vender_name"]}`
+            search: `?closing_date=${searchQueryList["ss.closing_date"]}&vender_name=${searchQueryList["ss.vender_name"]}&sales_date_start=${searchQueryList["ss.sales_date_start"]}&sales_date_end=${searchQueryList["ss.sales_date_end"]}&companyName=${company.name}&companyZipCode=${company.zip_code}&companyAddress=${company.address}&companyPhoneNumber=${company.phone_number}`
           }}
           className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' >請求計算</Link>
         <div onClick={() => navigate(-1)} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</div>

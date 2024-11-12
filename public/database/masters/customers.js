@@ -46,7 +46,7 @@ function searchCustomers(query, callback) {
         OR name_secondary LIKE ? 
         OR name_kana LIKE ? 
         OR id LIKE ? 
-        OR code LINK ?
+        OR code LIKE ?
         `;
         params = [
             `%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`

@@ -23,29 +23,78 @@ function InvoiceExportSettings() {
 
     const venderName = params.get('vender_name');
     const closingDate = params.get('closing_date');
-    const deliveryCustomer = params.get('delivery_customer');
+    const salesDateStart = params.get('sales_date_start');
+    const salesDateEnd = params.get('sales_date_end');
+    const companyName = params.get('companyName');
+    const companyAddress = params.get('companyAddress');
+    const companyZipCode = params.get('companyZipCode');
+    const companyPhoneNumber = params.get('companyPhoneNumber');
+
+    const formatDate = (dateString) => {
+        if (!dateString) {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth() + 1;
+
+            const endOfMonth = new Date(year, month, 0);
+
+            return `${endOfMonth.getFullYear()}年${endOfMonth.getMonth() + 1}月${endOfMonth.getDate()}日`;
+        } else {
+            const date = new Date(dateString);
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1; // 月は0から始まるので+1
+            const day = date.getDate();
+
+            return `${year}年${month}月${day}日`;
+        }
+    };
+
+    const [currentPage, setCurrentPage] = useState(0);
 
     const [company, setCompany] = useState({});
-    const [orderSlips, setOrderSlips] = useState([]);
+    const [salesSlips, setSalesSlips] = useState([]);
+
+    const [invoiceHTMLData, setInvoiceHTMLData] = useState([]);
 
 
     const [htmlContent, setHtmlContent] = useState('');
+    const [salesSlipOrganizedData, setSalesSlipOrganizedData] = useState({});
 
     const [searchQueryList, setSearchQueryList] = useState({
-        "os.vender_name": venderName,
-        "os.closing_date": closingDate,
+        "ss.vender_name": venderName,
+        // "ss.closing_date": closingDate,
+        "ss.sales_date_start": salesDateStart,
+        "ss.sales_date_end": salesDateEnd,
     });
+
+    const [invoiceData, setInvoiceData] = useState([]);
 
     useEffect(() => {
         const handleSearchResult = (event, data) => {
-            setOrderSlips(data);
+            setSalesSlips(data);
+            const organizedData = createBillingData(data)
+            setSalesSlipOrganizedData(organizedData);
+
+            let content = ``
+
+            console.log(organizedData, "organizedData")
+
+            for (let key in organizedData) {
+                let parentData = organizedData[key].parentName;
+                for (let key2 in organizedData[key]) {
+                    if (key2 === "parentName") continue;
+                    let htmlData = createHtmlContent(key, key2, organizedData[key][key2], parentData);
+                    setInvoiceHTMLData((prevData) => [...prevData, htmlData]);
+                }
+            }
+
+            setHtmlContent(content);
         };
 
         ipcRenderer.send('load-companies');
         ipcRenderer.on('load-companies', (event, data) => {
-          console.log(data)
-          if (data.length === 0) return;
-          setCompany(data[0]);
+            if (data.length === 0) return;
+            setCompany(data[0]);
         });
 
         const searchColums = {}
@@ -55,34 +104,64 @@ function InvoiceExportSettings() {
             }
         }
 
-        ipcRenderer.send('search-order-slip-details', searchColums);
-        ipcRenderer.on('search-order-slip-details-result', handleSearchResult);
+        ipcRenderer.send('search-sales-slip-details', searchColums);
+        ipcRenderer.on('search-sales-slip-details-result', handleSearchResult);
 
         return () => {
-            ipcRenderer.removeListener('search-order-slip-details', handleSearchResult);
+            ipcRenderer.removeListener('search-sales-slip-details', handleSearchResult);
             ipcRenderer.removeAllListeners('load-companies');
         }
     }, []);
 
-    useEffect(() => {
-        setHtmlContent(createHtmlContent());
-      }, [orderSlips, company]);
+
+    const createBillingData = (data) => {
+        const organizedData = data.reduce((acc, item) => {
+            let { parent_name, name_primary: name } = item;
+
+            if (parent_name === null) {
+                parent_name = name;
+            }
+            if (!acc[parent_name]) {
+                if (parent_name === name) {
+                    acc[parent_name] = { "parentName": { "name": item.name_primary, "zip_code": item.zip_code, "address": item.address, "customer_id": item.customer_id } };
+                } else {
+                    acc[parent_name] = { "parentName": { "name": item.parent_name, "zip_code": item.parent_zip_code, "address": item.parent_address,  "customer_id": item.parent_id } };
+                }
+            }
+
+            // name（例：A, B）のキーがなければ初期化
+            if (!acc[parent_name][name]) {
+                acc[parent_name][name] = [];
+            }
+
+            // 対応する配列に item を追加
+            acc[parent_name][name].push(item);
+
+            return acc;
+        }, {});
+
+        console.log(organizedData, "organizedData");
+
+        return organizedData;
+    }
 
     const handleSumPrice = (data) => {
         let SumPrice = 0
         let consumptionTaxEight = 0
         let consumptionTaxTen = 0
 
+        console.log(data, "data")
+
         for (let i = 0; i < data.length; i++) {
             SumPrice += data[i].unit_price * data[i].number;
-            if (data[i].tax_rate === 8) {
-                consumptionTaxEight += data[i].price * data[i].number * 0.08;
-            } else if (data[i].tax_rate === 10) {
-                consumptionTaxTen += data[i].price * data[i].number * 0.1;
+            if (parseInt(data[i].tax_rate) === 8) {
+                consumptionTaxEight += data[i].unit_price * data[i].number * 0.08;
+            } else if (parseInt(data[i].tax_rate) === 10) {
+                consumptionTaxTen += data[i].unit_price * data[i].number * 0.1;
             }
         }
 
-        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxTen, "Total": SumPrice + consumptionTaxEight + consumptionTaxTen}
+        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxTen, "Total": SumPrice + consumptionTaxEight + consumptionTaxTen }
     }
 
     function getTodayDateTimeCode() {
@@ -93,12 +172,12 @@ function InvoiceExportSettings() {
         const hours = String(today.getHours()).padStart(2, '0'); // 時間を2桁にゼロ埋め
         const minutes = String(today.getMinutes()).padStart(2, '0'); // 分を2桁にゼロ埋め
         const seconds = String(today.getSeconds()).padStart(2, '0'); // 秒を2桁にゼロ埋め
-    
+
         return `${year}${month}${day}${hours}${minutes}${seconds}`;
-    }    
+    }
 
 
-    const createHtmlContent = () => {
+    const createHtmlContent = (billing_name, name, data, parentData) => {
         let html_content = ``
         const html_content_header = `
     <!DOCTYPE html>
@@ -185,32 +264,38 @@ function InvoiceExportSettings() {
         <div class="header">
             <div>
                 <div class="section-title">請求先</div>
-                <div class="section-header">株式会社A</div>
+                <div class="section-header">${billing_name}</div>
                 <div class="address">
-                    〒100-0001<br>
-                    東京都千代田区千代田1-1 サンプルビル1F
+                    〒${parentData.zip_code}<br>
+                    ${parentData.address}
                 </div>
             </div>
             <div>
                 <div class="section-content">請求番号　INV-2023001</div>
-                <div class="section-content">発行日　2023年5月31日</div>
-                <div class="section-content">お支払期限　2023年6月30日</div>
+                <div class="section-content">発行日　${getFormattedDate()}</div>
+                <div class="section-content">お支払期限　${formatDate(closingDate)}</div>
                 <br>
-                <div class="section-content">${company?.name}</div>
+                <div class="section-content">${companyName}</div>
                 <div class="address">
-                    〒${company?.zip_code}<br>
-                    ${company?.address}<br>
-                    TEL ${company?.phone_number}
+                    〒${companyZipCode}<br>
+                    ${companyAddress}<br>
+                    TEL ${companyPhoneNumber}
                 </div>
             </div>
         </div>
          <p class="section-content">下記の通り、ご請求申し上げます。</p>
+
+         
     `
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0];
+    
+    setInvoiceData((prevData) => [...prevData, {customer_id: parentData.customer_id, billing_date: formattedDate}]);
 
         html_content += html_content_header;
 
         html_content += `
-    <div class="section-title">納品先A</div>
+    <div class="section-title">${name}</div>
         <table class="table">
             <thead>
                 <tr style="background-color: #F3F4F6">
@@ -226,16 +311,16 @@ function InvoiceExportSettings() {
             <tbody>
     `
 
-        for (let i = 0; i < orderSlips.length; i++) {
+        for (let i = 0; i < data.length; i++) {
             const html_content_table = `
       <tr>
-                    <td>${dayjs(orderSlips[i].delivery_date).format("YYYY/MM/DD")}</td>
+                    <td>${dayjs(data[i].delivery_date).format("YYYY/MM/DD")}</td>
                     <td>INV-001</td>
-                    <td>${orderSlips[i].product_name}</td>
-                    <td>${orderSlips[i].number}</td>
-                    <td>¥${orderSlips[i].unit_price.toLocaleString()}</td>
-                    <td>¥${(parseInt(orderSlips[i].unit_price)*parseInt(orderSlips[i].number)).toLocaleString()}</td>
-                    <td>${orderSlips[i].tax_rate}%</td>
+                    <td>${data[i].product_name}</td>
+                    <td>${data[i].number}</td>
+                    <td>¥${data[i].unit_price.toLocaleString()}</td>
+                    <td>¥${(parseInt(data[i].unit_price) * parseInt(data[i].number)).toLocaleString()}</td>
+                    <td>${data[i].tax_rate}%</td>
                 </tr>
     `
             html_content += html_content_table;
@@ -244,22 +329,22 @@ function InvoiceExportSettings() {
         const html_content_footer = `
             </tbody>
         </table>
-        <div class="total-section">小計 ¥${handleSumPrice(orderSlips).Total.toFixed(0).toLocaleString()}</div>
+        <div class="total-section">小計 ¥${handleSumPrice(data).Total.toFixed(0).toLocaleString()}</div>
     
         <!-- Summary Section -->
         <div class="summary">
             <div class="right-align">
-                <p>税抜合計　¥${handleSumPrice(orderSlips).subtotal.toFixed(0).toLocaleString()}</p>
-                <p>消費税(8%)　¥${handleSumPrice(orderSlips).consumptionTaxEight.toFixed(0).toLocaleString()}</p>
-                <p>消費税(10%)　¥${handleSumPrice(orderSlips).consumptionTaxTen.toFixed(0).toLocaleString()}</p>
-                <p>消費税合計　¥${handleSumPrice(orderSlips).totalConsumptionTax.toFixed(0).toLocaleString()}</p>
-                <p>税込合計　¥${handleSumPrice(orderSlips).Total.toFixed(0).toLocaleString()}</p>
+                <p>税抜合計　¥${handleSumPrice(data).subtotal.toFixed(0).toLocaleString()}</p>
+                <p>消費税(8%)　¥${handleSumPrice(data).consumptionTaxEight.toFixed(0).toLocaleString()}</p>
+                <p>消費税(10%)　¥${handleSumPrice(data).consumptionTaxTen.toFixed(0).toLocaleString()}</p>
+                <p>消費税合計　¥${handleSumPrice(data).totalConsumptionTax.toFixed(0).toLocaleString()}</p>
+                <p>税込合計　¥${handleSumPrice(data).Total.toFixed(0).toLocaleString()}</p>
             </div>
         </div>
     
         <!-- Final Total Section -->
         <div class="total-section">
-            <strong>合計金額(税込)　¥${handleSumPrice(orderSlips).Total.toFixed(0).toLocaleString()}</strong>
+            <strong>合計金額(税込)　¥${handleSumPrice(data).Total.toFixed(0).toLocaleString()}</strong>
         </div>
     
     </body>
@@ -281,8 +366,16 @@ function InvoiceExportSettings() {
         try {
             const filePath = await ipcRenderer.invoke('generate-pdf', htmlContent);
             alert(`PDFが作成されました: ${filePath}`);
+            handleSubmit();
         } catch (error) {
             console.error('PDF生成エラー:', error);
+        }
+    };
+
+
+    const handleSubmit = () => {
+        for (let i = 0; i < invoiceData.length; i++) {
+            ipcRenderer.send('save-invoice', invoiceData[i]);
         }
     };
 
@@ -305,6 +398,23 @@ function InvoiceExportSettings() {
     });
 
     const label = { inputProps: { 'aria-label': 'Switch demo' } };
+
+    const handleNextPage = () => {
+        setCurrentPage(currentPage + 1);
+    }
+
+    const handlePrevPage = () => {
+        setCurrentPage(currentPage - 1);
+    }
+
+    const getFormattedDate = () => {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth() + 1; // 月は0から始まるので+1
+        const day = today.getDate();
+
+        return `${year}年${month}月${day}日`;
+    };
 
     return (
         <div className='w-full'>
@@ -347,11 +457,6 @@ function InvoiceExportSettings() {
                                     PDF出力
                                 </div>
                             </div>
-                            <div className='ml-12'>
-                                <Link to="/document-settings" className='py-3 px-4 border rounded-lg text-base font-bold flex'>
-                                    保存
-                                </Link>
-                            </div>
                             <div className='ml-6'>
                                 <Link to="/document-settings" className='py-3 px-4 border rounded-lg text-base font-bold text-white bg-blue-600 flex'>
                                     印刷
@@ -360,8 +465,27 @@ function InvoiceExportSettings() {
                         </div>
                     </div>
                 </div>
-                <div className='ml-auto mb-12 border p-5 rounded w-[640px] h-[960px]'>
-                    <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
+
+                <div className='ml-auto mb-12 rounded w-[640px] h-[960px]'>
+                    <div className='border p-5  w-[640px] h-[960px]'>
+                        <div dangerouslySetInnerHTML={{ __html: invoiceHTMLData[currentPage] }} />
+                    </div>
+                    <div className='pt-6 flex items-center justify-center'>
+                        <div className='flex items-center'>
+                            {
+                                currentPage === 0 ?
+                                    <div className='border rounded mr-3 px-4 py-3 font-bold' style={{ backgroundColor: "#F7F7F7", color: "#B3B3B3" }}>戻る</div>
+                                    :
+                                    <div className='border rounded mr-3 px-4 py-3 font-bold' onClick={() => handlePrevPage()}>戻る</div>
+                            }
+                            {
+                                currentPage === invoiceHTMLData.length - 1 ?
+                                    <div className='border rounded ml-3 px-4 py-3 font-bold' style={{ backgroundColor: "#F7F7F7", color: "#B3B3B3" }}>次へ</div>
+                                    :
+                                    <div className='border rounded ml-3 px-4 py-3 font-bold' onClick={() => handleNextPage()}>次へ</div>
+                            }
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

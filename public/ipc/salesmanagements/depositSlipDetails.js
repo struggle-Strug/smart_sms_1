@@ -7,7 +7,8 @@ const {
     editDepositSlipDetail, 
     searchDepositSlipsByDepositSlipId,
     deleteDepositSlipDetailsBySlipId,
-    searchDepositSlipsDetails
+    searchDepositSlipsDetails,
+    getDepositsTotalByVendorIds,
 } = require('../../database/salesmanagements/depositSlipDetails');
 
 // 購入注文明細のデータをロード
@@ -112,3 +113,26 @@ ipcMain.on('delete-deposit-slip-details-by-slip-id', (event, depositSlipId) => {
         }
     });
 });
+
+
+ipcMain.on('get-deposit-slip-sum-by-vender-id', (event, data) => {
+    getDepositsTotalByVendorIds(data, (err, results) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('get-deposit-slip-sum-by-vender-id-result', results);
+        }
+    });
+});
+
+ipcMain.on('get-deposit-slip-sum-by-vender-id', (event, data) => {
+    getDepositsTotalByVendorIds(data, (err, results) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('get-deposit-slip-sum-by-vender-id-result', results);
+        }
+    });
+});
+
+

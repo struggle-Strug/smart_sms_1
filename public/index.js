@@ -51,6 +51,7 @@ require('./ipc/salesmanagements/orderSlips');
 require('./ipc/salesmanagements/orderSlipDetails');
 require('./ipc/salesmanagements/salesSlips');
 require('./ipc/salesmanagements/salesSlipDetails');
+require('./ipc/salesmanagements/invoices');
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -147,6 +148,8 @@ function createWindow() {
   salesSlipsDB.initializeDatabase();
   const salesSlipDetailsDB = require('./database/salesmanagements/salesSlipDetails');
   salesSlipDetailsDB.initializeDatabase();
+  const invoicesDB = require('./database/salesmanagements/invoices');
+  invoicesDB.initializeDatabase();
 }
 
 const dbPath = path.join(app.getPath('userData'), 'database.db');

@@ -147,7 +147,7 @@ function searchDepositSlipsDetails(conditions, callback) {
                 params.push(value); // created_endの日付をそのまま使用
             } else {
                 whereClauses.push(`${column} LIKE ?`);
-                params.push(`%${value}%`);
+                params.push(`%${value}%`); 
             }
         }
     }
@@ -158,6 +158,22 @@ function searchDepositSlipsDetails(conditions, callback) {
     }
 
     db.all(sql, params, (err, rows) => {
+        callback(err, rows);
+    });
+}
+
+function getDepositsTotalByVendorIds(data, callback) {
+    const { venderIds, formattedDate } = data;
+    const placeholders = venderIds.map(() => '?').join(', ');
+    const sql = `
+        SELECT vender_id, SUM(deposits) AS total_deposits, SUM(commission_fee) AS total_commission_fee
+        FROM deposit_slip_details
+        WHERE vender_id IN (${placeholders})
+        AND strftime('%Y-%m', created) = strftime('%Y-%m', ?)
+        GROUP BY vender_id
+    `;
+    
+    db.all(sql, [...venderIds, formattedDate], (err, rows) => {
         callback(err, rows);
     });
 }
@@ -191,5 +207,6 @@ module.exports = {
     initializeDatabase,
     searchDepositSlipsByDepositSlipId,
     searchDepositSlipsDetails,
-    deleteDepositSlipDetailsBySlipId
+    deleteDepositSlipDetailsBySlipId,
+    getDepositsTotalByVendorIds
 };
