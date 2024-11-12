@@ -10,6 +10,7 @@ function loadSalesSlipDetails(callback) {
     FROM sales_slip_details ssd
     LEFT JOIN sales_slips ss ON ssd.sales_slip_id = ss.id
     LEFT JOIN products p ON ssd.product_id = p.id
+    LEFT JOIN customers c ON ss.vender_id = c.id
 `;
     db.all(sql, [], (err, rows) => {
         callback(err, rows);
@@ -152,6 +153,8 @@ function initializeDatabase() {
         sales_slip_id INTEGER,
         product_id INTEGER,
         product_name VARCHAR(255),
+        customer_id INTEGER,
+        customer_name VARCHAR(255),
         number INTEGER,
         unit VARCHAR(255) NULL,
         unit_price INTEGER,
@@ -168,26 +171,32 @@ function initializeDatabase() {
 }
 
 function searchSalesSlipDetails(conditions, callback) {
-    let sql = `SELECT ssd.*, ss.*, p.*, p.created AS product_created, ss.created AS ss_created, ssd.created AS ssd_created
+    let sql = `SELECT ssd.*, ss.*, p.*, c.*, pc.code AS parent_code, c.id AS customer_id, pc.name_primary AS parent_name, pc.id AS parent_id,  pc.zip_code AS parent_zip_code, pc.address AS parent_address, p.created AS product_created, ss.created AS ss_created, ssd.created AS ssd_created
     FROM sales_slip_details ssd
     LEFT JOIN sales_slips ss ON ssd.sales_slip_id = ss.id
     LEFT JOIN products p ON ssd.product_id = p.id
+    LEFT JOIN customers c ON ss.vender_id = c.id
+    LEFT JOIN customers pc ON c.billing_code = pc.code
     `;
 
     let whereClauses = [];
     let params = [];
-
-    console.log(conditions);
 
     // 条件オブジェクトのキーと値を動的にWHERE句に追加
     if (conditions && Object.keys(conditions).length > 0) {
         for (const [column, value] of Object.entries(conditions)) {
             if (column === 'ssd.created_start') {
                 whereClauses.push(`ssd_created >= ?`);
-                params.push(value); // created_startの日付をそのまま使用
+                params.push(value);
             } else if (column === 'ssd.created_end') {
                 whereClauses.push(`ssd_created <= ?`);
-                params.push(value); // created_endの日付をそのまま使用
+                params.push(value);
+            } else if (column === 'ss.sales_date_start') {
+                whereClauses.push(`sales_date >= ?`);
+                params.push(value);
+            } else if (column === 'ss.sales_date_end') {
+                whereClauses.push(`sales_date <= ?`);
+                params.push(value);
             } else {
                 whereClauses.push(`${column} LIKE ?`);
                 params.push(`%${value}%`);
@@ -198,9 +207,6 @@ function searchSalesSlipDetails(conditions, callback) {
     if (whereClauses.length > 0) {
         sql += ` WHERE ` + whereClauses.join(" AND ");
     }
-
-    console.log(sql);
-    console.log(params)
 
     db.all(sql, params, (err, rows) => {
         console.log(rows)
@@ -245,6 +251,52 @@ function getMonthlySalesWithJoin(conditions, callback) {
     });
 }
 
+function getMonthlySales(data, callback) {
+    const { venderIds, formattedDate } = data;
+    const placeholders = venderIds.map(() => '?').join(', ');
+    const sql = `
+    SELECT ssd.sales_slip_id, SUM(ssd.unit_price * ssd.number) AS total_sales, ss.vender_id AS vender_id
+    FROM sales_slip_details ssd
+    LEFT JOIN sales_slips ss ON ssd.sales_slip_id = ss.id
+    LEFT JOIN products p ON ssd.product_id = p.id
+    LEFT JOIN customers c ON ss.vender_id = c.id
+    WHERE ss.vender_id IN (${placeholders})
+    AND strftime('%Y-%m', ss.sales_date) = strftime('%Y-%m', ?)
+    GROUP BY ss.vender_id
+`;
+
+    db.all(sql, [...venderIds, formattedDate], (err, rows) => {
+        if (err) {
+            console.error(err);
+        } else {
+            callback(err, rows); // 各sales_slip_idごとにtotal_salesが出力されます
+        }
+    });
+}
+
+function getMonthlySalesInTax(data, callback) {
+    const { venderIds, formattedDate } = data;
+    const placeholders = venderIds.map(() => '?').join(', ');
+    const sql = `
+    SELECT ssd.sales_slip_id, SUM(ssd.unit_price * ssd.number * (ssd.tax_rate*0.01 + 1)) AS total_sales, ss.vender_id AS vender_id
+    FROM sales_slip_details ssd
+    LEFT JOIN sales_slips ss ON ssd.sales_slip_id = ss.id
+    LEFT JOIN products p ON ssd.product_id = p.id
+    LEFT JOIN customers c ON ss.vender_id = c.id
+    WHERE ss.vender_id IN (${placeholders})
+    AND strftime('%Y-%m', ss.sales_date) = strftime('%Y-%m', ?)
+    GROUP BY ss.vender_id
+`;
+    db.all(sql, [...venderIds, formattedDate], (err, rows) => {
+        if (err) {
+            console.error(err);
+        } else {
+            callback(err, rows); // 各sales_slip_idごとにtotal_salesが出力されます
+        }
+    });
+}
+
+
 
 
 module.exports = {
@@ -257,5 +309,7 @@ module.exports = {
     deleteSalesSlipDetailsBySlipId,
     searchSalesSlipsBySalesSlipId,
     searchSalesSlipDetails,
-    getMonthlySalesWithJoin
+    getMonthlySalesWithJoin,
+    getMonthlySales,
+    getMonthlySalesInTax
 };
