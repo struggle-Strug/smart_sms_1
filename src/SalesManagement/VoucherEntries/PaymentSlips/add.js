@@ -7,10 +7,11 @@ import ListTooltip from '../../../Components/ListTooltip';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Validator from '../../../utils/validator';
 import DatePicker from 'react-datepicker';
+import PaymentDataImport from '../PaymentDataImport/import';
 import 'react-datepicker/dist/react-datepicker.css';
 const { ipcRenderer } = window.require('electron');
 
-function PaymentSlipsAdd() {
+function AddForm() {
     const options = [
         { value: '御中', label: '御中' },
         { value: '貴社', label: '貴社' },
@@ -452,7 +453,7 @@ function PaymentSlipsAdd() {
                             <div className='ml-4 text-lg font-semibold'>0円</div>
                         </div>
                     </div>
-                    <div className='w-36 bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' >銀行データ取込</div>
+                    <Link to='data-import' className='w-36 bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' >銀行データ取込</Link>
                     <div className='py-3'>
                         <hr className='' />
                     </div>
@@ -468,6 +469,15 @@ function PaymentSlipsAdd() {
             </div>
         </div>
     );
+}
+
+function PaymentSlipsAdd() {
+  return (
+    <Routes>
+      <Route path="" element={<AddForm />} />
+      <Route path="data-import/*" element={<PaymentDataImport />} />
+    </Routes>
+  )
 }
 
 export default PaymentSlipsAdd;
