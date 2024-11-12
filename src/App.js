@@ -49,6 +49,8 @@ function App() {
     };
   })
 
+  console.log(location.pathname);
+
   return (
     <div className="App">
       <div className='fixed w-full'>
@@ -57,7 +59,7 @@ function App() {
             Smart_SMS
           </div>
           <div className='absolute' style={{ top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
-            <Link to="/" className={`py-6 px-4 mx-2  ${location.pathname === "/" && "font-bold border-b-4 border-blue-600"}`}>ダッシュボード</Link>
+            <Link to="/" className={`pt-6 pb-5 px-4 mx-2  ${(location.pathname.includes("/dashboards") || location.pathname === "/" )&& "font-bold border-b-4 border-blue-600"}`}>ダッシュボード</Link>
             <Link to="/contact" className={`py-6 px-4 mx-2  ${location.pathname === "/contact" && "font-bold border-b-4 border-blue-600"}`} activeClassName=''>検索</Link>
             <Link to="/sales-management" className={`py-6 px-4 mx-2  ${location.pathname.includes("/sales-management") && "font-bold border-b-4 border-blue-600"} relative`}
               activeClassName=''
@@ -186,7 +188,7 @@ function App() {
                 </div>
               )}
             </Link>
-            <Link to="/master" className={`py-6 px-4 mx-2  ${location.pathname.includes("/master") && "font-bold border-b-4 border-blue-600"}`} activeClassName=''>マスタ管理</Link>
+            <Link to="/master" className={`pt-6 pb-5 px-4 mx-2  ${location.pathname.includes("/master") && "font-bold border-b-4 border-blue-600"}`} activeClassName=''>マスタ管理</Link>
           </div>
           <div className='ml-auto text-xl py-3 pr-10'>{companyName}</div>
         </div>

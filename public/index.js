@@ -24,7 +24,11 @@ require('./ipc/masters/categories'); // 追加
 require('./ipc/masters/subcategories'); // 追加
 
 //ダッシュボード
+require('./ipc/dashboard/bankApiSettings');//追加
 require('./ipc/dashboard/salesTaxSettings'); // 追加
+require('./ipc/dashboard/posCoordinationSettings');//追加
+require('./ipc/dashboard/dataConversions');//追加
+require('./ipc/dashboard/adminSettings');//追加
 
 //仕入管理
 require('./ipc/procurements/purchaseOrders');
@@ -74,7 +78,18 @@ function createWindow() {
   if (!app.isPackaged) {
     mainWindow.webContents.openDevTools();
   }
-  
+  //ダッシュボード
+  const dataConversionsDB = require('./database/dashboard/dataConversions')
+  dataConversionsDB.initializeDatabase();
+  const adminSettingsDB = require('./database/dashboard/adminSettings')
+  adminSettingsDB.initializeDatabase();
+  const posCoordinationsDB = require('./database/dashboard/posCoordinationSettings')
+  posCoordinationsDB.initializeDatabase();
+  const salesTaxSettingsDB = require('./database/dashboard/salesTaxSettings')
+  salesTaxSettingsDB.initializeDatabase();
+  const bankApiSettingsDB = require('./database/dashboard/bankApiSettings')
+  bankApiSettingsDB.initializeDatabase();
+//マスタ管理
   const customersDB = require('./database/masters/customers');
   customersDB.initializeDatabase();
   const deliveryCustomersDB = require('./database/masters/deliveryCustomers');

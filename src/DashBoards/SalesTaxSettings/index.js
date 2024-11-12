@@ -82,7 +82,7 @@ function Index() {
     }
 
     return (
-        <div className='mx-40'>
+        <div>
             <div className='p-8'>
                 <div className='pb-6 text-2xl font-bold'>消費税設定</div>
                 <div className='flex'>

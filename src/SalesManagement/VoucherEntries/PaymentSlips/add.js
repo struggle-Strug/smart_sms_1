@@ -7,13 +7,14 @@ import ListTooltip from '../../../Components/ListTooltip';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Validator from '../../../utils/validator';
 import DatePicker from 'react-datepicker';
+import PaymentDataImport from '../PaymentDataImport/import';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import axios from 'axios'; // 追加
 
 const { ipcRenderer } = window.require('electron');
 
-function PaymentSlipsAdd() {
+function AddForm() {
     const options = [
         { value: '御中', label: '御中' },
         { value: '貴社', label: '貴社' },
@@ -302,7 +303,7 @@ function PaymentSlipsAdd() {
                 method: 'GET',
                 url: 'https://developer.api.bk.mufg.jp/btmu/retail/trial/v2/me/accounts/001001110001/transactions?inquiryDateFrom=2021-12-20&inquiryDateTo=2021-12-27',
                 headers: {
-                    'X-IBM-Client-Id': 'APIキーを入力', // APIキー
+                    'X-IBM-Client-Id': '216d0c5626337b3dfde41c0888e78b07', // APIキー
                     'X-BTMU-Seq-No': '20200514-0000000123456789', // ランダムな値
                     Accept: 'application/json',
                 },
@@ -335,7 +336,7 @@ function PaymentSlipsAdd() {
 
 
             console.log('データ取得成功:', data);
-
+            console.log('newDetails',newDetails)
             console.log('depositSlip', depositSlip);
             console.log('depositSlipDetails', depositSlipDetails);
         } catch (error) {
@@ -499,6 +500,7 @@ function PaymentSlipsAdd() {
                             <div className='ml-4 text-lg font-semibold'>0円</div>
                         </div>
                     </div>
+                    {/* <Link to='data-import' className='w-36 bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' >銀行データ取込</Link> */}
                     <div className='w-36 bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleGetBankData}>銀行データ取込</div>
                     <div className='py-3'>
                         <hr className='' />
@@ -515,6 +517,15 @@ function PaymentSlipsAdd() {
             </div>
         </div>
     );
+}
+
+function PaymentSlipsAdd() {
+  return (
+    <Routes>
+      <Route path="" element={<AddForm />} />
+      <Route path="data-import/*" element={<PaymentDataImport />} />
+    </Routes>
+  )
 }
 
 export default PaymentSlipsAdd;
