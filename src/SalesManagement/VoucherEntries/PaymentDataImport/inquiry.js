@@ -105,7 +105,7 @@ function PaymentDataReconciliation() {
         >
           照合確定
         </button>
-        <Link to="/sales-management/voucher-entries/payment-slips/add/data-import" className="border px-6 py-3 rounded font-bold">戻る</Link>
+        <Link to={`/sales-management/voucher-entries/payment-slips/add`} className="border px-6 py-3 rounded font-bold">戻る</Link>
       </div>
     </div>
   );

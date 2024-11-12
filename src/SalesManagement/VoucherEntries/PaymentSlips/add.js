@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip'
 import CustomSelect from '../../../Components/CustomSelect';
 import ListTooltip from '../../../Components/ListTooltip';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Link, useNavigate } from 'react-router-dom';
 import Validator from '../../../utils/validator';
 import DatePicker from 'react-datepicker';
 import PaymentDataImport from '../PaymentDataImport/import';
@@ -27,6 +27,7 @@ function AddForm() {
     const [taxRateList, setTaxRateList] = useState([]);
     const [storageFacilitiesList, setStorageFacilitiesList] = useState([]);
     const [errors, setErrors] = useState({});
+    const navigate = useNavigate();
 
     const handleFocus = () => {
         setIsVendorIdFocused(true);
@@ -328,27 +329,20 @@ function AddForm() {
                 commission_fee: '',
                 data_category: '',
             }));
-
+   
+          setDepositSlipDetails(newDetails);
     
-            // 取得した銀行データを depositSlipDetails に格納
-            setDepositSlipDetails(newDetails);
-    
-
-
             console.log('データ取得成功:', data);
             console.log('newDetails',newDetails)
             console.log('depositSlip', depositSlip);
             console.log('depositSlipDetails', depositSlipDetails);
+            navigate('/sales-management/voucher-entries/payment-slips/add/data-import', { state: { newDetails: newDetails } });
         } catch (error) {
             // エラーメッセージを表示
             setError('データの取得に失敗しました。再度お試しください。');
             console.error('エラー:', error);
         }
     };
-
-
-
-
 
     return (
         <div className='w-full'>
@@ -500,8 +494,11 @@ function AddForm() {
                             <div className='ml-4 text-lg font-semibold'>0円</div>
                         </div>
                     </div>
-                    {/* <Link to='data-import' className='w-36 bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' >銀行データ取込</Link> */}
-                    <div className='w-36 bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleGetBankData}>銀行データ取込</div>
+                    <div 
+                      className='w-36 bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' 
+                      onClick={handleGetBankData}>
+                        銀行データ取込
+                    </div>
                     <div className='py-3'>
                         <hr className='' />
                     </div>
