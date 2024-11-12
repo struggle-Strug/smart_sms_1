@@ -76,11 +76,7 @@ function SalesSlipsAdd() {
     const [products, setProducts] = useState([])
 
     useEffect(() => {
-        ipcRenderer.on('search-id-vendors-result', (event, data) => {
-            setVendors(data);
-        });
-
-        ipcRenderer.on('search-name-vendors-result', (event, data) => {
+        ipcRenderer.on('search-customers-result', (event, data) => {
             setVendors(data);
         });
 
@@ -189,12 +185,8 @@ function SalesSlipsAdd() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        if (name === "vender_id") {
-            ipcRenderer.send('search-id-vendors', value);
-        }
-
-        if (name === "vender_name") {
-            ipcRenderer.send('search-name-vendors', value);
+        if (name === "vender_id" || name === "vender_name") {
+            ipcRenderer.send('search-customers', value);
         }
         setSalesSlip({ ...salesSlip, [name]: value });
     };

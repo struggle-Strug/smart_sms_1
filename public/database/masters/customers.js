@@ -46,9 +46,10 @@ function searchCustomers(query, callback) {
         OR name_secondary LIKE ? 
         OR name_kana LIKE ? 
         OR id LIKE ? 
+        OR code LINK ?
         `;
         params = [
-            `%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`, 
+            `%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`
         ];
     } else {
         // クエリが空の場合はすべてのデータを返す
