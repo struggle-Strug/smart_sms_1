@@ -30,7 +30,26 @@ function getAdminSettingById(id, callback) {
   db.get('SELECT * FROM users WHERE id = ?', [id], callback);
 }
 
+function checkLogin(loginData, callback) {
+  const { user_name, password } = loginData;
 
+  db.get('SELECT * FROM users WHERE user_name = ?', [user_name], (err, row) => {
+    if (err) {
+      console.error('データベースエラー:',err);
+      callback(err);
+      return;
+    }
+
+    if (!row) {
+      callback(new Error('ユーザー名またはパスワードが間違っています'));
+      return;
+    }
+
+    if (row.password === password) {
+      callback(null, )
+    }
+  })
+}
 
 
 

@@ -40,3 +40,7 @@ ipcMain.on('save-admin-setting', (event,adminSettingData) => {
     }
   });
 });
+
+ipcMain.on('login-request', (event, loginData) => {
+  console.log("受け取ったデータ",loginData);
+});
