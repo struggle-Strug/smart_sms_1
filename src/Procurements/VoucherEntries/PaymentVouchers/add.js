@@ -17,6 +17,20 @@ function PaymentVouchersAdd() {
     const [isProductNameFocused, setIsProductNameFocused] = useState(-1);
     const [taxRateList, setTaxRateList] = useState([]);
     const [errors, setErrors] = useState({});
+    const [paymentMethods, setPaymentMethods] = useState([]);
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
+
+    useEffect(() => {
+      ipcRenderer.send('load-payment-methods');      
+      ipcRenderer.on('load-payment-methods', (event, data) => {
+          setPaymentMethods(data);
+      });
+        return () => {
+          ipcRenderer.removeAllListeners('load-payment-methods');
+      };
+    }, []);
+    console.log(paymentMethods);
+  
 
     const handleFocus = () => {
         setIsVendorIdFocused(true);
@@ -94,6 +108,8 @@ function PaymentVouchersAdd() {
                     value: data[i].tax_rate,
                     label: data[i].tax_rate,
                 }
+                console.log(data[i].tax_rate);
+
                 arr.push(taxRateTemplate)
             }
             setTaxRateList(arr);
@@ -159,6 +175,10 @@ function PaymentVouchersAdd() {
         setPaymentVoucher({ ...paymentVoucher, [name]: value });
     };
 
+    const handlePaymentMethodChange = (e) => {
+      setSelectedPaymentMethod(e.target.value); // 選択した支払方法のcodeを保存
+    };
+
 
     const handleOnClick = (value) => {
         setPaymentVoucher({ ...paymentVoucher, ["vender_id"]: value.id, ["vender_name"]: value.name_primary, ["honorific"]: value.honorific, ["payment_due_date"]: value.payment_date, ["closing_date"]: value.closing_date, ["payment_method"]: value.payment_method, ["vender_contact_person"]: value.contact_person });
@@ -177,21 +197,31 @@ function PaymentVouchersAdd() {
 
 
     const handleSumPrice = () => {
-        let SumPrice = 0
-        let consumptionTaxEight = 0
-        let consumptionTaxTen = 0
-
-        for (let i = 0; i < paymentVoucherDetails.length; i++) {
-            SumPrice += paymentVoucherDetails[i].price * paymentVoucherDetails[i].number;
-            if (paymentVoucherDetails[i].tax_rate === 8) {
-                consumptionTaxEight += paymentVoucherDetails[i].price * paymentVoucherDetails[i].number * 0.08;
-            } else if (paymentVoucherDetails[i].tax_rate === 10) {
-                consumptionTaxTen += paymentVoucherDetails[i].price * paymentVoucherDetails[i].number * 0.1;
-            }
-        }
-
-        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxTen, "Total": SumPrice + consumptionTaxEight + consumptionTaxTen}
-    }
+      let SumPrice = 0;
+      let consumptionTaxEight = 0;
+      let consumptionTaxTen = 0;
+  
+      for (let i = 0; i < paymentVoucherDetails.length; i++) {
+          const price = Number(paymentVoucherDetails[i].price || 0);
+          const number = Number(paymentVoucherDetails[i].number || 0);
+          const taxRate = Number(paymentVoucherDetails[i].tax_rate || 0);
+  
+          SumPrice += price * number;
+          if (taxRate === 8) {
+              consumptionTaxEight += price * number * 0.08;
+          } else if (taxRate === 10) {
+              consumptionTaxTen += price * number * 0.1;
+          }
+      }
+  
+      return {
+          subtotal: SumPrice,
+          consumptionTaxEight,
+          consumptionTaxTen,
+          totalConsumptionTax: consumptionTaxEight + consumptionTaxTen,
+          Total: SumPrice + consumptionTaxEight + consumptionTaxTen
+      };
+    };
 
     const [isOpen, setIsOpen] = useState(null);
     const [selectedOption, setSelectedOption] = useState(null);
@@ -325,6 +355,13 @@ function PaymentVouchersAdd() {
             alert('新規登録が完了しました。');
         }
     };
+    console.log(paymentVoucherDetails);
+    //paymentVoucherDetails[index].price * paymentVoucherDetails[index].number * paymentVoucherDetails[index].tax_rate*0.01).toFixed(0)}円</div>
+    // console.log(paymentVoucherDetails[index].price);
+    // console.log(paymentVoucherDetails[index].number);
+    // console.log(paymentVoucherDetails[index].tax_rate);
+    // console.log();
+    // console.log();
 
     return (
         <div className='w-full mb-20'>
@@ -543,7 +580,23 @@ function PaymentVouchersAdd() {
                                         <div className='flex items-center'>
                                             <div className=''>
                                                 <div className='text-sm pb-1.5'>支払方法 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="payment_method" value={paymentVoucherDetail.payment_method} onChange={(e) => handleInputChange(index, e)} style={{ width: "120px" }} />
+                                                {/* 支払方法を選択するプルダウン */}
+                                                <select
+                                                  name="payment_method"
+                                                  value={selectedPaymentMethod} // 現在選択されている支払方法のcode
+                                                  onChange={handlePaymentMethodChange} // 選択肢が変更された時に実行
+                                                  className='border rounded px-4 py-2.5 bg-white'
+                                                  style={{ width: "120px" }}
+                                                >
+                                                  <option value=""></option> {/* 初期選択肢 */}
+                                                  
+                                                  {/* 支払方法のリストを表示 */}
+                                                  {paymentMethods.map((method) => (
+                                                    <option key={method.code} value={method.code}>
+                                                      {method.name}
+                                                    </option>
+                                                  ))}
+                                                </select>
                                             </div>
                                             <div className='ml-4'>
                                                 <div className='text-sm pb-1.5'>支払金額 <span className='text-sm font-bold text-red-600'>必須</span></div>
@@ -567,12 +620,27 @@ function PaymentVouchersAdd() {
                                 {errors["payment_price" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["payment_price" + index]}</div>}
                                 <div className='flex items-center justify-end'>
                                     <div className='flex items-center'>
+                                      {/* 以下を変更 */}
                                         <div className='mr-4'>消費税額</div>
-                                        <div className='mr-4'>{(paymentVoucherDetails[index].price * paymentVoucherDetails[index].number * paymentVoucherDetails[index].tax_rate*0.01).toFixed(0)}円</div>
+                                        <div className='mr-4'>
+                                          {(
+                                            (paymentVoucherDetails[index].payment_price && paymentVoucherDetails[index].number && paymentVoucherDetails[index].tax_rate)
+                                              ? (paymentVoucherDetails[index].payment_price * (paymentVoucherDetails[index].number || 1) * (paymentVoucherDetails[index].tax_rate * 0.01)).toFixed(0)
+                                              : 0
+                                          )}円
+                                        </div>
+                                        {console.log(paymentVoucherDetails[0].payment_price)}
                                         <div className='mr-4'>金額</div>
-                                        <div className='text-lg font-bold'>{(paymentVoucherDetails[index].price * paymentVoucherDetails[index].number * (paymentVoucherDetails[index].tax_rate*0.01 + 1)).toFixed(0)}円</div>
+                                        <div className='text-lg font-bold'>
+                                          {(
+                                            (paymentVoucherDetails[index].price && paymentVoucherDetails[index].number && paymentVoucherDetails[index].tax_rate)
+                                              ? (paymentVoucherDetails[index].price * paymentVoucherDetails[index].number * (paymentVoucherDetails[index].tax_rate * 0.01 + 1)).toFixed(0)
+                                              : 0
+                                          )}円
+                                        </div>
                                     </div>
                                 </div>
+                                
                                 <hr className='py-3' />
                             </div>
                         ))
@@ -582,26 +650,26 @@ function PaymentVouchersAdd() {
                     </div>
                     <div className='py-6 flex'>
                         <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>税抜合計</div>
-                                <div>{handleSumPrice().subtotal.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税(8%)</div>
-                                <div>{handleSumPrice().consumptionTaxEight.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税(10%)</div>
-                                <div>{handleSumPrice().consumptionTaxTen.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税合計</div>
-                                <div>{handleSumPrice().totalConsumptionTax.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex'>
-                                <div className='w-40'>税込合計</div>
-                                <div>{handleSumPrice().Total.toFixed(0).toLocaleString()}円</div>
-                            </div>
+                          <div className='flex pb-2'>
+                            <div className='w-40'>税抜合計</div>
+                            <div>{(handleSumPrice().subtotal || 0).toLocaleString()}円</div>
+                          </div>
+                          <div className='flex pb-2'>
+                            <div className='w-40'>消費税(8%)</div>
+                            <div>{(handleSumPrice().consumptionTaxEight || 0).toLocaleString()}円</div>
+                          </div>
+                          <div className='flex pb-2'>
+                            <div className='w-40'>消費税(10%)</div>
+                            <div>{(handleSumPrice().consumptionTaxTen || 0).toLocaleString()}円</div>
+                          </div>
+                          <div className='flex pb-2'>
+                            <div className='w-40'>消費税合計</div>
+                            <div>{(handleSumPrice().totalConsumptionTax || 0).toLocaleString()}円</div>
+                          </div>
+                          <div className='flex'>
+                            <div className='w-40'>税込合計</div>
+                            <div>{(handleSumPrice().Total || 0).toLocaleString()}円</div>
+                          </div>
                         </div>
                     </div>
                     <div className='py-3'>

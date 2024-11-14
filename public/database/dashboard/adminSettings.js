@@ -46,9 +46,11 @@ function checkLogin(loginData, callback) {
     }
 
     if (row.password === password) {
-      callback(null, )
+      callback(null, {success: true, user_id: row.id});
+    } else {
+      callback(new Error('ユーザー名またはパスワードが間違っています'));
     }
-  })
+  });
 }
 
 
@@ -76,5 +78,6 @@ module.exports = {
   initializeDatabase,
   loadAdminSettings,
   getAdminSettingById,
-  saveAdminSetting
+  saveAdminSetting,
+  checkLogin
  };

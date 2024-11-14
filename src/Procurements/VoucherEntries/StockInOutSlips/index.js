@@ -125,8 +125,8 @@ function Index() {
                         <tr className='border-b'>
                             <th className='text-left pb-2.5'>入出庫日付</th>
                             <th className='text-left pb-2.5'>伝票番号</th>
-                            <th className='text-left pb-2.5'>仕入先名</th>
-                            <th className='text-left pb-2.5'>仕入先コード</th>
+                            {/* <th className='text-left pb-2.5'>仕入先名</th>
+                            <th className='text-left pb-2.5'>仕入先コード</th> */}
                             <th className='text-left pb-2.5'>備考</th>
                             <th className='text-right'></th>
                         </tr>

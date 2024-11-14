@@ -1,5 +1,5 @@
 const { ipcMain} = require('electron');
-const { loadAdminSettings, saveAdminSetting, getAdminSettingById } = require('../../database/dashboard/adminSettings');
+const { loadAdminSettings, saveAdminSetting, getAdminSettingById, checkLogin } = require('../../database/dashboard/adminSettings');
 
 ipcMain.on('load-admin-settings', (event) => {
   loadAdminSettings((err, rows) => {
@@ -43,4 +43,14 @@ ipcMain.on('save-admin-setting', (event,adminSettingData) => {
 
 ipcMain.on('login-request', (event, loginData) => {
   console.log("受け取ったデータ",loginData);
+  checkLogin(loginData, (err, result) => {
+    if (err) {
+      // エラーが発生した場合、エラーメッセージを送信
+      console.error('ログインエラー:', err.message);
+      event.reply('login-response', { success: false, message: err.message });
+    } else {
+      // 成功した場合、ユーザーIDを送信
+      event.reply('login-response', { success: true, user_id: result.user_id });
+    }
+  });
 });
