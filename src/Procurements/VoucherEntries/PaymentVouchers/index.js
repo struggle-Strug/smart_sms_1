@@ -21,7 +21,7 @@ function Index() {
   const page = 10;
 
   useEffect(() => {
-    ipcRenderer.send('load-estimation-slips', pages);
+    ipcRenderer.send('load-payment-vouchers', pages);
   }, [pages]);
   console.log(pages);
 
