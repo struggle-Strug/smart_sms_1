@@ -10,8 +10,8 @@ const {
 } = require('../../database/salesmanagements/depositSlips');
 
 // 売上伝票のデータをロード
-ipcMain.on('load-deposit-slips', (event) => {
-    loadDepositSlips((err, rows) => {
+ipcMain.on('load-deposit-slips', (event, page) => {
+    loadDepositSlips(page, (err, rows) => {
         if (err) {
             console.error(err.message);
         } else {

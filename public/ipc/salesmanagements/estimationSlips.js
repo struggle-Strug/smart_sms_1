@@ -10,8 +10,9 @@ const {
 } = require('../../database/salesmanagements/estimationSlips');
 
 // 見積書のデータをロード
-ipcMain.on('load-estimation-slips', (event) => {
-    loadEstimationSlips((err, rows) => {
+ipcMain.on('load-estimation-slips', (event, page) => {
+  console.log(page);
+    loadEstimationSlips(page, (err, rows) => {
         if (err) {
             console.error(err.message);
         } else {

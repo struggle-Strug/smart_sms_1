@@ -5,37 +5,39 @@ const { app } = require('electron');
 const dbPath = path.join(app.getPath('userData'), 'database.db');
 const db = new sqlite3.Database(dbPath);
 
-function loadDepositSlips(callback) {
-    const sql = "SELECT * FROM deposit_slips";
-    db.all(sql, [], (err, rows) => {
-        callback(err, rows);
-    });
+function loadDepositSlips(page, callback) {
+  const pageSize = 10;
+  const offset = page;
+  const sql = "SELECT * FROM deposit_slips LIMIT ? OFFSET ?";
+  db.all(sql, [pageSize, offset], (err, rows) => {
+    callback(err, rows);
+  });
 }
 
 function getDepositSlipById(id, callback) {
-    const sql = "SELECT * FROM deposit_slips WHERE id = ?";
-    db.get(sql, [id], (err, row) => {
-        callback(err, row);
-    });
+  const sql = "SELECT * FROM deposit_slips WHERE id = ?";
+  db.get(sql, [id], (err, row) => {
+    callback(err, row);
+  });
 }
 
 function saveDepositSlip(depositSlipData, callback) {
-    const {
-        id,
-        code,
-        deposit_date,
-        status,
-        vender_name,
-        vender_id,
-        remarks,
-        updated,
-        created,
+  const {
+    id,
+    code,
+    deposit_date,
+    status,
+    vender_name,
+    vender_id,
+    remarks,
+    updated,
+    created,
 
-    } = depositSlipData;
+  } = depositSlipData;
 
-    if (id) {
-        db.run(
-            `UPDATE deposit_slips SET 
+  if (id) {
+    db.run(
+      `UPDATE deposit_slips SET 
                 code = ?,
                 deposit_date = ?,
                 status = ?,
@@ -44,65 +46,65 @@ function saveDepositSlip(depositSlipData, callback) {
                 remarks = ?, 
                 updated = datetime('now') 
             WHERE id = ?`,
-            [
-                code,
-                deposit_date,
-                status,
-                vender_name,
-                vender_id,
-                remarks,  
-                id,
-            ],
-            function (err) {
-                if (err) {
-                    return callback(err);
-                }
-                // 更新のため、IDをそのまま返す
-                callback(null, { lastID: id });
-            }
+      [
+        code,
+        deposit_date,
+        status,
+        vender_name,
+        vender_id,
+        remarks,
+        id,
+      ],
+      function (err) {
+        if (err) {
+          return callback(err);
+        }
+        // 更新のため、IDをそのまま返す
+        callback(null, { lastID: id });
+      }
 
-        );
-    } else {
-        db.run(
-            `INSERT INTO deposit_slips 
+    );
+  } else {
+    db.run(
+      `INSERT INTO deposit_slips 
             (code, remarks, deposit_date, status, vender_name, vender_id, created, updated) 
             VALUES 
             (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
-            [
-                code,
-                remarks,
-                deposit_date,
-                status,
-                vender_name,
-                vender_id,           ],
-                function (err) {
-                    if (err) {
-                        return callback(err);
-                    }
-                    // 更新のため、IDをそのまま返す
-                    callback(null, { lastID: this.lastID });
-                }
-    
-            );
+      [
+        code,
+        remarks,
+        deposit_date,
+        status,
+        vender_name,
+        vender_id,],
+      function (err) {
+        if (err) {
+          return callback(err);
         }
-    }
+        // 更新のため、IDをそのまま返す
+        callback(null, { lastID: this.lastID });
+      }
+
+    );
+  }
+}
 
 function deleteDepositSlipById(id, callback) {
-    const sql = "DELETE FROM deposit_slips WHERE id = ?";
-    db.run(sql, [id], (err) => {
-        callback(err);
-    });
+  const sql = "DELETE FROM deposit_slips WHERE id = ?";
+  db.run(sql, [id], (err) => {
+    callback(err);
+  });
 }
 
 function editDepositSlip(id, callback) {
-    const sql = "SELECT * FROM deposit_slips WHERE id = ?";
-    db.get(sql, [id], (err, row) => {
-        callback(err, row);
-    });
+  const sql = "SELECT * FROM deposit_slips WHERE id = ?";
+  db.get(sql, [id], (err, row) => {
+    callback(err, row);
+  });
 }
 
 function initializeDatabase() {
-    const sql = 
+  const sql =
     `CREATE TABLE IF NOT EXISTS deposit_slips (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         code VARCHAR(255) DEFAULT NULL,
@@ -114,36 +116,36 @@ function initializeDatabase() {
         created DATE DEFAULT CURRENT_DATE,
         updated DATE DEFAULT CURRENT_DATE
     )`;
-    db.run(sql);
+  db.run(sql);
 }
 
 function searchDepositSlips(query, callback) {
-    let sql;
-    let params = [];
+  let sql;
+  let params = [];
 
-    if (query && query.trim() !== '') {
-        sql = `
+  if (query && query.trim() !== '') {
+    sql = `
         SELECT * FROM deposit_slips 
         WHERE code LIKE ?
         OR vender_name LIKE ? 
         OR vender_id LIKE ?
         `;
-        // params = [`%${query}%`, `%${query}%`, `%${query}%`];
-        params = Array(2).fill(`%${query}%`);
-    } else {
-        sql = `SELECT * FROM deposit_slips`;
-    }
-    db.all(sql, params, (err, rows) => {
-        callback(err, rows);
-    });
+    // params = [`%${query}%`, `%${query}%`, `%${query}%`];
+    params = Array(2).fill(`%${query}%`);
+  } else {
+    sql = `SELECT * FROM deposit_slips`;
+  }
+  db.all(sql, params, (err, rows) => {
+    callback(err, rows);
+  });
 }
 
 module.exports = {
-    loadDepositSlips,
-    getDepositSlipById,
-    saveDepositSlip,
-    deleteDepositSlipById,
-    editDepositSlip,
-    initializeDatabase,
-    searchDepositSlips
+  loadDepositSlips,
+  getDepositSlipById,
+  saveDepositSlip,
+  deleteDepositSlipById,
+  editDepositSlip,
+  initializeDatabase,
+  searchDepositSlips
 };
