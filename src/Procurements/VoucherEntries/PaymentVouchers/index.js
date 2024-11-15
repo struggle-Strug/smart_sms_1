@@ -135,7 +135,7 @@ function Index() {
                                 <td>{voucher.voucher_number || <div className='border w-4'></div>}</td>
                                 <td>{voucher.vender_name || <div className='border w-4'></div>}</td>
                                 <td>{voucher.vender_id || <div className='border w-4'></div>}</td>
-                                <td>{voucher.remarks || <div className='border w-4'></div>}</td>
+                                <td>{voucher.remarks || ''}</td>
                                 <td className='flex justify-center relative'>
                                     <div className='border rounded px-4 py-3 relative hover:cursor-pointer' onClick={(e) => toggleDropdown(voucher.id)}>
                                         {isOpen === voucher.id && <DropDown id={voucher.id} name={voucher.code} />}

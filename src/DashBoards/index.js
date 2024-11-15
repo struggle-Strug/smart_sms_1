@@ -7,6 +7,7 @@ import AdminSettingsIndex from './AdminManament';
 import PosCoordinationSettingsIndex from './PosCoordinationSettings';
 import SalesTaxSettingsIndex from './SalesTaxSettings';
 import BanksApiSettingsIndex from './BanksApiSettings';
+import LoginIndex from './login';
 
 function Dashboards() {
   const [isOpen, setIsOpen] = useState(false);
@@ -37,6 +38,7 @@ function Dashboards() {
           <div className={`text-center py-2 text-lg ${location.pathname.includes("/pos-coordination-settings") && "font-bold border-l-4 border-blue-600"}`}><Link to="pos-coordination-settings" className={``}>POS連携設定</Link></div>
           <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-tax-settings") && "font-bold border-l-4 border-blue-600"}`}><Link to="sales-tax-settings" className={``}>消費税設定</Link></div>
           <div className={`text-center py-2 text-lg ${location.pathname.includes("/banks-api-settings") && "font-bold border-l-4 border-blue-600"}`}><Link to="banks-api-settings" className={``}>銀行API設定</Link></div>
+          <div className={`text-center py-2 text-lg ${location.pathname.includes("/login") && "font-bold border-l-4 border-blue-600"}`}><Link to="login" className={``}>ログイン</Link></div>
         </div>
       </div>
       <div className='overflow-y-scroll h-[92vh] w-full'>
@@ -47,6 +49,7 @@ function Dashboards() {
           <Route path="pos-coordination-settings" element={<PosCoordinationSettingsIndex />} />
           <Route path="sales-tax-settings/*" element={<SalesTaxSettingsIndex />} />
           <Route path="banks-api-settings" element={<BanksApiSettingsIndex />} />
+          <Route path="login" element={<LoginIndex />} />
         </Routes>
       </div>
     </div>)

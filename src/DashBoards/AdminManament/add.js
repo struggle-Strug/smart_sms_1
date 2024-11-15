@@ -69,7 +69,7 @@ function AdminSettingsAdd() {
             <input 
               type='text'
               className='border rounded px-4 py-2.5 bg-white w-full' 
-              placeholder='APIキーを入力' 
+              placeholder='' 
               name="user_name" 
               value={admin.user_name} 
               onChange={handleChange} 
@@ -96,7 +96,7 @@ function AdminSettingsAdd() {
             <input 
               type={showPassword ? 'text' : 'password'} 
               className='border rounded px-4 py-2.5 bg-white w-full' 
-              placeholder='APIキーを入力' 
+              placeholder='' 
               name="password" 
               value={admin.password} 
               onChange={handleChange} 
@@ -118,7 +118,7 @@ function AdminSettingsAdd() {
             <input 
               type={showPassword ? 'text' : 'password'} 
               className='border rounded px-4 py-2.5 bg-white w-full' 
-              placeholder='APIキーを入力' 
+              placeholder='' 
               name="confirmPassword" 
               value={admin.confirmPassword} 
               onChange={handleChange} 

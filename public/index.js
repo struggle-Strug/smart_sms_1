@@ -29,6 +29,7 @@ require('./ipc/dashboard/salesTaxSettings'); // 追加
 require('./ipc/dashboard/posCoordinationSettings');//追加
 require('./ipc/dashboard/dataConversions');//追加
 require('./ipc/dashboard/adminSettings');//追加
+require('./ipc/dashboard/backupsSettings');
 
 //仕入管理
 require('./ipc/procurements/purchaseOrders');
