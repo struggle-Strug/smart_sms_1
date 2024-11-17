@@ -62,6 +62,17 @@ ipcMain.on('delete-order-slip-detail', (event, id) => {
     });
 });
 
+// 購入注文明細を削除
+ipcMain.on('order-slip-details-deleted-by-slip-id', (event, id) => {
+    deleteOrderSlipDetailById(id, (err) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('order-slip-detail-deleted', id);
+        }
+    });
+});
+
 // 購入注文明細を編集
 ipcMain.on('edit-order-slip-detail', (event, id) => {
     editOrderSlipDetail(id, (err, row) => {
@@ -107,7 +118,7 @@ ipcMain.on('search-order-slip-details-by-vender-id', (event, query) => {
 });
 
 ipcMain.on('delete-order-slip-details-by-slip-id', (event, orderSlipId) => {
-    deleteOrderSlipDetailsBySoId(orderSlipId, (err) => {
+    deleteOrderSlipDetailsBySlipId(orderSlipId, (err) => {
         if (err) {
             console.error(err.message);
         } else {

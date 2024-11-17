@@ -42,6 +42,7 @@ require('./ipc/procurements/stockInOutSlipDetails');
 require('./ipc/procurements/paymentVoucherDetails');
 require('./ipc/procurements/statementSettings');
 require('./ipc/procurements/posPvsMappings');
+require('./ipc/procurements/inventories');
 
 //ツール
 require('./ipc/utilis/export');
@@ -56,6 +57,7 @@ require('./ipc/salesmanagements/orderSlips');
 require('./ipc/salesmanagements/orderSlipDetails');
 require('./ipc/salesmanagements/salesSlips');
 require('./ipc/salesmanagements/salesSlipDetails');
+require('./ipc/salesmanagements/invoices');
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -143,6 +145,8 @@ function createWindow() {
   statementSettingsDB.initializeDatabase();
   const posPvsMappingsDB = require('./database/procurements/posPvsMappings');
   posPvsMappingsDB.initializeDatabase();
+  const inventoriesDB = require('./database/procurements/inventories');
+  inventoriesDB.initializeDatabase();
 
   //集計管理
 
@@ -163,6 +167,8 @@ function createWindow() {
   salesSlipsDB.initializeDatabase();
   const salesSlipDetailsDB = require('./database/salesmanagements/salesSlipDetails');
   salesSlipDetailsDB.initializeDatabase();
+  const invoicesDB = require('./database/salesmanagements/invoices');
+  invoicesDB.initializeDatabase();
 }
 
 const dbPath = path.join(app.getPath('userData'), 'database.db');

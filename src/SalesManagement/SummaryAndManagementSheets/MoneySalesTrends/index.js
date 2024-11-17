@@ -412,7 +412,7 @@ function Index() {
 
 
     return (
-        <div className='w-5/6'>
+        <div className='w-full'>
             <div className='p-8'>
                 <div className='pb-6 flex items-center'>
                     <div className='text-3xl font-bold'>月次売上推移</div>

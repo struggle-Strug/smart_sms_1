@@ -290,7 +290,6 @@ function Index() {
     return purchaseOrderSumPrice;
   };
 
-
   return (
     <div className='w-5/6'>
       <div className='p-8'>

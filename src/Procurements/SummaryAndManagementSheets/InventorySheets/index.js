@@ -6,25 +6,29 @@ const { ipcRenderer } = window.require('electron');
 
 
 function Index() {
-    const [customers, setCustomers] = useState([]);
+    const [inventories, setInventories] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
     const location = useLocation();
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchQueryList, setSearchQueryList] = useState({
+        "倉庫": "",
+        "商品": "",
+        "アラート": "",
+    });
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     useEffect(() => {
-        ipcRenderer.send('get-customers');
-        ipcRenderer.on('customers-data', (event, data) => {
-            setCustomers(data);
+        ipcRenderer.send('load-inventories');
+        ipcRenderer.on('load-inventories', (event, data) => {
+            setInventories(data);
         });
 
-        ipcRenderer.on('customer-deleted', (event, id) => {
-            setCustomers((prevCustomers) => prevCustomers.filter(customer => customer.id !== id));
+        ipcRenderer.on('inventory-deleted', (event, id) => {
+            setInventories((prevInventories) => prevInventories.filter(inventory => inventory.id !== id));
         });
 
         ipcRenderer.on('search-customers-result', (event, data) => {
-            setCustomers(data);
+            setInventories(data);
         });
 
         return () => {
@@ -47,12 +51,21 @@ function Index() {
 
     const handleDelete = (id) => {
         if (window.confirm('本当にこの顧客を削除しますか？')) {
-            ipcRenderer.send('delete-customer', id);
+            ipcRenderer.send('delete-inventory', id);
         }
     };
 
     const handleSearch = () => {
-        ipcRenderer.send('search-customers', searchQuery);
+        ipcRenderer.send('search-inventories', searchQueryList);
+    };
+    
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setSearchQueryList((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
     };
 
     const handleKeyDown = (event) => {
@@ -81,82 +94,86 @@ function Index() {
     return (
         <div className='w-full'>
             <div className='p-8'>
+            <div className='pb-6 flex items-center'>
                 <div className='pb-6 text-2xl font-bold'>在庫表</div>
+                    <div className='flex ml-auto'>
+                        <div className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
+                            アラート設定
+                        </div>
+                        <div className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
+                            出力設定
+                        </div>
+                        <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={() => setIsDialogOpen(true)}>
+                            エクスポート
+                        </div>
+                    </div>
+            </div>
                 <div className='bg-gray-100 rounded p-6'>
                     <div className='pb-3 text-lg font-bold'>
                         表示条件指定
                     </div>
                     <div className='grid grid-cols-3 gap-8'>
                         <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <div className='text-sm pb-1.5'>倉庫</div>
+                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="倉庫" value={searchQueryList["倉庫"]} onChange={handleInputChange}/>
                         </div>
                         <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <div className='text-sm pb-1.5'>商品</div>
+                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="商品" value={searchQueryList["商品"]} onChange={handleInputChange}/>
                         </div>
                         <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
-                        </div>
-                        <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
-                        </div>
-                        <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
-                        </div>
-                        <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
-                        </div>
-                        <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
-                        </div>
-                        <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
-                        </div>
-                        <div>
-                            <div className='text-sm pb-1.5'>仕入先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <div className='text-sm pb-1.5'>アラート先の指定</div>
+                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="アラート" value={searchQueryList["アラート"]} onChange={handleInputChange}/>
                         </div>
                     </div>
                     <div className='flex mt-4'>
-                        <div className='border rounded-lg py-3 px-7 mb-8 text-base font-bold bg-blue-600 text-white'>適用して表示</div>
+                        <div className='border rounded-lg py-3 px-7 mb-8 text-base font-bold bg-blue-600 text-white' onClick={(e) => handleSearch()}>適用して表示</div>
                     </div>
                 </div>
             </div>
-            <div className='flex px-8 justify-end'>
-                <div className='border rounded-lg py-3 px-7 text-base font-bold text-black'>
-                    エクスポート
+            <div className='px-8'>
+                <div className='mb-4'>
+                    最終更新: 2023年6月15日 14:30 (内部システム更新: リアルタイム / POS連動: 1時間ごと)
+                </div>
+                <div className='border rounded-lg py-3 px-7 text-base font-bold text-black inline-block'>
+                    更新
                 </div>
             </div>
             <div className='px-8 pb-8'>
                 <table className="w-full mt-8 table-auto">
                     <thead className=''>
                         <tr className='border-b '>
-                            <th className='text-left pb-2.5'>支払日付</th>
-                            <th className='text-left pb-2.5'>伝票番号</th>
-                            <th className='text-left pb-2.5'>仕入先名</th>
-                            <th className='text-left pb-2.5'>仕入先コード</th>
-                            <th className='text-left pb-2.5'>備考</th>
+                            <th className='text-left pb-2.5'>アラート</th>
+                            <th className='text-left pb-2.5'>商品コード</th>
+                            <th className='text-left pb-2.5'>商品名</th>
+                            <th className='text-left pb-2.5'>ロット番号</th>
+                            <th className='text-left pb-2.5'>在庫数</th>
+                            <th className='text-left pb-2.5'>在庫予定数</th>
+                            <th className='text-left pb-2.5'>警告値</th>
                         </tr>
                     </thead>
                     <tbody className=''>
-                        {customers.map((customer) => (
-                            <tr className='border-b' key={customer.id}>
-                                <td className='py-4'>{customer.name_primary || <div className='border w-4'></div>}</td>
-                                <td>{customer.name_primary || <div className='border w-4'></div>}</td>
-                                <td>{customer.billing_code || <div className='border w-4'></div>}</td>
-                                <td>{customer.phone_number || <div className='border w-4'></div>}</td>
-                                <td>{customer.email}</td>
+                        {inventories.map((inventory) => (
+                            <tr className='border-b' key={inventory.id}>
+                                <td className='py-4'>{<div className='border w-4'></div>}</td>
+                                <td className='py-4'>{inventory.product_id || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{inventory.product_name || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{inventory.lot_number || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{inventory.inventory || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{inventory.estimated_inventory || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{inventory.warning_value || <div className='border w-4'></div>}</td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
+            </div>
+            <div className='flex justify-end items-center mb-16 text-lg'>
+                <div className='grid grid-cols-4'>
+                    <div className='py-1 pr-4'>在庫数</div>
+                    <div className='py-1 font-bold'>0 個</div>
+                    <div className='py-1 pr-4'>在庫予定数</div>
+                    <div className='py-1 font-bold'>0 個</div>
+                </div>
             </div>
         </div>
     )
