@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+
+const { ipcRenderer } = window.require('electron');
 
 function PaymentDataReconciliation() {
   // サンプルデータ
@@ -21,6 +23,20 @@ function PaymentDataReconciliation() {
     },
   ];
 
+  const [invoices, setInvoices] = useState([]);
+
+
+  useEffect(() => {
+    ipcRenderer.send('load-invoices');
+    ipcRenderer.on('load-invoices', (event, data) => {
+      console.log('data', data);
+      setInvoices(data);
+    })
+    return () => {
+      ipcRenderer.removeAllListeners('load-invoices');
+    }
+  }, []);
+
   // 選択された請求番号
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [showConfirmationMessage, setShowConfirmationMessage] = useState(false);
@@ -33,7 +49,7 @@ function PaymentDataReconciliation() {
     <div className="w-full p-8">
       {/* ヘッダー */}
       <div className="pb-6 text-2xl font-bold">入金データ照合</div>
-      
+
       {/* 取引詳細 */}
       <div className="bg-gray-100 rounded-lg p-6 mb-8">
         <div className="text-lg font-bold pb-4">取引詳細</div>
@@ -63,7 +79,7 @@ function PaymentDataReconciliation() {
           </tr>
         </thead>
         <tbody>
-          {invoiceData.map((invoice, index) => (
+          {invoices.map((invoice, index) => (
             <tr key={index} className="border-b">
               <td className="py-2">
                 <input
@@ -72,13 +88,13 @@ function PaymentDataReconciliation() {
                   onChange={() => setSelectedInvoice(invoice.id)}
                   checked={selectedInvoice === invoice.id}
                 />
-                <span className="ml-2">{invoice.id}</span>
+                <span className="ml-2">INV-{invoice.invoice_number}</span>
               </td>
-              <td className="py-2">{invoice.customer}</td>
-              <td className="py-2">{invoice.status}</td>
-              <td className="py-2">{invoice.invoiceDate}</td>
+              <td className="py-2">{invoice.name_primary}</td>
+              <td className="py-2">{invoice.status === 0 ? "未照合" : "照合確定"}</td>
+              <td className="py-2">{invoice.invoice_created}</td>
               <td className="py-2">{invoice.transferFee}</td>
-              <td className="py-2">{invoice.amount}</td>
+              <td className="py-2">{invoice.total_price}</td>
             </tr>
           ))}
         </tbody>
@@ -97,9 +113,8 @@ function PaymentDataReconciliation() {
       {/* ボタン */}
       <div className="flex justify-start mt-6 space-x-4">
         <button
-          className={`px-6 py-3 rounded font-bold ${
-            selectedInvoice ? 'bg-blue-600 text-white' : 'bg-gray-400 text-gray-200'
-          }`}
+          className={`px-6 py-3 rounded font-bold ${selectedInvoice ? 'bg-blue-600 text-white' : 'bg-gray-400 text-gray-200'
+            }`}
           onClick={handleConfirm}
           disabled={!selectedInvoice}
         >

@@ -16,6 +16,7 @@ import { useLocation } from 'react-router-dom';
 // import ShopsIndex from './Masters/Shops';
 import EstimationSlipIndex from './EstimationSlip';
 import DepositSlipsIndex from './DepositSlips';
+import PaymentSlipsIndex from './PaymentSlips';
 import SalesSlipsIndex from './SalesSlips';
 import OrderSlipsIndex from './OrderSlips';
 
@@ -66,7 +67,7 @@ function VoucherEntries() {
         <Route path="estimation-slip/*" element={<EstimationSlipIndex />}/>
         <Route path="order-slips/*" element={<OrderSlipsIndex />}/>
         <Route path="sales-slips/*" element={<SalesSlipsIndex />}/>
-        <Route path="payment-slips/*" element={<DepositSlipsIndex />}/>
+        <Route path="payment-slips/*" element={<PaymentSlipsIndex />}/>
       </Routes>
     </div>)
 }

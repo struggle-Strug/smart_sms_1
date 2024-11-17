@@ -30,6 +30,8 @@ function InvoiceExportSettings() {
     const companyZipCode = params.get('companyZipCode');
     const companyPhoneNumber = params.get('companyPhoneNumber');
 
+    const [invoiceTodayCount, setInvoiceTodayCount] = useState(0)
+
     const formatDate = (dateString) => {
         if (!dateString) {
             const today = new Date();
@@ -78,12 +80,13 @@ function InvoiceExportSettings() {
             let content = ``
 
             console.log(organizedData, "organizedData")
-
+            let i = 0;
             for (let key in organizedData) {
                 let parentData = organizedData[key].parentName;
                 for (let key2 in organizedData[key]) {
                     if (key2 === "parentName") continue;
-                    let htmlData = createHtmlContent(key, key2, organizedData[key][key2], parentData);
+                    let invoiceNumber = getTodayAsYYYYMMDD()+(invoiceTodayCount+i)
+                    let htmlData = createHtmlContent(key, key2, organizedData[key][key2], parentData, invoiceNumber);
                     setInvoiceHTMLData((prevData) => [...prevData, htmlData]);
                 }
             }
@@ -107,8 +110,18 @@ function InvoiceExportSettings() {
         ipcRenderer.send('search-sales-slip-details', searchColums);
         ipcRenderer.on('search-sales-slip-details-result', handleSearchResult);
 
+        ipcRenderer.send('count-today-invoices');
+        ipcRenderer.on('count-today-invoices-result', (event, data) => {
+            console.log(data)
+            setInvoiceTodayCount(data);
+        });
+
+
+
         return () => {
             ipcRenderer.removeListener('search-sales-slip-details', handleSearchResult);
+            ipcRenderer.removeListener('count-today-invoices-result', handleSearchResult);
+            ipcRenderer.removeListener('count-today-invoices', handleSearchResult);
             ipcRenderer.removeAllListeners('load-companies');
         }
     }, []);
@@ -128,13 +141,9 @@ function InvoiceExportSettings() {
                     acc[parent_name] = { "parentName": { "name": item.parent_name, "zip_code": item.parent_zip_code, "address": item.parent_address,  "customer_id": item.parent_id } };
                 }
             }
-
-            // name（例：A, B）のキーがなければ初期化
             if (!acc[parent_name][name]) {
                 acc[parent_name][name] = [];
             }
-
-            // 対応する配列に item を追加
             acc[parent_name][name].push(item);
 
             return acc;
@@ -176,8 +185,16 @@ function InvoiceExportSettings() {
         return `${year}${month}${day}${hours}${minutes}${seconds}`;
     }
 
+    function getTodayAsYYYYMMDD() {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0'); // 月は0始まりなので+1
+        const day = String(today.getDate()).padStart(2, '0');
+        return `${year}${month}${day}`;
+    }
 
-    const createHtmlContent = (billing_name, name, data, parentData) => {
+
+    const createHtmlContent = (billing_name, name, data, parentData, invoiceNumber) => {
         let html_content = ``
         const html_content_header = `
     <!DOCTYPE html>
@@ -271,7 +288,7 @@ function InvoiceExportSettings() {
                 </div>
             </div>
             <div>
-                <div class="section-content">請求番号　INV-2023001</div>
+                <div class="section-content">請求番号　INV-${invoiceNumber}</div>
                 <div class="section-content">発行日　${getFormattedDate()}</div>
                 <div class="section-content">お支払期限　${formatDate(closingDate)}</div>
                 <br>
@@ -289,8 +306,6 @@ function InvoiceExportSettings() {
     `
     const today = new Date();
     const formattedDate = today.toISOString().split('T')[0];
-    
-    setInvoiceData((prevData) => [...prevData, {customer_id: parentData.customer_id, billing_date: formattedDate}]);
 
         html_content += html_content_header;
 
@@ -351,6 +366,8 @@ function InvoiceExportSettings() {
     </html>
     `;
         html_content += html_content_footer;
+
+        setInvoiceData((prevData) => [...prevData, {customer_id: parentData.customer_id, billing_date: formattedDate, total_price: handleSumPrice(data).Total.toFixed(0), invoice_number: invoiceNumber, status: 0}]);
 
 
         return html_content
