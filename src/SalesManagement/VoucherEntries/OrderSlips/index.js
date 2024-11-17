@@ -123,9 +123,9 @@ function Index() {
                         {orderSlips.map((slip) => (
                             <tr className='border-b' key={slip.id}>
                                 <td>{slip.order_date || <div className='border w-4'></div>}</td>
-                                <td>{slip.id || <div className='border w-4'></div>}</td>
+                                <td>{slip.code || <div className='border w-4'></div>}</td>
                                 <td>{slip.vender_name || <div className='border w-4'></div>}</td>
-                                <td>{slip.vender_nid || <div className='border w-4'></div>}</td>
+                                <td>{slip.vender_id || <div className='border w-4'></div>}</td>
                                 <td>{slip.remarks}</td>
                                 <td className='flex justify-center relative'>
                                     <div className='border rounded px-4 py-3 relative hover:cursor-pointer' onClick={(e) => toggleDropdown(slip.id)}>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import Validator from '../utils/validator'; // バリデーション用のクラスをインポート
+import Validator from '../../utils/validator'; // バリデーション用のクラスをインポート
 
 const { ipcRenderer } = window.require('electron');
 
@@ -94,7 +94,7 @@ function SalesTaxSettingsAdd() {
             </div>
             <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
                 <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>新規登録</div>
-                <Link to={`/sales-tax-settings`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
+                <Link to={`/dashboards/sales-tax-settings`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
             </div>
         </div>
     );

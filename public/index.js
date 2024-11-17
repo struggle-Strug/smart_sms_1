@@ -24,7 +24,12 @@ require('./ipc/masters/categories'); // 追加
 require('./ipc/masters/subcategories'); // 追加
 
 //ダッシュボード
+require('./ipc/dashboard/bankApiSettings');//追加
 require('./ipc/dashboard/salesTaxSettings'); // 追加
+require('./ipc/dashboard/posCoordinationSettings');//追加
+require('./ipc/dashboard/dataConversions');//追加
+require('./ipc/dashboard/adminSettings');//追加
+require('./ipc/dashboard/backupsSettings');
 
 //仕入管理
 require('./ipc/procurements/purchaseOrders');
@@ -37,6 +42,7 @@ require('./ipc/procurements/stockInOutSlipDetails');
 require('./ipc/procurements/paymentVoucherDetails');
 require('./ipc/procurements/statementSettings');
 require('./ipc/procurements/posPvsMappings');
+require('./ipc/procurements/inventories');
 
 //ツール
 require('./ipc/utilis/export');
@@ -51,6 +57,7 @@ require('./ipc/salesmanagements/orderSlips');
 require('./ipc/salesmanagements/orderSlipDetails');
 require('./ipc/salesmanagements/salesSlips');
 require('./ipc/salesmanagements/salesSlipDetails');
+require('./ipc/salesmanagements/invoices');
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -72,7 +79,18 @@ function createWindow() {
   if (!app.isPackaged) {
     mainWindow.webContents.openDevTools();
   }
-  
+  //ダッシュボード
+  const dataConversionsDB = require('./database/dashboard/dataConversions')
+  dataConversionsDB.initializeDatabase();
+  const adminSettingsDB = require('./database/dashboard/adminSettings')
+  adminSettingsDB.initializeDatabase();
+  const posCoordinationsDB = require('./database/dashboard/posCoordinationSettings')
+  posCoordinationsDB.initializeDatabase();
+  const salesTaxSettingsDB = require('./database/dashboard/salesTaxSettings')
+  salesTaxSettingsDB.initializeDatabase();
+  const bankApiSettingsDB = require('./database/dashboard/bankApiSettings')
+  bankApiSettingsDB.initializeDatabase();
+//マスタ管理
   const customersDB = require('./database/masters/customers');
   customersDB.initializeDatabase();
   const deliveryCustomersDB = require('./database/masters/deliveryCustomers');
@@ -127,6 +145,8 @@ function createWindow() {
   statementSettingsDB.initializeDatabase();
   const posPvsMappingsDB = require('./database/procurements/posPvsMappings');
   posPvsMappingsDB.initializeDatabase();
+  const inventoriesDB = require('./database/procurements/inventories');
+  inventoriesDB.initializeDatabase();
 
   //集計管理
 
@@ -147,6 +167,8 @@ function createWindow() {
   salesSlipsDB.initializeDatabase();
   const salesSlipDetailsDB = require('./database/salesmanagements/salesSlipDetails');
   salesSlipDetailsDB.initializeDatabase();
+  const invoicesDB = require('./database/salesmanagements/invoices');
+  invoicesDB.initializeDatabase();
 }
 
 const dbPath = path.join(app.getPath('userData'), 'database.db');

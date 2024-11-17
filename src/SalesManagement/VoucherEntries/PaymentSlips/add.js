@@ -4,13 +4,17 @@ import { useLocation } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip'
 import CustomSelect from '../../../Components/CustomSelect';
 import ListTooltip from '../../../Components/ListTooltip';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Link, useNavigate } from 'react-router-dom';
 import Validator from '../../../utils/validator';
 import DatePicker from 'react-datepicker';
+import PaymentDataImport from '../PaymentDataImport/import';
 import 'react-datepicker/dist/react-datepicker.css';
+
+import axios from 'axios'; // 追加
+
 const { ipcRenderer } = window.require('electron');
 
-function PaymentSlipsAdd() {
+function AddForm() {
     const options = [
         { value: '御中', label: '御中' },
         { value: '貴社', label: '貴社' },
@@ -23,6 +27,7 @@ function PaymentSlipsAdd() {
     const [taxRateList, setTaxRateList] = useState([]);
     const [storageFacilitiesList, setStorageFacilitiesList] = useState([]);
     const [errors, setErrors] = useState({});
+    const navigate = useNavigate();
 
     const handleFocus = () => {
         setIsVendorIdFocused(true);
@@ -74,11 +79,7 @@ function PaymentSlipsAdd() {
     const [products, setProducts] = useState([])
 
     useEffect(() => {
-        ipcRenderer.on('search-id-vendors-result', (event, data) => {
-            setVendors(data);
-        });
-
-        ipcRenderer.on('search-name-vendors-result', (event, data) => {
+        ipcRenderer.on('search-customers-result', (event, data) => {
             setVendors(data);
         });
 
@@ -118,8 +119,7 @@ function PaymentSlipsAdd() {
 
 
         return () => {
-            ipcRenderer.removeAllListeners('search-id-vendors-result');
-            ipcRenderer.removeAllListeners('search-name-vendors-result');
+            ipcRenderer.removeAllListeners('search-customers-result');
             ipcRenderer.removeAllListeners('search-id-products-result');
             ipcRenderer.removeAllListeners('search-name-products-result');
         };
@@ -178,11 +178,11 @@ function PaymentSlipsAdd() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         if (name === "vender_id") {
-            ipcRenderer.send('search-id-vendors', value);
+            ipcRenderer.send('search-customers', { id: value });
         }
 
         if (name === "vender_name") {
-            ipcRenderer.send('search-name-vendors', value);
+            ipcRenderer.send('search-customers', { name_primary: value });
         }
         setDepositSlip({ ...depositSlip, [name]: value });
     };
@@ -293,6 +293,56 @@ function PaymentSlipsAdd() {
 
 
 
+
+
+    const [error, setError] = useState('');
+    const handleGetBankData = async () => {
+        console.log('handleGetBankData');
+        try {
+            const response = await axios({
+                method: 'GET',
+                url: 'https://developer.api.bk.mufg.jp/btmu/retail/trial/v2/me/accounts/001001110001/transactions?inquiryDateFrom=2021-12-20&inquiryDateTo=2021-12-27',
+                headers: {
+                    'X-IBM-Client-Id': '216d0c5626337b3dfde41c0888e78b07', // APIキー
+                    'X-BTMU-Seq-No': '20200514-0000000123456789', // ランダムな値
+                    Accept: 'application/json',
+                },
+            });
+
+            // APIレスポンスからデータを格納
+            const data = response.data;
+            setDepositSlip(prevState => ({
+                ...prevState,
+                deposit_date: data.transactions[0].settlementDate,
+            }));
+
+            const newDetails = data.transactions.map(transaction => ({
+                id: '',
+                deposit_slip_id: '',
+                deposit_date: transaction.settlementDate,
+                vender_id: '', // 必要に応じて値を設定
+                vender_name: data.accountInfo.accountName, // 必要に応じて値を設定
+                claim_id: '',
+                deposit_method: transaction.transactionType, // 取引タイプをセット
+                deposits: transaction.amount, // 取引額をセット
+                commission_fee: '',
+                data_category: '',
+            }));
+   
+          setDepositSlipDetails(newDetails);
+    
+            console.log('データ取得成功:', data);
+            console.log('newDetails',newDetails)
+            console.log('depositSlip', depositSlip);
+            console.log('depositSlipDetails', depositSlipDetails);
+            navigate('/sales-management/voucher-entries/payment-slips/add/data-import', { state: { newDetails: newDetails } });
+        } catch (error) {
+            // エラーメッセージを表示
+            setError('データの取得に失敗しました。再度お試しください。');
+            console.error('エラー:', error);
+        }
+    };
+
     return (
         <div className='w-full'>
             <div className=''>
@@ -311,19 +361,6 @@ function PaymentSlipsAdd() {
                     </div>
                 </div>
                 <div className='px-8 py-6'>
-                    <div className='pb-2.5 font-bold text-xl'>伝票情報</div>
-                    <div className='pb-2'>
-                        <div className='w-40 text-sm pb-1.5'>伝票番号 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-[480px]' placeholder='' name="code" value={depositSlip.code} onChange={handleChange} />
-                        {errors.code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.code}</div>}
-
-                    </div>
-                </div>
-                <div className='py-3'>
-                    <hr className='' />
-                </div>
-                <div className='px-8 py-6'>
-                    <div className='py-2.5 font-bold text-xl'>明細</div>
                     {
                         depositSlipDetails.map((depositSlipDetail, index) => (
                             <div>
@@ -335,24 +372,24 @@ function PaymentSlipsAdd() {
                                         <div className='flex items-center'>
                                             <div className=''>
                                                 <div className='text-sm pb-1.5'>入金伝票番号 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                                <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="deposit_slip_id" value={depositSlipDetail.deposit_slip_id} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
+                                                <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="deposit_slip_id" value={depositSlipDetail.deposit_slip_id} onChange={(e) => handleInputChange(index, e)} style={{ width: "120px" }} />
                                                 {errors.deposit_slip_id && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.deposit_slip_id}</div>}
 
                                             </div>
                                             <div className='ml-4'>
-                                                <div className='w-40 text-sm pb-1.5'>入金日付 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
+                                                <div className='w-30 text-sm pb-1.5'>入金日付 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
                                                 <DatePicker
-                                                    selected={depositSlip.deposit_date ? new Date(depositSlip.deposit_date) : null}
+                                                    selected={depositSlipDetail.deposit_date ? new Date(depositSlipDetail.deposit_date) : null}
                                                     onChange={(date) => handleDateChange(date, "deposit_date")}
                                                     dateFormat="yyyy-MM-dd"
-                                                    className='w-40 border rounded px-4 py-2.5 bg-white w-[240px]'
+                                                    className='w-40 border rounded px-4 py-2.5 bg-white w-[180px]'
                                                     placeholderText='入金日付を選択'
                                                 />
                                                 {errors.deposit_date && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.deposit_date}</div>}
                                             </div>
                                             <div className='ml-4 relative'>
-                                                <div className='w-40 text-sm pb-1.5'>得意先コード <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="vender_id" value={depositSlipDetail.vender_id} onChange={handleChange} onFocus={handleFocus} onBlur={handleBlur} />
+                                                <div className='w-45 text-sm pb-1.5'>得意先コード <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="vender_id" value={depositSlipDetail.vender_id} onChange={handleChange} onFocus={handleFocus} onBlur={handleBlur} style={{ width: "180px" }} />
                                                 {
                                                     isVendorIdFocused &&
                                                     <div className='absolute top-20 left-0 z-10' onMouseDown={(e) => e.preventDefault()}>
@@ -372,8 +409,8 @@ function PaymentSlipsAdd() {
                                                 }
                                             </div>
                                             <div className='ml-4 relative'>
-                                                <div className='w-40 text-sm pb-1.5'>得意先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="vender_name" value={depositSlipDetail.vender_name} onChange={handleChange} onFocus={handleVendorNameFocus} onBlur={handleVendorNameBlur} />
+                                                <div className='w-45 text-sm pb-1.5'>得意先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="vender_name" value={depositSlipDetail.vender_name} onChange={handleChange} onFocus={handleVendorNameFocus} onBlur={handleVendorNameBlur} style={{ width: "180px" }} />
                                                 {
                                                     isVendorNameFocused &&
                                                     <div className='absolute top-20 left-0 z-10' onMouseDown={(e) => e.preventDefault()}>
@@ -394,16 +431,16 @@ function PaymentSlipsAdd() {
                                             </div>
 
                                             <div className='ml-4'>
-                                                <div className='text-sm pb-1.5'>請求番号</div>
-                                                <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="claim_id" value={depositSlipDetail.claim_id} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
+                                                <div className='text-sm pb-1.5 w-30'>請求番号</div>
+                                                <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="claim_id" value={depositSlipDetail.claim_id} onChange={(e) => handleInputChange(index, e)} style={{ width: "120px" }} />
                                             </div>
                                             <div className='ml-4'>
-                                                <div className='text-sm pb-1.5'>入金方法<span className='text-sm font-bold text-red-600'>必須</span></div>
-                                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="deposit_method" value={depositSlipDetail.deposit_method} onChange={(e) => handleInputChange(index, e)} style={{ width: "120px" }} />
+                                                <div className='text-sm pb-1.5 w-30'>入金方法<span className='text-sm font-bold text-red-600'>必須</span></div>
+                                                <input type='text' className='border rounded px-4 py-2.5 bg-whit' placeholder='' name="deposit_method" value={depositSlipDetail.deposit_method} onChange={(e) => handleInputChange(index, e)} style={{ width: "120px" }} />
                                             </div>
                                             <div className='ml-4'>
-                                                <div className='text-sm pb-1.5'>入金額 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                                <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="deposits" value={depositSlipDetail.deposits} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
+                                                <div className='text-sm pb-1.5 w-30'>入金額 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                                <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="deposits" value={depositSlipDetail.deposits} onChange={(e) => handleInputChange(index, e)} style={{ width: "120px" }} />
                                             </div>
                                         </div>
                                         {errors["vender_id" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["vender_id" + index]}</div>}
@@ -418,6 +455,10 @@ function PaymentSlipsAdd() {
                                             <div className='ml-4'>
                                                 <div className='text-sm pb-1.5'>データ区分</div>
                                                 <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="data_category" value={depositSlipDetail.data_category} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)} />
+                                            </div>
+                                            <div className='ml-4'>
+                                                <div className='text-sm pb-1.5 w-30'>備考</div>
+                                                <input className='border rounded px-4 py-2.5 bg-white resize-none' placeholder='' rows={1} name="remarks" value={depositSlip.remarks} onChange={handleChange} style={{ width: "640px" }} />
                                             </div>
                                         </div>
                                     </div>
@@ -452,7 +493,11 @@ function PaymentSlipsAdd() {
                             <div className='ml-4 text-lg font-semibold'>0円</div>
                         </div>
                     </div>
-                    <div className='w-36 bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' >銀行データ取込</div>
+                    <div 
+                      className='w-36 bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' 
+                      onClick={handleGetBankData}>
+                        銀行データ取込
+                    </div>
                     <div className='py-3'>
                         <hr className='' />
                     </div>
@@ -468,6 +513,15 @@ function PaymentSlipsAdd() {
             </div>
         </div>
     );
+}
+
+function PaymentSlipsAdd() {
+  return (
+    <Routes>
+      <Route path="" element={<AddForm />} />
+      <Route path="data-import/*" element={<PaymentDataImport />} />
+    </Routes>
+  )
 }
 
 export default PaymentSlipsAdd;

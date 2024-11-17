@@ -8,7 +8,9 @@ const {
     searchSalesSlipDetails,
     searchSalesSlipsBySalesSlipId,
     deleteSalesSlipDetailsBySlipId,
-    getMonthlySalesWithJoin
+    getMonthlySalesWithJoin,
+    getMonthlySales,
+    getMonthlySalesInTax
 } = require('../../database/salesmanagements/salesSlipDetails');
 
 // 売上伝票明細のデータをロード
@@ -120,6 +122,26 @@ ipcMain.on('delete-sales-slip-details-by-slip-id', (event, salesSlipId) => {
             console.error(err.message);
         } else {
             event.sender.send('sales-slip-details-deleted-by-slip-id', salesSlipId);
+        }
+    });
+});
+
+ipcMain.on('get-monthly-sales-by-vender-id', (event, data) => {
+    getMonthlySales(data, (err, results) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('get-monthly-sales-by-vender-id-result', results);
+        }
+    });
+});
+
+ipcMain.on('get-monthly-sales-in-tax-by-vender-id', (event, data) => {
+    getMonthlySalesInTax(data, (err, results) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('get-monthly-sales-in-tax-by-vender-id-result', results);
         }
     });
 });

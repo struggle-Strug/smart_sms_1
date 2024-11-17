@@ -18,9 +18,10 @@ const { ipcRenderer } = window.require('electron');
 
 function App() {
   const location = useLocation();
-  const [companyName, setCompanyName] = useState("自社名");
+  const [companyName, setCompanyName] = useState("株式会社サンプル");
 
   const [isHovered, setIsHovered] = useState(false);
+  const [SalesManagementIsHover, setSalesManagementIsHover] = useState(false);
 
   const handleMouseEnter = () => {
     setIsHovered(true);
@@ -28,6 +29,13 @@ function App() {
 
   const handleMouseLeave = () => {
     setIsHovered(false);
+  };
+  const handlSalesManagementMouseEnter = () => {
+    setSalesManagementIsHover(true);
+  };
+
+  const handlelSalesManagementMouseLeave = () => {
+    setSalesManagementIsHover(false);
   };
 
   useEffect(() => {
@@ -47,13 +55,77 @@ function App() {
     <div className="App">
       <div className='fixed w-full'>
         <div className='bg-white border-b flex items-center w-full relative' style={{ minWidth: "1440px", margin: "auto" }}>
-          <div className='text-3xl font-bold pl-10 py-4' style={{ color: "#0272F5" }}>
-            Smart_SMS
+          <div className='text-2xl font-bold pl-10 py-4' style={{ color: "#0272F5" }}>
+            Smart_SmS
           </div>
           <div className='absolute' style={{ top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
             <Link to="/dashboards" className={`py-6 px-4 mx-2  ${location.pathname.includes ("/dashboards") && "font-bold border-b-4 border-blue-600"}`}>ダッシュボード</Link>
             <Link to="/contact" className={`py-6 px-4 mx-2  ${location.pathname === "/contact" && "font-bold border-b-4 border-blue-600"}`} activeClassName=''>検索</Link>
-            <Link to="/sales-management" className={`py-6 px-4 mx-2  ${location.pathname === "/about" && "font-bold border-b-4 border-blue-600"}`} activeClassName=''>売上管理</Link>
+            <Link to="/sales-management" className={`py-6 px-4 mx-2  ${location.pathname.includes("/sales-management") && "font-bold border-b-4 border-blue-600"} relative`}
+              activeClassName=''
+              onMouseEnter={handlSalesManagementMouseEnter}
+              onMouseLeave={handlelSalesManagementMouseLeave}>
+                売上管理
+                {SalesManagementIsHover && (
+                <div
+                  onMouseEnter={handlSalesManagementMouseEnter}
+                  onMouseLeave={handlelSalesManagementMouseLeave}
+                  className={`absolute bg-white shadow-md mt-2 top-12 p-3 left-0`}
+                >
+                  <div className='font-normal' style={{ width: "344px" }}>
+                    <div className='px-3 pb-4'>
+                      <div className='font-bold flex items-center'>
+                        <div className='w-24'>伝票入力</div>
+                        <div className='border w-full'></div>
+                      </div>
+                      <div className='grid grid-cols-2 text-gray-600'>
+                        <Link to="/sales-management/voucher-entries/estimation-slip">見積伝票</Link>
+                        <Link to="/sales-management/voucher-entries/order-slips">受注伝票</Link>
+                      </div>
+                      <div className='grid grid-cols-2 text-gray-600'>
+                        <Link to="/sales-management/voucher-entries/sales-slips">売上伝票</Link>
+                        <Link to="/sales-management/voucher-entries/payment-slips">入金伝票</Link>
+                      </div>
+                    </div>
+                    <div className='px-3 pb-4'>
+                      <div className='font-bold flex items-center'>
+                        <div className='w-20'>明細表</div>
+                        <div className='border w-full'></div>
+                      </div>
+                      <div className='grid grid-cols-2 text-gray-600'>
+                        <Link to="/sales-management/statements/quotation-detail-sheets">見積明細表</Link>
+                        <Link to="/sales-management/statements/order-detail-sheets">受注明細表</Link>
+                      </div>
+                      <div className='grid grid-cols-2 text-gray-600'>
+                        <Link to="/sales-management/statements/sales-detail-sheets">売上明細表</Link>
+                        <Link to="/sales-management/statements/payment-detail-sheets">入金明細表</Link>
+                      </div>
+                    </div>
+                    <div className='px-3 pb-4'>
+                      <div className='font-bold flex items-center'>
+                        <div className='w-28'>集計管理表</div>
+                        <div className='border w-full'></div>
+                      </div>
+                      <div className='grid grid-cols-2 text-gray-600'>
+                        <Link to="/sales-management/summary-and-management-sheets/order-summary-sheets">受注集計表</Link>
+                        <Link to="/sales-management/summary-and-management-sheets/sales-summary-sheets">売上集計表</Link>
+                      </div>
+                      <div className='grid grid-cols-2 text-gray-600'>
+                        <Link to="/sales-management/summary-and-management-sheets/money-sales-trends">月次売上推移</Link>
+                        <Link to="/sales-management/summary-and-management-sheets/invoice-processings">請求処理</Link>
+                      </div>
+                      <div className='grid grid-cols-2 text-gray-600'>
+                        <Link to="/sales-management/summary-and-management-sheets/incoming-payment-schedule">入金予定表</Link>
+                        <Link to="/sales-management/summary-and-management-sheets/accounts-receivable-balance">売掛金残高</Link>
+                      </div>
+                      <div className='grid grid-cols-2 text-gray-600'>
+                        <Link to="/sales-management/summary-and-management-sheets/accounts-receivable-ledger">得意先元帳</Link>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </Link>
             <Link to="/procurement" className={`py-6 px-4 mx-2  ${location.pathname.includes("/procurement") && "font-bold border-b-4 border-blue-600"} relative`}
               activeClassName=''
               onMouseEnter={handleMouseEnter}
@@ -116,7 +188,7 @@ function App() {
                 </div>
               )}
             </Link>
-            <Link to="/master" className={`py-6 px-4 mx-2  ${location.pathname.includes("/master") && "font-bold border-b-4 border-blue-600"}`} activeClassName=''>マスタ管理</Link>
+            <Link to="/master" className={`pt-6 pb-5 px-4 mx-2  ${location.pathname.includes("/master") && "font-bold border-b-4 border-blue-600"}`} activeClassName=''>マスタ管理</Link>
           </div>
           <div className='ml-auto text-xl py-3 pr-10'>{companyName}</div>
         </div>
@@ -124,7 +196,7 @@ function App() {
       <div className='pt-16'>
         <Routes>
           <Route path="/*" element={<Home />} />
-          <Route path="/dashboards/*" element={<Home />} />
+          <Route path="dashboards/*" element={<Home />} />
           <Route path="/sales-management/*" element={<SalesManagement />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/master/*" element={<Master />} />

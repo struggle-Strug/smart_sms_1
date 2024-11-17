@@ -149,7 +149,7 @@ function PaymentSlipsIndex() {
     return (
         <Routes>
             <Route path="" element={<Index />} />
-            <Route path="add" element={<PaymentSlipsAdd />} />
+            <Route path="add/*" element={<PaymentSlipsAdd />} />
             <Route path="detail/:id" element={<PaymentSlipsDetail />} />
             <Route path="edit/:id" element={<PaymentSlipsEdit />} />
         </Routes>
