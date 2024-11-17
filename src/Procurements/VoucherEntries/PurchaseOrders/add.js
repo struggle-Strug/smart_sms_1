@@ -81,9 +81,11 @@ function PurchaseOrdersAdd() {
             setProducts(data);
         });
 
+        ipcRenderer.on('purchase-order-inventory-result', (event, data) => {
+        });
+
         ipcRenderer.on('search-name-products-result', (event, data) => {
             setProducts(data);
-            console.log(data);
         });
 
         ipcRenderer.send('load-sales-tax-settings');
@@ -119,6 +121,7 @@ function PurchaseOrdersAdd() {
             ipcRenderer.removeAllListeners('search-name-vendors-result');
             ipcRenderer.removeAllListeners('search-id-products-result');
             ipcRenderer.removeAllListeners('search-name-products-result');
+            ipcRenderer.removeAllListeners('purchase-order-inventory-result');
         };
     }, []);
 
@@ -135,6 +138,8 @@ function PurchaseOrdersAdd() {
             tax_rate: '',
             storage_facility: '',
             stock: '',
+            lot_number: '',
+            threshold: ''
         }
     ]);
 
@@ -227,6 +232,24 @@ function PurchaseOrdersAdd() {
                     const purchaseOrderDetailData = purchaseOrderDetails[i];
                     purchaseOrderDetailData.purchase_order_id = data.id;
                     ipcRenderer.send('save-purchase-order-detail', purchaseOrderDetailData);
+                    const inventoryData = {
+                        product_id: purchaseOrderDetailData.product_id,
+                        product_name: purchaseOrderDetailData.product_name,
+                        lot_number: purchaseOrderDetailData.lot_number,
+                        inventory: purchaseOrderDetailData.number,
+                        estimated_inventory: purchaseOrderDetailData.number,
+                        warning_value: purchaseOrderDetailData.threshold,
+                    }
+                    ipcRenderer.send('purchase-order-inventory', inventoryData);
+                    const inventoryLogData = {
+                        product_id: purchaseOrderDetailData.product_id,
+                        product_name: purchaseOrderDetailData.product_name,
+                        lot_number: purchaseOrderDetailData.lot_number,
+                        number: purchaseOrderDetailData.number,
+                        action: "purchase order",
+                        storage_facility_id: purchaseOrderDetailData.storage_facility,
+                    }
+                    ipcRenderer.send('save-inventory-log', inventoryLogData);
                 }
             });
             setPurchaseOrder({
@@ -302,14 +325,13 @@ function PurchaseOrdersAdd() {
     }, []);
 
     const handleDateChange = (date, name) => {
-        // 日付をフォーマットしてpurchaseOrderにセット
         const formattedDate = date ? date.toISOString().split('T')[0] : '';
         setPurchaseOrder({ ...purchaseOrder, [name]: formattedDate });
     };
 
     const handleProductClick = (product, index) => {
         const updatedDetails = purchaseOrderDetails.map((detail, i) =>
-            i === index ? { ...detail, ["product_name"]: product.name, ["product_id"]: product.id, ["tax_rate"]: product.tax_rate, ["unit"] : product.unit, ["price"] : product.procurement_cost  } : detail
+            i === index ? { ...detail, ["product_name"]: product.name, ["product_id"]: product.id, ["tax_rate"]: product.tax_rate, ["unit"] : product.unit, ["price"] : product.procurement_cost, ["threshold"]: product.threshold  } : detail
         );
         setPurchaseOrderDetails(updatedDetails);
     }
@@ -612,6 +634,14 @@ function PurchaseOrdersAdd() {
                                             <div className='ml-4'>
                                                 <div className='text-sm pb-1.5'>在庫数</div>
                                                 <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="stock" value={purchaseOrderDetail.stock} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)} />
+                                            </div>
+                                            <div className='ml-4'>
+                                                <div className='text-sm pb-1.5'>ロット番号</div>
+                                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="stock" value={purchaseOrderDetail.lot_number} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)} />
+                                            </div>
+                                            <div className='ml-4'>
+                                                <div className='text-sm pb-1.5'>警告値</div>
+                                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="stock" value={purchaseOrderDetail.threshold} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)} />
                                             </div>
                                         </div>
                                         {errors["tax_rate" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["tax_rate" + index]}</div>}

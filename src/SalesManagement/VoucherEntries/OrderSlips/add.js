@@ -159,6 +159,7 @@ function OrderSlipsAdd() {
             stock: '',
             gross_profit: '',
             gross_margin_rate: '',
+            threshold: '',
             created: '',
             updated: '',
         }
@@ -255,6 +256,24 @@ function OrderSlipsAdd() {
                     const orderSlipDetailData = orderSlipDetails[i];
                     orderSlipDetailData.order_slip_id = data.id;
                     ipcRenderer.send('save-order-slip-detail', orderSlipDetailData);
+                    const inventoryData = {
+                        product_id: orderSlipDetailData.product_id,
+                        product_name: orderSlipDetailData.product_name,
+                        lot_number: orderSlipDetailData.lot_number,
+                        inventory: orderSlipDetailData.number,
+                        estimated_inventory: orderSlipDetailData.number,
+                        warning_value: orderSlipDetailData.threshold,
+                    }
+                    ipcRenderer.send('order-slips-inventory', inventoryData);
+                    const inventoryLogData = {
+                        product_id: orderSlipDetailData.product_id,
+                        product_name: orderSlipDetailData.product_name,
+                        lot_number: orderSlipDetailData.lot_number,
+                        number: orderSlipDetailData.number*(-1),
+                        action: "order slips",
+                        storage_facility_id: orderSlipDetailData.storage_facility,
+                    }
+                    ipcRenderer.send('save-inventory-log', inventoryLogData);
                 }
             });
             setOrderSlip({
@@ -330,6 +349,13 @@ function OrderSlipsAdd() {
         setOrderSlip({ ...orderSlip, [name]: formattedDate });
     };
 
+    const handleProductClick = (product, index) => {
+        const updatedDetails = orderSlipDetails.map((detail, i) =>
+            i === index ? { ...detail, ["product_name"]: product.name, ["product_id"]: product.id, ["tax_rate"]: product.tax_rate, ["unit"] : product.unit, ["price"] : product.procurement_cost, ["threshold"]: product.threshold  } : detail
+        );
+        setOrderSlipDetails(updatedDetails);
+    }
+
     return (
         <div className='w-full'>
             <div className=''>
@@ -392,7 +418,6 @@ function OrderSlipsAdd() {
                             className='border rounded px-4 py-2.5 bg-white  w-[480px]'
                             placeholderText='納品日付を選択'
                         />
-                    {/* <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="delivery_date" value={orderSlip.delivery_date} onChange={handleChange}/> */}
                     </div>
                     <div className='py-3'>
                         <hr className='' />
@@ -532,7 +557,7 @@ function OrderSlipsAdd() {
                                                                         products.map((product, idx) => (
                                                                             <div key={idx}
                                                                                 className="p-2 hover:bg-gray-100 hover:cursor-pointer"
-                                                                                onClick={(e) => handleOnDetailClick("product_id", product.id, index)}
+                                                                                onClick={(e) => handleProductClick(product, index)}
                                                                             >
                                                                                 {product.name}
                                                                             </div>
@@ -567,7 +592,7 @@ function OrderSlipsAdd() {
                                                                         products.map((product, idx) => (
                                                                             <div key={idx}
                                                                                 className="p-2 hover:bg-gray-100 hover:cursor-pointer"
-                                                                                onClick={(e) => handleOnDetailClick("product_name", product.name, index)}
+                                                                                onClick={(e) => handleProductClick(product, index)}
                                                                             >
                                                                                 {product.name}
                                                                             </div>

@@ -7,6 +7,7 @@ import InventorySheetsIndex from './InventorySheets';
 import OrderSummarySheetsIndex from './OrderSummarySheets';
 import PaymentSummarySheetsIndex from './PaymentSummarySheets';
 import PurchaseSummarySheetsIndex from './PurchaseSummarySheets';
+import MonthlyInventorySheetsIndex from './MonthlyInventorySheets';
 
 
 
@@ -53,11 +54,14 @@ function SummaryAndManagementSheets() {
         <div className={`text-center py-2 text-lg ${location.pathname.includes("/procurement/summary-and-management-sheets/payment-summary-sheet") && "font-bold border-l-4 border-blue-600"}`}><Link to="payment-summary-sheet" className={``}>支払集計表</Link></div>
         <div className={`text-center py-2 text-lg ${location.pathname.includes("/procurement/summary-and-management-sheets/account-payment-balance") && "font-bold border-l-4 border-blue-600"}`}><Link to="account-payment-balance" className={``}>買掛金残高</Link></div>
         <div className={`text-center py-2 text-lg ${location.pathname.includes("/procurement/summary-and-management-sheets/inventory-sheet") && "font-bold border-l-4 border-blue-600"}`}><Link to="inventory-sheet" className={``}>在庫表</Link></div>
+        <div className={`text-center py-2 text-lg ${location.pathname.includes("/procurement/summary-and-management-sheets/monthly-inventory-sheet") && "font-bold border-l-4 border-blue-600"}`}><Link to="monthly-inventory-sheet" className={``}>月次在庫表</Link></div>
       </div>
       <Routes>
         <Route path="" element={<OrderSummarySheetsIndex />}/>
         <Route path="account-payment-balance/*" element={<AccountsPayableBalancesIndex />}/>
         <Route path="inventory-in-out-summary-sheet/*" element={<InventoryInOutSummarySheetsIndex />}/>
+        <Route path="inventory-sheet/*" element={<InventorySheetsIndex />}/>
+        <Route path="monthly-inventory-sheet/*" element={<MonthlyInventorySheetsIndex />}/>
         <Route path="inventory-sheet/*" element={<InventorySheetsIndex />}/>
         <Route path="order-summary-sheet/*" element={<OrderSummarySheetsIndex />}/>
         <Route path="payment-summary-sheet/*" element={<PaymentSummarySheetsIndex />}/>

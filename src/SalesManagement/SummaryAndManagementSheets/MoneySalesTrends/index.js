@@ -150,9 +150,6 @@ function Index() {
         return { graphData: graphData, companyNames: companyNames, values: values }
     };
 
-
-    console.log(searchQueryList)
-
     const calculatedMonthlySales = (rows) => {
         const monthlySales = {};
         const monthlyNumber = {};

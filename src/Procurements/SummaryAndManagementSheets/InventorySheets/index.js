@@ -17,8 +17,12 @@ function Index() {
     });
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+    const [updatedDateTime, setUpdatedDateTime] = useState('');
+
     useEffect(() => {
         ipcRenderer.send('load-inventories');
+        ipcRenderer.send('get-last-square-log');
+        fetchTransactions('2024-11-01T00:00:00Z', '2024-11-15T23:59:59Z');
         ipcRenderer.on('load-inventories', (event, data) => {
             setInventories(data);
         });
@@ -31,14 +35,24 @@ function Index() {
             setInventories(data);
         });
 
+        ipcRenderer.on('get-transactions', (event, data) => {
+            console.log(data);
+        });
+
+        ipcRenderer.on('get-last-square-log-result', (event, data) => {
+            console.log(data);
+            setUpdatedDateTime(data?.request_date_time);
+        });
+
         return () => {
             ipcRenderer.removeAllListeners('customers-data');
             ipcRenderer.removeAllListeners('search-customers-result');
+            ipcRenderer.removeAllListeners('get-last-square-log-result');
         };
     }, []);
 
     const toggleDropdown = (id) => {
-        
+
         if (!isOpen) setIsOpen(id);
         else setIsOpen(false);
     };
@@ -58,7 +72,7 @@ function Index() {
     const handleSearch = () => {
         ipcRenderer.send('search-inventories', searchQueryList);
     };
-    
+
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -91,11 +105,26 @@ function Index() {
         )
     }
 
+    const fetchTransactions = async (startDate, endDate) => {
+        try {
+            console.log('Fetching transactions...');
+            ipcRenderer.send('get-transactions', {startDate, endDate});
+        } catch (error) {
+            console.error('Failed to fetch transactions:', error);
+        }
+    }
+
+    const handleUpdateInventory = () => {
+        ipcRenderer.send('load-inventories');
+    }
+    
+
+
     return (
         <div className='w-full'>
             <div className='p-8'>
-            <div className='pb-6 flex items-center'>
-                <div className='pb-6 text-2xl font-bold'>在庫表</div>
+                <div className='pb-6 flex items-center'>
+                    <div className='pb-6 text-2xl font-bold'>在庫表</div>
                     <div className='flex ml-auto'>
                         <div className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex'>
                             アラート設定
@@ -107,7 +136,7 @@ function Index() {
                             エクスポート
                         </div>
                     </div>
-            </div>
+                </div>
                 <div className='bg-gray-100 rounded p-6'>
                     <div className='pb-3 text-lg font-bold'>
                         表示条件指定
@@ -115,15 +144,15 @@ function Index() {
                     <div className='grid grid-cols-3 gap-8'>
                         <div>
                             <div className='text-sm pb-1.5'>倉庫</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="倉庫" value={searchQueryList["倉庫"]} onChange={handleInputChange}/>
+                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="倉庫" value={searchQueryList["倉庫"]} onChange={handleInputChange} />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>商品</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="商品" value={searchQueryList["商品"]} onChange={handleInputChange}/>
+                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="商品" value={searchQueryList["商品"]} onChange={handleInputChange} />
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>アラート先の指定</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="アラート" value={searchQueryList["アラート"]} onChange={handleInputChange}/>
+                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="アラート" value={searchQueryList["アラート"]} onChange={handleInputChange} />
                         </div>
                     </div>
                     <div className='flex mt-4'>
@@ -133,9 +162,9 @@ function Index() {
             </div>
             <div className='px-8'>
                 <div className='mb-4'>
-                    最終更新: 2023年6月15日 14:30 (内部システム更新: リアルタイム / POS連動: 1時間ごと)
+                    最終更新: {updatedDateTime} (内部システム更新: リアルタイム / POS連動: 15分ごと)
                 </div>
-                <div className='border rounded-lg py-3 px-7 text-base font-bold text-black inline-block'>
+                <div className='border rounded-lg py-3 px-7 text-base font-bold text-black inline-block' onClick={handleUpdateInventory}>
                     更新
                 </div>
             </div>

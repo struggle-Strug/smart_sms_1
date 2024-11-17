@@ -18,43 +18,44 @@ function Contact() {
     { name: '銀行API設定', path: '/dashboards/banks-api-settings' },
     ////////売り上げ管理
     { name: '売上管理', path: '/sales-management' },
-      //伝票入力
-      { name: '見積伝票', path: '/sales-management/voucher-entries/estimation-slip' },
-      { name: '受注伝票', path: '/sales-management/voucher-entries/order-slips' },
-      { name: '売上伝票', path: '/sales-management/voucher-entries/sales-slips' },
-      { name: '入金伝票', path: '/sales-management/voucher-entries/payment-slips' },
-      //明細表
-      { name: '見積明細表', path: '/sales-management/statements/quotation-detail-sheets' },
-      { name: '受注明細表', path: '/sales-management/statements/order-detail-sheets' },
-      { name: '売上明細表', path: '/sales-management/statements/sales-detail-sheets' },
-      { name: '入金明細表', path: '/sales-management/statements/payment-detail-sheets' },
-      //集計・管理表
-      { name: '受注集計表', path: '/sales-management/summary-and-management-sheets/order-summary-sheets' },
-      { name: '売上集計表', path: '/sales-management/summary-and-management-sheets/sales-summary-sheets' },
-      { name: '月次売上推移', path: '/sales-management/summary-and-management-sheets/money-sales-trends' },
-      { name: '請求処理', path: '/sales-management/summary-and-management-sheets/invoice-processings' },
-      { name: '入金予定表', path: '/sales-management/summary-and-management-sheets/incoming-payment-schedule' },
-      { name: '売掛金残高', path: '/sales-management/summary-and-management-sheets/accounts-receivable-balance' },
-      { name: '得意先元帳', path: '/sales-management/summary-and-management-sheets/accounts-receivable-ledger' },
+    //伝票入力
+    { name: '見積伝票', path: '/sales-management/voucher-entries/estimation-slip' },
+    { name: '受注伝票', path: '/sales-management/voucher-entries/order-slips' },
+    { name: '売上伝票', path: '/sales-management/voucher-entries/sales-slips' },
+    { name: '入金伝票', path: '/sales-management/voucher-entries/payment-slips' },
+    //明細表
+    { name: '見積明細表', path: '/sales-management/statements/quotation-detail-sheets' },
+    { name: '受注明細表', path: '/sales-management/statements/order-detail-sheets' },
+    { name: '売上明細表', path: '/sales-management/statements/sales-detail-sheets' },
+    { name: '入金明細表', path: '/sales-management/statements/payment-detail-sheets' },
+    //集計・管理表
+    { name: '受注集計表', path: '/sales-management/summary-and-management-sheets/order-summary-sheets' },
+    { name: '売上集計表', path: '/sales-management/summary-and-management-sheets/sales-summary-sheets' },
+    { name: '月次売上推移', path: '/sales-management/summary-and-management-sheets/money-sales-trends' },
+    { name: '請求処理', path: '/sales-management/summary-and-management-sheets/invoice-processings' },
+    { name: '入金予定表', path: '/sales-management/summary-and-management-sheets/incoming-payment-schedule' },
+    { name: '売掛金残高', path: '/sales-management/summary-and-management-sheets/accounts-receivable-balance' },
+    { name: '得意先元帳', path: '/sales-management/summary-and-management-sheets/accounts-receivable-ledger' },
     //仕入管理
     { name: '仕入管理', path: '/procurement' },
-      //伝票入力
-      { name: '発注伝票', path: '/procurement/voucher-entries/purchase-orders' },
-      { name: '仕入伝票', path: '/procurement/voucher-entries/purchase-invoices' },
-      { name: '入出庫伝票', path: '/procurement/voucher-entries/stock-in-out-slips' },
-      { name: '支払伝票', path: '/procurement/voucher-entries/payment-vouchers' },
-      //明細表
-      { name: '発注明細表', path: '/procurement/statements/purchase-order-statement' },
-      { name: '仕入明細表', path: '/procurement/statements/purchase-detail-statement' },
-      { name: '入出庫明細表', path: '/procurement/statements/stock-in-out-statement' },
-      { name: '支払明細表', path: '/procurement/statements/payment-statement' },
-      //集計・管理表
-      { name: '発注集計表', path: '/procurement/summary-and-management-sheets/order-summary-sheet' },
-      { name: '仕入集計表', path: '/procurement/summary-and-management-sheets/purchase-summary-sheet' },
-      { name: '入出庫集計表', path: '/procurement/summary-and-management-sheets/inventory-in-out-summary-sheet' },
-      { name: '支払集計表', path: '/procurement/summary-and-management-sheets/payment-summary-sheet' },
-      { name: '買掛集計表', path: '/procurement/summary-and-management-sheets/account-payment-balance' },
-      { name: '在庫表', path: '/procurement/summary-and-management-sheets/inventory-sheet' },
+    //伝票入力
+    { name: '発注伝票', path: '/procurement/voucher-entries/purchase-orders' },
+    { name: '仕入伝票', path: '/procurement/voucher-entries/purchase-invoices' },
+    { name: '入出庫伝票', path: '/procurement/voucher-entries/stock-in-out-slips' },
+    { name: '支払伝票', path: '/procurement/voucher-entries/payment-vouchers' },
+    //明細表
+    { name: '発注明細表', path: '/procurement/statements/purchase-order-statement' },
+    { name: '仕入明細表', path: '/procurement/statements/purchase-detail-statement' },
+    { name: '入出庫明細表', path: '/procurement/statements/stock-in-out-statement' },
+    { name: '支払明細表', path: '/procurement/statements/payment-statement' },
+    //集計・管理表
+    { name: '発注集計表', path: '/procurement/summary-and-management-sheets/order-summary-sheet' },
+    { name: '仕入集計表', path: '/procurement/summary-and-management-sheets/purchase-summary-sheet' },
+    { name: '入出庫集計表', path: '/procurement/summary-and-management-sheets/inventory-in-out-summary-sheet' },
+    { name: '支払集計表', path: '/procurement/summary-and-management-sheets/payment-summary-sheet' },
+    { name: '買掛集計表', path: '/procurement/summary-and-management-sheets/account-payment-balance' },
+    { name: '在庫表', path: '/procurement/summary-and-management-sheets/inventory-sheet' },
+    { name: '月次在庫表', path: '/procurement/summary-and-management-sheets/monthly-inventory-sheet' },
     //マスタ管理
     { name: 'マスタ管理', path: '/master' },
     { name: '得意先', path: '/master/customers' },

@@ -62,6 +62,7 @@ function VoucherEntries() {
         <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/voucher-entries/sales-slips") && "font-bold border-l-4 border-blue-600"}`}><Link to="sales-slips" className={``}>売上伝票</Link></div>
         <div className={`text-center py-2 text-lg ${location.pathname.includes("/sales-management/voucher-entries/payment-slips") && "font-bold border-l-4 border-blue-600"}`}><Link to="payment-slips" className={``}>入金伝票</Link></div>
       </div>
+      <div className='w-5/6'>
       <Routes>
         <Route path="" element={<EstimationSlipIndex />}/>
         <Route path="estimation-slip/*" element={<EstimationSlipIndex />}/>
@@ -69,6 +70,7 @@ function VoucherEntries() {
         <Route path="sales-slips/*" element={<SalesSlipsIndex />}/>
         <Route path="payment-slips/*" element={<PaymentSlipsIndex />}/>
       </Routes>
+      </div>
     </div>)
 }
 
