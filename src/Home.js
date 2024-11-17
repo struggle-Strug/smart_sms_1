@@ -57,7 +57,7 @@ function Home() {
   return (
     <>
       {
-        location.pathname === '/' &&
+        location.pathname === '/dashboards' &&
         <div className='mx-40 my-9'>
           <>
             <div className='text-3xl font-bold'>
