@@ -6,7 +6,7 @@ const dbPath = path.join(app.getPath('userData'), 'database.db');
 const db = new sqlite3.Database(dbPath);
 
 function loadInventories(callback) {
-  const sql = `SELECT * FROM inventories`;
+  const sql = `SELECT * FROM inventories LEFT JOIN products p ON p.id = inventories.product_id`;
   db.all(sql, [], (err, rows) => {
       callback(err, rows);
   });
@@ -197,7 +197,7 @@ function initializeDatabase() {
   const sql = `
   CREATE TABLE IF NOT EXISTS inventories (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      product_id VARCHAR(255) DEFAULT NULL,
+      product_id INTEGER DEFAULT NULL,
       product_name VARCHAR(255) DEFAULT NULL,
       lot_number VARCHAR(255) DEFAULT NULL,
       inventory INTEGER DEFAULT NULL,

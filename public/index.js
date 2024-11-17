@@ -44,6 +44,7 @@ require('./ipc/procurements/statementSettings');
 require('./ipc/procurements/posPvsMappings');
 require('./ipc/procurements/inventories');
 require('./ipc/procurements/squareLogs');
+require('./ipc/procurements/inventoryLogs');
 
 //ツール
 require('./ipc/utilis/export');
@@ -149,6 +150,8 @@ function createWindow() {
   posPvsMappingsDB.initializeDatabase();
   const inventoriesDB = require('./database/procurements/inventories');
   inventoriesDB.initializeDatabase();
+  const inventoryLogsDB = require('./database/procurements/inventoryLogs');
+  inventoryLogsDB.initializeDatabase();
   const squareLogsDB = require('./database/procurements/squareLogs');
   squareLogsDB.initializeDatabase();
 

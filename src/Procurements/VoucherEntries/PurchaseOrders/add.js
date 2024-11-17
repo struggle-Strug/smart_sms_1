@@ -241,6 +241,15 @@ function PurchaseOrdersAdd() {
                         warning_value: purchaseOrderDetailData.threshold,
                     }
                     ipcRenderer.send('purchase-order-inventory', inventoryData);
+                    const inventoryLogData = {
+                        product_id: purchaseOrderDetailData.product_id,
+                        product_name: purchaseOrderDetailData.product_name,
+                        lot_number: purchaseOrderDetailData.lot_number,
+                        number: purchaseOrderDetailData.number,
+                        action: "purchase order",
+                        storage_facility_id: purchaseOrderDetailData.storage_facility,
+                    }
+                    ipcRenderer.send('save-inventory-log', inventoryLogData);
                 }
             });
             setPurchaseOrder({

@@ -55,6 +55,7 @@ function Contact() {
     { name: '支払集計表', path: '/procurement/summary-and-management-sheets/payment-summary-sheet' },
     { name: '買掛集計表', path: '/procurement/summary-and-management-sheets/account-payment-balance' },
     { name: '在庫表', path: '/procurement/summary-and-management-sheets/inventory-sheet' },
+    { name: '月次在庫表', path: '/procurement/summary-and-management-sheets/monthly-inventory-sheet' },
     //マスタ管理
     { name: 'マスタ管理', path: '/master' },
     { name: '得意先', path: '/master/customers' },

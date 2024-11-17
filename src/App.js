@@ -183,6 +183,9 @@ function App() {
                         <Link to="/procurement/summary-and-management-sheets/account-payment-balance">買掛金残高</Link>
                         <Link to="/procurement/summary-and-management-sheets/inventory-sheet">在庫表</Link>
                       </div>
+                      <div className='grid grid-cols-2 text-gray-600'>
+                        <Link to="/procurement/summary-and-management-sheets/monthly-inventory-sheet">月次在庫表</Link>
+                      </div>
                     </div>
                   </div>
                 </div>

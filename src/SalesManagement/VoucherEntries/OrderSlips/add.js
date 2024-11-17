@@ -265,6 +265,15 @@ function OrderSlipsAdd() {
                         warning_value: orderSlipDetailData.threshold,
                     }
                     ipcRenderer.send('order-slips-inventory', inventoryData);
+                    const inventoryLogData = {
+                        product_id: orderSlipDetailData.product_id,
+                        product_name: orderSlipDetailData.product_name,
+                        lot_number: orderSlipDetailData.lot_number,
+                        number: orderSlipDetailData.number*(-1),
+                        action: "order slips",
+                        storage_facility_id: orderSlipDetailData.storage_facility,
+                    }
+                    ipcRenderer.send('save-inventory-log', inventoryLogData);
                 }
             });
             setOrderSlip({
