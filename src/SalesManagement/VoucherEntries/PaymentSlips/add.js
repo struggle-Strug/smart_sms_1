@@ -296,9 +296,8 @@ function AddForm() {
 
 
     const [error, setError] = useState('');
-
-    // handleGetBankData メソッドの定義
     const handleGetBankData = async () => {
+        console.log('handleGetBankData');
         try {
             const response = await axios({
                 method: 'GET',
