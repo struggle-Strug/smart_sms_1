@@ -95,8 +95,7 @@ function Contact() {
 
   return (
     <div className="px-8">
-      <div className="pt-6 pb-4 text-lg font-bold">画面の検索</div>
-      <div className="relative w-full mb-6">
+      <div className="relative w-full mt-4 mb-6">
         <input
           type="text"
           className=" pl-10 pr-4 py-2.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
