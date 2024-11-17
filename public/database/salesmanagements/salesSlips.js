@@ -5,43 +5,45 @@ const { app } = require('electron');
 const dbPath = path.join(app.getPath('userData'), 'database.db');
 const db = new sqlite3.Database(dbPath);
 
-function loadSalesSlips(callback) {
-    const sql = `SELECT * FROM sales_slips`;
-    db.all(sql, [], (err, rows) => {
-        callback(err, rows);
-    });
+function loadSalesSlips(page, callback) {
+  const pageSize = 10;
+  const offset = page;
+  const sql = `SELECT * FROM sales_slips LIMIT ? OFFSET ?`;
+  db.all(sql, [pageSize, offset], (err, rows) => {
+    callback(err, rows);
+  });
 }
 
 function getSalesSlipById(id, callback) {
-    const sql = `SELECT * FROM sales_slips WHERE id = ?`;
-    db.get(sql, [id], (err, row) => {
-        callback(err, row);
-    });
+  const sql = `SELECT * FROM sales_slips WHERE id = ?`;
+  db.get(sql, [id], (err, row) => {
+    callback(err, row);
+  });
 }
 
 function saveSalesSlip(salesSlipData, callback) {
-    const {
-        id,
-        code,
-        sales_date,
-        delivery_due_date,
-        vender_id,
-        vender_name,
-        honorific,
-        vender_contact_person,
-        order_slip_id,
-        order_id,
-        remarks,
-        closing_date,
-        deposit_due_date,
-        deposit_method,
-        created,
-        updated
-    } = salesSlipData;
+  const {
+    id,
+    code,
+    sales_date,
+    delivery_due_date,
+    vender_id,
+    vender_name,
+    honorific,
+    vender_contact_person,
+    order_slip_id,
+    order_id,
+    remarks,
+    closing_date,
+    deposit_due_date,
+    deposit_method,
+    created,
+    updated
+  } = salesSlipData;
 
-    if (id) {
-        db.run(
-            `UPDATE sales_slips SET 
+  if (id) {
+    db.run(
+      `UPDATE sales_slips SET 
                 code = ?,
                 sales_date = ?, 
                 delivery_due_date = ?, 
@@ -57,80 +59,80 @@ function saveSalesSlip(salesSlipData, callback) {
                 deposit_method = ?, 
                 updated = datetime('now') 
             WHERE id = ?`,
-            [
-                code,
-                sales_date,
-                delivery_due_date,
-                vender_id,
-                vender_name,
-                honorific,
-                vender_contact_person,
-                order_slip_id,
-                order_id,
-                remarks,
-                closing_date,
-                deposit_due_date,
-                deposit_method,
-                id
-            ],
-            function (err) {
-                if (err) {
-                    return callback(err);
-                }
-                // 更新のため、IDをそのまま返す
-                callback(null, { lastID: id });
-            }
+      [
+        code,
+        sales_date,
+        delivery_due_date,
+        vender_id,
+        vender_name,
+        honorific,
+        vender_contact_person,
+        order_slip_id,
+        order_id,
+        remarks,
+        closing_date,
+        deposit_due_date,
+        deposit_method,
+        id
+      ],
+      function (err) {
+        if (err) {
+          return callback(err);
+        }
+        // 更新のため、IDをそのまま返す
+        callback(null, { lastID: id });
+      }
 
-        );
-    } else {
-        db.run(
-            `INSERT INTO sales_slips 
+    );
+  } else {
+    db.run(
+      `INSERT INTO sales_slips 
             (code, sales_date, delivery_due_date, vender_id, vender_name, honorific, vender_contact_person, order_slip_id, order_id, remarks, closing_date, deposit_due_date, deposit_method, created, updated) 
             VALUES 
             (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
-            [
-                code,
-                sales_date,
-                delivery_due_date,
-                vender_id,
-                vender_name,
-                honorific,
-                vender_contact_person,
-                order_slip_id,
-                order_id,
-                remarks,
-                closing_date,
-                deposit_due_date,
-                deposit_method
-            ],
-            function (err) {
-                if (err) {
-                    return callback(err);
-                }
-                // 更新のため、IDをそのまま返す
-                callback(null, { lastID: this.lastID });
-            }
+      [
+        code,
+        sales_date,
+        delivery_due_date,
+        vender_id,
+        vender_name,
+        honorific,
+        vender_contact_person,
+        order_slip_id,
+        order_id,
+        remarks,
+        closing_date,
+        deposit_due_date,
+        deposit_method
+      ],
+      function (err) {
+        if (err) {
+          return callback(err);
+        }
+        // 更新のため、IDをそのまま返す
+        callback(null, { lastID: this.lastID });
+      }
 
-        );
-    }
+    );
+  }
 }
 
 function deleteSalesSlipById(id, callback) {
-    const sql = `DELETE FROM sales_slips WHERE id = ?`;
-    db.run(sql, [id], (err) => {
-        callback(err);
-    });
+  const sql = `DELETE FROM sales_slips WHERE id = ?`;
+  db.run(sql, [id], (err) => {
+    callback(err);
+  });
 }
 
 function editSalesSlip(id, callback) {
-    const sql = `SELECT * FROM sales_slips WHERE id = ?`;
-    db.get(sql, [id], (err, row) => {
-        callback(err, row);
-    });
+  const sql = `SELECT * FROM sales_slips WHERE id = ?`;
+  db.get(sql, [id], (err, row) => {
+    callback(err, row);
+  });
 }
 
 function initializeDatabase() {
-    const sql = `
+  const sql = `
     CREATE TABLE IF NOT EXISTS sales_slips (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         code VARCHAR(255) DEFAULT NULL,
@@ -149,38 +151,38 @@ function initializeDatabase() {
         created DATE DEFAULT CURRENT_DATE,
         updated DATE DEFAULT CURRENT_DATE
     )`;
-    db.run(sql);
+  db.run(sql);
 }
 
 function searchSalesSlips(query, callback) {
-    let sql;
-    let params = [];
+  let sql;
+  let params = [];
 
-    if (query && query.trim() !== '') {
-        sql = `
+  if (query && query.trim() !== '') {
+    sql = `
         SELECT * FROM sales_slips 
         WHERE code LIKE ?
         OR vender_name LIKE ? 
         OR vender_id LIKE ?
         `;
-        // params = [`%${query}%`, `%${query}%`, `%${query}%`];
-        params = Array(2).fill(`%${query}%`);
-    } else {
-        sql = `SELECT * FROM sales_slips`;
-    }
-    db.all(sql, params, (err, rows) => {
-        callback(err, rows);
-    });
+    // params = [`%${query}%`, `%${query}%`, `%${query}%`];
+    params = Array(2).fill(`%${query}%`);
+  } else {
+    sql = `SELECT * FROM sales_slips`;
+  }
+  db.all(sql, params, (err, rows) => {
+    callback(err, rows);
+  });
 }
 
 
 module.exports = {
-    loadSalesSlips,
-    getSalesSlipById,
-    saveSalesSlip,
-    deleteSalesSlipById,
-    editSalesSlip,
-    initializeDatabase,
-    searchSalesSlips
+  loadSalesSlips,
+  getSalesSlipById,
+  saveSalesSlip,
+  deleteSalesSlipById,
+  editSalesSlip,
+  initializeDatabase,
+  searchSalesSlips
 
 };
