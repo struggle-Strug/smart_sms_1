@@ -78,6 +78,107 @@ function saveInventory(inventoryData, callback) {
   };
 }
 
+function addInventoryNumber(inventoryData, callback) {
+    const {
+        product_id,
+        product_name,
+        lot_number,
+        inventory,
+        estimated_inventory,
+        warning_value,
+    } = inventoryData;
+
+    // 指定された product_id を持つデータを検索
+    const findSql = `SELECT * FROM inventories WHERE product_id = ?`;
+    db.get(findSql, [product_id], (err, row) => {
+        if (err) {
+            return callback(err);
+        }
+
+        if (row) {
+            const updatedInventory = parseInt(row.estimated_inventory) + parseInt(estimated_inventory);
+            const updateSql = `
+                UPDATE inventories 
+                SET 
+                    estimated_inventory = ?, 
+                    updated = datetime('now') 
+                WHERE product_id = ?
+            `;
+            db.run(updateSql, [updatedInventory, product_id], function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                callback(null, { lastID: row.id, estimated_inventory: updatedInventory });
+            });
+        } else {
+            // 既存データが見つからない場合、新しいデータを挿入
+            const insertSql = `
+                INSERT INTO inventories 
+                (product_id, product_name, lot_number, inventory, estimated_inventory, warning_value, created, updated) 
+                VALUES 
+                (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+            `;
+            db.run(insertSql, [product_id, product_name, lot_number, inventory, estimated_inventory || inventory, warning_value], function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                callback(null, { lastID: this.lastID, estimated_inventory: estimated_inventory || inventory });
+            });
+        }
+    });
+}
+
+function subtractInventoryNumber(inventoryData, callback) {
+    const {
+        product_id,
+        product_name,
+        lot_number,
+        inventory,
+        estimated_inventory,
+        warning_value,
+    } = inventoryData;
+
+    // 指定された product_id を持つデータを検索
+    const findSql = `SELECT * FROM inventories WHERE product_id = ?`;
+    db.get(findSql, [product_id], (err, row) => {
+        if (err) {
+            return callback(err);
+        }
+
+        if (row) {
+            const updatedInventory = parseInt(row.estimated_inventory) - parseInt(estimated_inventory);
+            const updateSql = `
+                UPDATE inventories 
+                SET 
+                    estimated_inventory = ?, 
+                    updated = datetime('now') 
+                WHERE product_id = ?
+            `;
+            db.run(updateSql, [updatedInventory, product_id], function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                callback(null, { lastID: row.id, estimated_inventory: updatedInventory });
+            });
+        } else {
+            // 既存データが見つからない場合、新しいデータを挿入
+            const insertSql = `
+                INSERT INTO inventories 
+                (product_id, product_name, lot_number, inventory, estimated_inventory, warning_value, created, updated) 
+                VALUES 
+                (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+            `;
+            db.run(insertSql, [product_id, product_name, lot_number, inventory, estimated_inventory || inventory, warning_value], function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                callback(null, { lastID: this.lastID, estimated_inventory: estimated_inventory || inventory });
+            });
+        }
+    });
+}
+
+
 function deleteInventoryById(id, callback) {
   const sql = `DELETE FROM inventories WHERE id = ?`;
   db.run(sql, [id], (err) => {
@@ -130,6 +231,45 @@ function searchInventories(query, callback) {
   });
 }
 
+function subtractInventoryByProductName(productName, quantity, callback) {
+    const findSql = `SELECT * FROM inventories WHERE product_name = ? LIMIT 1`;
+  
+    // 商品名でデータを検索
+    db.get(findSql, [productName], (err, row) => {
+      if (err) {
+        return callback(err);
+      }
+  
+      if (row) {
+        // 検索したデータが見つかった場合、estimated_inventoryを更新
+        const updatedInventory = parseInt(row.estimated_inventory) - parseInt(quantity);
+  
+        // estimated_inventoryが負になる場合のエラーハンドリング
+        if (updatedInventory < 0) {
+          return callback(new Error('Insufficient inventory to subtract the specified quantity.'));
+        }
+  
+        const updateSql = `
+          UPDATE inventories 
+          SET estimated_inventory = ?, 
+              updated = datetime('now') 
+          WHERE id = ?
+        `;
+        db.run(updateSql, [updatedInventory, row.id], function (err) {
+          if (err) {
+            return callback(err);
+          }
+          // 更新後のデータを返す
+          callback(null, { id: row.id, product_name: productName, estimated_inventory: updatedInventory });
+        });
+      } else {
+        // データが見つからない場合
+        callback(new Error(`Product "${productName}" not found in inventories.`));
+      }
+    });
+  }
+  
+
 module.exports = {
   loadInventories, 
   deleteInventoryById, 
@@ -137,4 +277,7 @@ module.exports = {
   editInventory, 
   initializeDatabase,
   searchInventories, 
+  addInventoryNumber,
+  subtractInventoryNumber,
+  subtractInventoryByProductName
 };

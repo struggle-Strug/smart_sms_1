@@ -48,6 +48,7 @@
     "csv-writer": "^1.6.0",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
+    "dotenv": "^16.4.5",
     "electron-log": "^5.2.0",
     "electron-squirrel-startup": "^1.0.1",
     "fs": "^0.0.1-security",
@@ -63,6 +64,7 @@
     "react-to-print": "^3.0.2",
     "react-tooltip": "^5.28.0",
     "sqlite3": "^5.1.7",
+    "square": "^38.2.0",
     "update-electron-app": "^3.0.0",
     "web-vitals": "^2.1.4",
     "xlsx": "^0.18.5"
