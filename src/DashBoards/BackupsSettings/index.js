@@ -18,10 +18,21 @@ function Index() {
     };
   }, []);
 
+  const [message, setMessage] = useState("");
+
   // ボタン押下時に実行する処理
   const hoge = () => {
     ipcRenderer.send('export-all-tables-to-csv'); // ボタン押下でデータを要求
   };
+  ipcRenderer.once('export-all-tables-to-csv-reply', (event, response) => {
+    if (response.error) {
+      setMessage(`Error: ${response.error}`);
+      alert(`Error: ${response.error}`);
+    } else {
+      setMessage(response.message);
+      alert(response.message); // 成功メッセージを表示
+    }
+  });
 
   useEffect(() => {
     ipcRenderer.on('restore-all-tables-from-csv-reply', (event, data) => {

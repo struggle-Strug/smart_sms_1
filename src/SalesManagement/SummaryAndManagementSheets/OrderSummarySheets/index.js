@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
+import Validator from '../../../utils/validator';
 import CustomSelect from '../../../Components/CustomSelect';
 import DatePicker from 'react-datepicker';
 
@@ -265,8 +266,10 @@ function Index() {
       ipcRenderer.send('delete-customer', id);
     }
   };
+  const validator = new Validator();
 
   const handleSearch = () => {
+    validator.required(orderSlipDetails.code, 'code', '伝票番号');
     const searchColums = {}
     setOrderSlipDetails([])
     for (let key in searchQueryList) {
@@ -346,12 +349,13 @@ function Index() {
               <div className='flex items-center'>
                 <div>
                   <div className='text-sm pb-1.5'>期間指定 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
-                  <DatePicker
-                    selected={searchQueryList["osd.created_start"] ? new Date(searchQueryList["osd.created_start"]) : null}
-                    onChange={(date) => handleDateChange(date, "osd.created_start")}
-                    dateFormat="yyyy-MM-dd"
-                    className='border rounded px-4 py-2.5 bg-white  w-full'
-                    placeholderText='期間を選択'
+                  <input
+                    type='date'
+                    className='border rounded px-4 py-2.5 bg-white w-2/3'
+                    placeholder='適用開始日を入力'
+                    name="osd.created_start"
+                    value={searchQueryList["osd.created_start"]}
+                    onChange={handleInputChange}
                   />
                 </div>
                 <div>
@@ -361,12 +365,13 @@ function Index() {
 
                 <div>
                   <div className='text-sm pb-1.5 text-gray-100'>期間指定</div>
-                  <DatePicker
-                    selected={searchQueryList["osd.created_end"] ? new Date(searchQueryList["osd.created_end"]) : null}
-                    onChange={(date) => handleDateChange(date, "osd.created_end")}
-                    dateFormat="yyyy-MM-dd"
-                    className='border rounded px-4 py-2.5 bg-white  w-full'
-                    placeholderText='期間を選択'
+                  <input
+                    type='date'
+                    className='border rounded px-4 py-2.5 bg-white w-2/3'
+                    placeholder='適用開始日を入力'
+                    name="osd.end"
+                    value={searchQueryList["osd.end"]}
+                    onChange={handleInputChange}
                   />
                 </div>
               </div>
@@ -487,7 +492,7 @@ function Index() {
             </div>
           </div>
           <div className='flex mt-6'>
-            <div className='border rounded-lg py-3 px-7 text-base font-bold bg-blue-600 text-white'>適用して表示</div>
+            <div className='border rounded-lg py-3 px-7 text-base font-bold bg-blue-600 text-white' onClick={(e) => handleSearch()}>適用して表示</div>
           </div>
         </div>
         <div className='flex justify-end'>

@@ -29,13 +29,13 @@ function ProcessRegistrationIndex() {
   useEffect(() => {
     ipcRenderer.send('load-companies');
     ipcRenderer.on('load-companies', (event, data) => {
-        if (data.length === 0) return;
-        setCompany(data[0]);
+      if (data.length === 0) return;
+      setCompany(data[0]);
     });
 
     return () => {
       ipcRenderer.removeAllListeners('load-companies');
-  }
+    }
   }, [])
 
 
@@ -73,13 +73,15 @@ function ProcessRegistrationIndex() {
           <div className='flex items-center pb-2'>
             <div>
               <div className='text-sm pb-1.5'>請求期間 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
-              <DatePicker
-                selected={searchQueryList["ss.sales_date_start"] ? new Date(searchQueryList["ss.sales_date_start"]) : null}
-                onChange={(date) => handleDateChange(date, "ss.sales_date_start")}
-                dateFormat="yyyy-MM-dd"
-                className='border rounded px-4 py-2.5 bg-white  w-full'
-                placeholderText='期間を選択'
+              <input
+                type='date'
+                className='border rounded px-4 py-2.5 bg-white w-2/3'
+                placeholder='適用開始日を入力'
+                name="ss.sales_date_start"
+                value={searchQueryList["ss.sales_date_start"]}
+                onChange={handleInputChange}
               />
+
             </div>
             <div>
               <div className='w-1'>&nbsp;</div>
@@ -88,12 +90,13 @@ function ProcessRegistrationIndex() {
 
             <div>
               <div className='text-sm pb-1.5 text-white'>期間指定</div>
-              <DatePicker
-                selected={searchQueryList["osd.created_end"] ? new Date(searchQueryList["osd.created_end"]) : null}
-                onChange={(date) => handleDateChange(date, "osd.created_end")}
-                dateFormat="yyyy-MM-dd"
-                className='border rounded px-4 py-2.5 bg-white  w-full'
-                placeholderText='期間を選択'
+              <input
+                type='date'
+                className='border rounded px-4 py-2.5 bg-white w-2/3'
+                placeholder='適用開始日を入力'
+                name="osd.created_end"
+                value={searchQueryList["osd.created_end"]}
+                onChange={handleInputChange}
               />
             </div>
           </div>
@@ -111,12 +114,13 @@ function ProcessRegistrationIndex() {
             </div>
             <div className='pb-2'>
               <div className='w-40 text-sm pb-1.5'>締日</div>
-              <DatePicker
-                selected={searchQueryList["ss.closing_date"] ? new Date(searchQueryList["ss.closing_date"]) : null}
-                onChange={(date) => handleDateChange(date, "ss.closing_date")}
-                dateFormat="yyyy-MM-dd"
-                className='border rounded px-4 py-2.5 bg-white  w-full'
-                placeholderText='締日'
+              <input
+                type='date'
+                className='border rounded px-4 py-2.5 bg-white w-2/3'
+                placeholder='適用開始日を入力'
+                name="ss.closing_date"
+                value={searchQueryList["ss.closing_date"]}
+                onChange={handleInputChange}
               />
             </div>
           </div>

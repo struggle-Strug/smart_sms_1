@@ -349,12 +349,13 @@ function Index() {
                 <div>
                   <div className='text-sm pb-1.5'>期間指定 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
                   {/* <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} /> */}
-                  <DatePicker
-                    selected={searchQueryList["siod.created_start"] ? new Date(searchQueryList["siod.created_start"]) : null}
-                    onChange={(date) => handleDateChange(date, "siod.created_start")}
-                    dateFormat="yyyy-MM-dd"
-                    className='border rounded px-4 py-2.5 bg-white  w-full'
-                    placeholderText='期間を選択'
+                  <input
+                    type='date'
+                    className='border rounded px-4 py-2.5 bg-white w-2/3'
+                    placeholder='適用開始日を入力'
+                    name="siod.created_start"
+                    value={searchQueryList["siod.created_start"]}
+                    onChange={handleInputChange}
                   />
                 </div>
                 <div>
@@ -365,12 +366,13 @@ function Index() {
                 <div>
                   <div className='text-sm pb-1.5 text-gray-100'>期間指定</div>
                   {/* <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} /> */}
-                  <DatePicker
-                    selected={searchQueryList["siod.created_end"] ? new Date(searchQueryList["siod.created_end"]) : null}
-                    onChange={(date) => handleDateChange(date, "siod.created_end")}
-                    dateFormat="yyyy-MM-dd"
-                    className='border rounded px-4 py-2.5 bg-white  w-full'
-                    placeholderText='期間を選択'
+                  <input
+                    type='date'
+                    className='border rounded px-4 py-2.5 bg-white w-2/3'
+                    placeholder='適用開始日を入力'
+                    name="siod.created_end"
+                    value={searchQueryList["siod.created_end"]}
+                    onChange={handleInputChange}
                   />
                 </div>
               </div>

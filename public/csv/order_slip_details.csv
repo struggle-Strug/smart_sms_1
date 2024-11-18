@@ -1,0 +1,12 @@
+id,order_slip_id,product_id,product_name,number,unit,unit_price,tax_rate,lot_number,storage_facility,stock,gross_profit,gross_margin_rate,created,updated
+1,test,6,test,1,test,100,test,test,test,test,test,test,2024-11-17 11:21:08,2024-11-17 11:21:08
+2,host,9,test,4,test,1000,test,test,test,test,test,test,2024-11-17 11:22:47,2024-11-17 11:22:47
+3,test,3,test,2,test,400,test,test,test,test,test,test,2024-11-17 11:22:47,2024-11-17 11:22:47
+4,test,2,test,3,test,898,test,test,test,test,test,test,2024-11-17 11:22:47,2024-11-17 11:22:47
+5,test,7,test,3,test,298,test,test,test,test,test,test,2024-11-17 11:22:48,2024-11-17 11:22:48
+6,test,2,test,100,test,123,test,test,test,test,test,test,2024-11-17 11:22:48,2024-11-17 11:22:48
+7,test,8,test,4,test,777,test,test,test,test,test,test,2024-11-17 11:22:48,2024-11-17 11:22:48
+8,test,13,test,86,test,456,test,test,test,test,test,test,2024-11-17 11:22:48,2024-11-17 11:22:48
+9,test,1,test,92,test,893,test,test,test,test,test,test,2024-11-17 11:22:48,2024-11-17 11:22:48
+10,test,1,test,25,test,4649,test,test,test,test,test,test,2024-11-17 11:22:49,2024-11-17 11:22:49
+11,test,5,test,7,test,634,test,test,test,test,test,test,2024-11-17 11:22:49,2024-11-17 11:22:49

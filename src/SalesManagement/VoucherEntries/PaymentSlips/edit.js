@@ -221,9 +221,9 @@ function PaymentSlipsEdit() {
         validator.required(depositSlip.code, 'code', '伝票番号');
         for (let i = 0; i < depositSlipDetails.length; i++) {
             validator.required(depositSlipDetails[i].deposit_slip_id, 'deposit_slip_id' + i, '入金伝票番号');
-            // validator.required(depositSlipDetails[i].deposit_date, 'deposit_date' + i, '入金日付');
-            // validator.required(depositSlipDetails[i].vender_id, 'vender_id' + i, '得意先コード');
-            // validator.required(depositSlipDetails[i].vender_name, 'vender_name' + i, '得意先名');
+            validator.required(depositSlipDetails[i].deposit_date, 'deposit_date' + i, '入金日付');
+            validator.required(depositSlipDetails[i].vender_id, 'vender_id' + i, '得意先コード');
+            validator.required(depositSlipDetails[i].vender_name, 'vender_name' + i, '得意先名');
             validator.required(depositSlipDetails[i].deposit_method, 'deposit_method' + i, '入金方法');
             validator.required(depositSlipDetails[i].deposits, 'deposits' + i, '入金額');
         }
@@ -415,6 +415,7 @@ function PaymentSlipsEdit() {
                                         {errors["vender_name" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["vender_name" + index]}</div>}
                                         {errors["deposit_method" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["deposit_method" + index]}</div>}
                                         {errors["deposits" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["deposits" + index]}</div>}
+                                        {errors.sales_date && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.sales_date}</div>}
                                         <div className='flex items-center mt-4'>
                                             <div className=''>
                                                 <div className='text-sm pb-1.5'>手数料</div>

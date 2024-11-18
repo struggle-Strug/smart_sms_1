@@ -112,13 +112,54 @@ function importCsvToTable(db, tableName, filePath, callback) {
     .on('error', callback);
 }
 
+function saveExcelToDataConversionsTable(db, excelFilePath, totalLineCount, callback) {
+  const fileName = path.basename(excelFilePath); // ファイル名を取得
+  const completeTime = new Date().toISOString(); // 完了日時を現在時刻として設定
+  const updatedRecord = 0; // 上書きレコード数 (この例では0)
+  const importedLineCount = totalLineCount; // インポートした行数
+  const newRecord = totalLineCount; // 新規レコード数 (この例では全行を新規とする)
+
+  const insertQuery = `
+    INSERT INTO data_conversions (
+      file_name,
+      complete_time,
+      total_line_count,
+      updated_record,
+      imported_line_count,
+      new_record
+    ) VALUES (?, ?, ?, ?, ?, ?)
+  `;
+
+  db.run(
+    insertQuery,
+    [fileName, completeTime, totalLineCount, updatedRecord, importedLineCount, newRecord],
+    (err) => {
+      if (err) {
+        console.error("Error inserting into data_conversions:", err);
+        callback(err);
+      } else {
+        console.log("データ変換情報が登録されました:", {
+          fileName,
+          completeTime,
+          totalLineCount,
+          updatedRecord,
+          importedLineCount,
+          newRecord,
+        });
+        callback(null);
+      }
+    }
+  );
+}
+
 
 
 module.exports = { 
   initializeDatabase,
   loadDataConversions,
   importExcelToDatabase,
-  convertExcelToCsv
+  convertExcelToCsv,
+  saveExcelToDataConversionsTable
 };
 
 
