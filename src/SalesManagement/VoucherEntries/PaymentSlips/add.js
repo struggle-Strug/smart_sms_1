@@ -11,6 +11,7 @@ import PaymentDataImport from '../PaymentDataImport/import';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import axios from 'axios'; // 追加
+// import { set } from 'react-datepicker/dist/date_utils';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -27,6 +28,8 @@ function AddForm() {
   const [taxRateList, setTaxRateList] = useState([]);
   const [storageFacilitiesList, setStorageFacilitiesList] = useState([]);
   const [errors, setErrors] = useState({});
+  const [api_key, setApi_key] = useState();
+  const [loading, setLoading] = useState('');
   const navigate = useNavigate();
 
   const handleFocus = () => {
@@ -79,6 +82,12 @@ function AddForm() {
   const [products, setProducts] = useState([])
 
   useEffect(() => {
+    ipcRenderer.send('load-band-api-settings');
+    ipcRenderer.on('bank-api-settings-data',(event, data) => {
+      console.log("受信したAPIデータ",data[0].api_key);
+      setApi_key(data[0].api_key);
+    });
+
     ipcRenderer.on('search-customers-result', (event, data) => {
       setVendors(data);
     });
@@ -122,6 +131,7 @@ function AddForm() {
       ipcRenderer.removeAllListeners('search-customers-result');
       ipcRenderer.removeAllListeners('search-id-products-result');
       ipcRenderer.removeAllListeners('search-name-products-result');
+      ipcRenderer.removeAllListeners('bank-api-settings-data');
     };
   }, []);
 
@@ -300,11 +310,13 @@ function AddForm() {
   // handleGetBankData メソッドの定義
   const handleGetBankData = async () => {
     try {
+      setLoading('取得中...')
       const response = await axios({
         method: 'GET',
         url: 'https://developer.api.bk.mufg.jp/btmu/retail/trial/v2/me/accounts/001001110001/transactions?inquiryDateFrom=2021-12-20&inquiryDateTo=2021-12-27',
         headers: {
-          'X-IBM-Client-Id': '216d0c5626337b3dfde41c0888e78b07', // APIキー
+          // 'X-IBM-Client-Id': '216d0c5626337b3dfde41c0888e78b07', // APIキー
+          'X-IBM-Client-Id': api_key, // APIキー
           'X-BTMU-Seq-No': '20200514-0000000123456789', // ランダムな値
           Accept: 'application/json',
         },
@@ -500,7 +512,9 @@ function AddForm() {
             className='w-36 bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer'
             onClick={handleGetBankData}>
             銀行データ取込
+            
           </div>
+          <span>{loading}</span>
           <div className='py-3'>
             <hr className='' />
           </div>
