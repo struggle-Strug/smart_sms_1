@@ -1,5 +1,5 @@
 const { ipcMain } = require('electron');
-const { loadInvoices, getInvoiceById, saveInvoice, deleteInvoiceById, editInvoice, searchInvoices } = require('../../database/salesmanagements/invoices');
+const { loadInvoices, getInvoiceById, saveInvoice, deleteInvoiceById, editInvoice, searchInvoices, countInvoicesForToday } = require('../../database/salesmanagements/invoices');
 
 // Load Invoices
 ipcMain.on('load-invoices', (event) => {
@@ -69,6 +69,16 @@ ipcMain.on('search-invoices', (event, query) => {
             console.error(err.message);
         } else {
             event.sender.send('search-invoices-result', rows);
+        }
+    });
+});
+// Search Invoices
+ipcMain.on('count-today-invoices', (event, query) => {
+    countInvoicesForToday((err, data) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('count-today-invoices-result', data);
         }
     });
 });

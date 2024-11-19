@@ -62,6 +62,14 @@ function Index() {
     };
   }, []);
 
+  const nextPageSubmit = () => {
+    setPages(pages + page);
+  };
+
+  const backPagesSubmit = () => {
+    setPages(pages - page);
+  }
+
   const toggleDropdown = (id) => {
 
     if (!isOpen) setIsOpen(id);
@@ -89,14 +97,6 @@ function Index() {
       handleSearch();
     }
   };
-
-  const nextPageSubmit = () => {
-    setPages(pages + page);
-  };
-
-  const backPagesSubmit = () => {
-    setPages(pages - page);
-  }
 
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);

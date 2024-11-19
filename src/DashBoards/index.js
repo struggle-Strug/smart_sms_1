@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
+import DataConversionIndex from './DataConversion';
 import BackupsSettingsIndex from './BackupsSettings';
 import DataConversionsIndex from './DataConversions';
 import AdminSettingsIndex from './AdminManament';
@@ -43,6 +44,7 @@ function Dashboards() {
       </div>
       <div className='overflow-y-scroll h-[92vh] w-full'>
         <Routes>
+          <Route path="" element={<DataConversionIndex />} />
           <Route path="backups-settings" element={<BackupsSettingsIndex />} />
           <Route path="data-conversions" element={<DataConversionsIndex />} />
           <Route path="admin-settings/*" element={<AdminSettingsIndex />} />

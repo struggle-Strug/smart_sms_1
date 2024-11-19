@@ -4,10 +4,12 @@ import { useLocation } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip'
 import CustomSelect from '../../../Components/CustomSelect';
 import ListTooltip from '../../../Components/ListTooltip';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Link, useNavigate } from 'react-router-dom';
 import Validator from '../../../utils/validator';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import axios from 'axios'; // 追加
+
 const { ipcRenderer } = window.require('electron');
 
 function DepositSlipsAdd() {
@@ -16,13 +18,14 @@ function DepositSlipsAdd() {
     { value: '貴社', label: '貴社' },
   ];
 
-  const [isVendorIdFocused, setIsVendorIdFocused] = useState(false);
-  const [isVendorNameFocused, setIsVendorNameFocused] = useState(false);
-  const [isProductIdFocused, setIsProductIdFocused] = useState(-1);
-  const [isProductNameFocused, setIsProductNameFocused] = useState(-1);
-  const [taxRateList, setTaxRateList] = useState([]);
-  const [storageFacilitiesList, setStorageFacilitiesList] = useState([]);
-  const [errors, setErrors] = useState({});
+    const [isVendorIdFocused, setIsVendorIdFocused] = useState(false);
+    const [isVendorNameFocused, setIsVendorNameFocused] = useState(false);
+    const [isProductIdFocused, setIsProductIdFocused] = useState(-1);
+    const [isProductNameFocused, setIsProductNameFocused] = useState(-1);
+    const [taxRateList, setTaxRateList] = useState([]);
+    const [storageFacilitiesList, setStorageFacilitiesList] = useState([]);
+    const [errors, setErrors] = useState({});
+    const navigate = useNavigate();
 
   const handleFocus = () => {
     setIsVendorIdFocused(true);
@@ -292,6 +295,49 @@ function DepositSlipsAdd() {
   };
 
 
+    const handleGetBankData = async () => {
+        console.log('handleGetBankData');
+        try {
+            const response = await axios({
+                method: 'GET',
+                url: 'https://developer.api.bk.mufg.jp/btmu/retail/trial/v2/me/accounts/001001110001/transactions?inquiryDateFrom=2021-12-20&inquiryDateTo=2022-12-27',
+                headers: {
+                    'X-IBM-Client-Id': '216d0c5626337b3dfde41c0888e78b07', // APIキー
+                    'X-BTMU-Seq-No': '20200514-0000000123456789', // ランダムな値
+                    Accept: 'application/json',
+                },
+            });
+
+            // APIレスポンスからデータを格納
+            const data = response.data;
+            setDepositSlip(prevState => ({
+                ...prevState,
+                deposit_date: data.transactions[0].settlementDate,
+            }));
+
+            const newDetails = data.transactions.map(transaction => ({
+                id: '',
+                deposit_slip_id: '',
+                deposit_date: transaction.settlementDate,
+                vender_id: '', // 必要に応じて値を設定
+                vender_name: data.accountInfo.accountName, // 必要に応じて値を設定
+                claim_id: '',
+                deposit_method: transaction.transactionType, // 取引タイプをセット
+                deposits: transaction.amount, // 取引額をセット
+                commission_fee: '',
+                data_category: '',
+            }));
+
+            setDepositSlipDetails(newDetails);
+            navigate('/sales-management/voucher-entries/payment-slips/add/data-import', { state: { newDetails: newDetails } });
+        } catch (error) {
+            // エラーメッセージを表示
+            // setError('データの取得に失敗しました。再度お試しください。');
+            console.error('エラー:', error);
+        }
+    };
+
+
 
   return (
     <div className='w-full'>
@@ -443,32 +489,32 @@ function DepositSlipsAdd() {
                 </div>
               </div>
 
-            ))
-          }
-          <div className='pb-6 flex flex-col mr-14'>
-            <div className='flex items-center mr-10 pt-3'>
-              <div className='ml-auto flex'>消費税額</div>
-              <div className='ml-4'>0円</div>
-              <div className='ml-10 flex'>金額</div>
-              <div className='ml-4 text-lg font-semibold'>0円</div>
+                        ))
+                    }
+                    <div className='pb-6 flex flex-col mr-14'>
+                        <div className='flex items-center mr-10 pt-3'>
+                            <div className='ml-auto flex'>消費税額</div>
+                            <div className='ml-4'>0円</div>
+                            <div className='ml-10 flex'>金額</div>
+                            <div className='ml-4 text-lg font-semibold'>0円</div>
+                        </div>
+                    </div>
+                    <div className='w-36 bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleGetBankData} >銀行データ取込</div>
+                    <div className='py-3'>
+                        <hr className='' />
+                    </div>
+                    <div className='py-2.5 font-bold text-xl'>備考</div>
+                    <div className='pb-2 mb-24'>
+                        <textarea className='border rounded px-4 py-2.5 bg-white w-full resize-none' placeholder='' rows={5} name="remarks" value={depositSlip.remarks} onChange={handleChange}></textarea>
+                    </div>
+                </div>
             </div>
-          </div>
-          <div className='w-36 bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' >銀行データ取込</div>
-          <div className='py-3'>
-            <hr className='' />
-          </div>
-          <div className='py-2.5 font-bold text-xl'>備考</div>
-          <div className='pb-2 mb-24'>
-            <textarea className='border rounded px-4 py-2.5 bg-white w-full resize-none' placeholder='' rows={5} name="remarks" value={depositSlip.remarks} onChange={handleChange}></textarea>
-          </div>
+            <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
+                <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>新規登録</div>
+                <Link to={`salesmanagements/deposit-slips`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
+            </div>
         </div>
-      </div>
-      <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
-        <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>新規登録</div>
-        <Link to={`salesmanagements/deposit-slips`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
-      </div>
-    </div>
-  );
+    );
 }
 
 export default DepositSlipsAdd;

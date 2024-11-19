@@ -49,6 +49,10 @@ function Index() {
     ipcRenderer.send('restore-all-tables-from-csv');
   };
 
+  const resetData = () => {
+    ipcRenderer.send('reset-database');
+  }
+
   return (
     <div>
       <div className='p-8'>
@@ -63,6 +67,13 @@ function Index() {
         <div className='flex'>
           <div className='border rounded-lg py-3 px-7 mb-8 text-base font-bold bg-white text-black'>
           <button onClick={restoreBackup}>復元</button>
+          </div>
+        </div>
+
+        <div className='pb-6 text-2xl font-bold'>データを初期化</div>
+        <div className='flex'>
+          <div className='border rounded-lg py-3 px-7 mb-8 text-base font-bold bg-white text-black'>
+          <button onClick={resetData}>初期化</button>
           </div>
         </div>
 

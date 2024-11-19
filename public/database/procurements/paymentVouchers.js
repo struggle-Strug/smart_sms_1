@@ -5,39 +5,41 @@ const { app } = require('electron');
 const dbPath = path.join(app.getPath('userData'), 'database.db');
 const db = new sqlite3.Database(dbPath);
 
-function loadPaymentVouchers(callback) {
-    const sql = `SELECT * FROM payment_vouchers`;
-    db.all(sql, [], (err, rows) => {
-        callback(err, rows);
-    });
+function loadPaymentVouchers(page, callback) {
+  const pageSize = 10;
+  const offset = page;
+  const sql = `SELECT * FROM payment_vouchers LIMIT ? OFFSET ?`;
+  db.all(sql, [pageSize, offset], (err, rows) => {
+    callback(err, rows);
+  });
 }
 
 function getPaymentVoucherById(id, callback) {
-    const sql = `SELECT * FROM payment_vouchers WHERE id = ?`;
-    db.get(sql, [id], (err, row) => {
-        callback(err, row);
-    });
+  const sql = `SELECT * FROM payment_vouchers WHERE id = ?`;
+  db.get(sql, [id], (err, row) => {
+    callback(err, row);
+  });
 }
 
 function savePaymentVoucher(voucherData, callback) {
-    const {
-        id,
-        code,
-        order_date,
-        vender_id,
-        vender_name,
-        honorific,
-        vender_contact_person,
-        contact_person,
-        purchase_voucher_id,
-        remarks,
-        created,
-        updated
-    } = voucherData;
+  const {
+    id,
+    code,
+    order_date,
+    vender_id,
+    vender_name,
+    honorific,
+    vender_contact_person,
+    contact_person,
+    purchase_voucher_id,
+    remarks,
+    created,
+    updated
+  } = voucherData;
 
-    if (id) {
-        db.run(
-            `UPDATE payment_vouchers SET 
+  if (id) {
+    db.run(
+      `UPDATE payment_vouchers SET 
                 code = ?,
                 order_date = ?, 
                 vender_id = ?, 
@@ -49,70 +51,70 @@ function savePaymentVoucher(voucherData, callback) {
                 remarks = ?, 
                 updated = datetime('now') 
             WHERE id = ?`,
-            [
-                code,
-                order_date,
-                vender_id,
-                vender_name,
-                honorific,
-                vender_contact_person,
-                contact_person,
-                purchase_voucher_id,
-                remarks,
-                id
-            ],
-            function (err) {
-                if (err) {
-                    return callback(err);
-                }
-                // 更新のため、IDをそのまま返す
-                callback(null, { lastID: id });
-            }
-        );
-    } else {
-        db.run(
-            `INSERT INTO payment_vouchers 
+      [
+        code,
+        order_date,
+        vender_id,
+        vender_name,
+        honorific,
+        vender_contact_person,
+        contact_person,
+        purchase_voucher_id,
+        remarks,
+        id
+      ],
+      function (err) {
+        if (err) {
+          return callback(err);
+        }
+        // 更新のため、IDをそのまま返す
+        callback(null, { lastID: id });
+      }
+    );
+  } else {
+    db.run(
+      `INSERT INTO payment_vouchers 
             (code, order_date, vender_id, vender_name, honorific, vender_contact_person, contact_person, purchase_voucher_id, remarks, created, updated) 
             VALUES 
             (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
-            [
-                code,
-                order_date,
-                vender_id,
-                vender_name,
-                honorific,
-                vender_contact_person,
-                contact_person,
-                purchase_voucher_id,
-                remarks
-            ],
-            function (err) {
-                if (err) {
-                    return callback(err);
-                }
-                // 更新のため、IDをそのまま返す
-                callback(null, { lastID: this.lastID });
-            }
-        );
-    }
+      [
+        code,
+        order_date,
+        vender_id,
+        vender_name,
+        honorific,
+        vender_contact_person,
+        contact_person,
+        purchase_voucher_id,
+        remarks
+      ],
+      function (err) {
+        if (err) {
+          return callback(err);
+        }
+        // 更新のため、IDをそのまま返す
+        callback(null, { lastID: this.lastID });
+      }
+    );
+  }
 }
 
 function deletePaymentVoucherById(id, callback) {
-    const sql = `DELETE FROM payment_vouchers WHERE id = ?`;
-    db.run(sql, [id], (err) => {
-        callback(err);
-    });
+  const sql = `DELETE FROM payment_vouchers WHERE id = ?`;
+  db.run(sql, [id], (err) => {
+    callback(err);
+  });
 }
 
 function editPaymentVoucher(id, callback) {
-    const sql = `SELECT * FROM payment_vouchers WHERE id = ?`;
-    db.get(sql, [id], (err, row) => {
-        callback(err, row);
-    });
+  const sql = `SELECT * FROM payment_vouchers WHERE id = ?`;
+  db.get(sql, [id], (err, row) => {
+    callback(err, row);
+  });
 }
 
 function initializeDatabase() {
-    const sql = `
+  const sql = `
     CREATE TABLE IF NOT EXISTS payment_vouchers (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         code VARCHAR(255),
@@ -128,33 +130,33 @@ function initializeDatabase() {
         updated DATE DEFAULT CURRENT_DATE
     )
     `;
-    db.run(sql);
+  db.run(sql);
 }
 
 function searchPaymentVouchers(query, callback) {
-    let sql;
-    let params = [];
+  let sql;
+  let params = [];
 
-    if (query && query.trim() !== '') {
-        sql = `
+  if (query && query.trim() !== '') {
+    sql = `
         SELECT * FROM payment_vouchers 
         WHERE code LIKE ? OR vender_name LIKE ? 
         `;
-        params = [`%${query}%`, `%${query}%`];
-    } else {
-        sql = `SELECT * FROM payment_vouchers`;
-    }
-    db.all(sql, params, (err, rows) => {
-        callback(err, rows);
-    });
+    params = [`%${query}%`, `%${query}%`];
+  } else {
+    sql = `SELECT * FROM payment_vouchers`;
+  }
+  db.all(sql, params, (err, rows) => {
+    callback(err, rows);
+  });
 }
 
 module.exports = {
-    loadPaymentVouchers,
-    getPaymentVoucherById,
-    savePaymentVoucher,
-    deletePaymentVoucherById,
-    editPaymentVoucher,
-    initializeDatabase,
-    searchPaymentVouchers
+  loadPaymentVouchers,
+  getPaymentVoucherById,
+  savePaymentVoucher,
+  deletePaymentVoucherById,
+  editPaymentVoucher,
+  initializeDatabase,
+  searchPaymentVouchers
 };

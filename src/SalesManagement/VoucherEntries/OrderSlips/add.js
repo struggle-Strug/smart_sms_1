@@ -144,25 +144,26 @@ function OrderSlipsAdd() {
     };
   }, []);
 
-  const [orderSlipDetails, setOrderSlipDetails] = useState([
-    {
-      id: '',
-      order_slip_id: '',
-      product_id: '',
-      product_name: '',
-      number: '',
-      unit: '',
-      unit_price: '',
-      tax_rate: '',
-      lot_number: '',
-      storage_facility: '',
-      stock: '',
-      gross_profit: '',
-      gross_margin_rate: '',
-      created: '',
-      updated: '',
-    }
-  ]);
+    const [orderSlipDetails, setOrderSlipDetails] = useState([
+        {
+            id: '',
+            order_slip_id: '',
+            product_id: '',
+            product_name: '',
+            number: '',
+            unit: '',
+            unit_price: '',
+            tax_rate: '',
+            lot_number: '',
+            storage_facility: '',
+            stock: '',
+            gross_profit: '',
+            gross_margin_rate: '',
+            threshold: '',
+            created: '',
+            updated: '',
+        }
+    ]);
 
   const addOrderSlipDetail = () => {
     setOrderSlipDetails([...orderSlipDetails, {
@@ -251,31 +252,49 @@ function OrderSlipsAdd() {
 
       ipcRenderer.on('save-order-slip-result', (event, data) => {
 
-        for (let i = 0; i < orderSlipDetails.length; i++) {
-          const orderSlipDetailData = orderSlipDetails[i];
-          orderSlipDetailData.order_slip_id = data.id;
-          ipcRenderer.send('save-order-slip-detail', orderSlipDetailData);
+                for (let i = 0; i < orderSlipDetails.length; i++) {
+                    const orderSlipDetailData = orderSlipDetails[i];
+                    orderSlipDetailData.order_slip_id = data.id;
+                    ipcRenderer.send('save-order-slip-detail', orderSlipDetailData);
+                    const inventoryData = {
+                        product_id: orderSlipDetailData.product_id,
+                        product_name: orderSlipDetailData.product_name,
+                        lot_number: orderSlipDetailData.lot_number,
+                        inventory: orderSlipDetailData.number,
+                        estimated_inventory: orderSlipDetailData.number,
+                        warning_value: orderSlipDetailData.threshold,
+                    }
+                    ipcRenderer.send('order-slips-inventory', inventoryData);
+                    const inventoryLogData = {
+                        product_id: orderSlipDetailData.product_id,
+                        product_name: orderSlipDetailData.product_name,
+                        lot_number: orderSlipDetailData.lot_number,
+                        number: orderSlipDetailData.number*(-1),
+                        action: "order slips",
+                        storage_facility_id: orderSlipDetailData.storage_facility,
+                    }
+                    ipcRenderer.send('save-inventory-log', inventoryLogData);
+                }
+            });
+            setOrderSlip({
+                code: '',
+                order_id: '',
+                order_date: '',
+                delivery_date: '',
+                vender_id: '',
+                vender_name: '',
+                honorific: '',
+                vender_contact_person: '',
+                estimation_slip_id: '',
+                estimation_id: '',
+                remarks: '',
+                closing_date: '',
+                deposit_due_date: '',
+                deposit_method: '',
+            });
+            alert('新規登録が完了しました。');
         }
-      });
-      setOrderSlip({
-        code: '',
-        order_id: '',
-        order_date: '',
-        delivery_date: '',
-        vender_id: '',
-        vender_name: '',
-        honorific: '',
-        vender_contact_person: '',
-        estimation_slip_id: '',
-        estimation_id: '',
-        remarks: '',
-        closing_date: '',
-        deposit_due_date: '',
-        deposit_method: '',
-      });
-      alert('新規登録が完了しました。');
-    }
-  };
+    };
 
   const handleSumPrice = () => {
     let SumPrice = 0
@@ -324,11 +343,18 @@ function OrderSlipsAdd() {
     };
   }, []);
 
-  const handleDateChange = (date, name) => {
-    // 日付をフォーマットしてorderSlipにセット
-    const formattedDate = date ? date.toISOString().split('T')[0] : '';
-    setOrderSlip({ ...orderSlip, [name]: formattedDate });
-  };
+    const handleDateChange = (date, name) => {
+        // 日付をフォーマットしてorderSlipにセット
+        const formattedDate = date ? date.toISOString().split('T')[0] : '';
+        setOrderSlip({ ...orderSlip, [name]: formattedDate });
+    };
+
+    const handleProductClick = (product, index) => {
+        const updatedDetails = orderSlipDetails.map((detail, i) =>
+            i === index ? { ...detail, ["product_name"]: product.name, ["product_id"]: product.id, ["tax_rate"]: product.tax_rate, ["unit"] : product.unit, ["price"] : product.procurement_cost, ["threshold"]: product.threshold  } : detail
+        );
+        setOrderSlipDetails(updatedDetails);
+    }
 
   return (
     <div className='w-full'>
@@ -464,159 +490,159 @@ function OrderSlipsAdd() {
                     </svg>
                   </div>
 
-                  {isOpen === "honorific" && (
-                    <div className="absolute z-10 mt-1 w-full bg-white border  rounded-md shadow-lg max-h-60 overflow-auto">
-                      {[{ label: "御中", value: "御中" }, { label: "貴社", value: "貴社" }].map((option) => (
-                        <div
-                          key={option.value}
-                          className="cursor-pointer p-2 hover:bg-gray-100"
-                          onClick={() => selectOrderSlipOption(option, "honorific")}
-                        >
-                          {option.label}
+                                    {isOpen === "honorific" && (
+                                        <div className="absolute z-10 mt-1 w-full bg-white border  rounded-md shadow-lg max-h-60 overflow-auto">
+                                            {[{ label: "御中", value: "御中" }, { label: "貴社", value: "貴社" }].map((option) => (
+                                                <div
+                                                    key={option.value}
+                                                    className="cursor-pointer p-2 hover:bg-gray-100"
+                                                    onClick={() => selectOrderSlipOption(option, "honorific")}
+                                                >
+                                                    {option.label}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
-                      ))}
+                    </div>                    {errors.vender_id && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.vender_id}</div>}
+                    {errors.vender_name && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.vender_name}</div>}
+                    <div className='pb-2'>
+                        <div className='text-sm pb-1.5'>先方担当者</div>
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="vender_contact_person" value={orderSlip.vender_contact_person} onChange={handleChange}/>
                     </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>                    {errors.vender_id && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.vender_id}</div>}
-          {errors.vender_name && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.vender_name}</div>}
-          <div className='pb-2'>
-            <div className='text-sm pb-1.5'>先方担当者</div>
-            <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="vender_contact_person" value={orderSlip.vender_contact_person} onChange={handleChange} />
-          </div>
-          <div className='py-3'>
-            <hr className='' />
-          </div>
-          <div className='py-2.5 font-bold text-xl'>見積伝票</div>
-          <div className='pb-2'>
-            <div className='text-sm pb-1.5'>見積伝票番号</div>
-            <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="estimation_slip_id" value={orderSlip.estimation_slip_id} onChange={handleChange} />
-          </div>
-          <div className='pb-2'>
-            <div className='text-sm pb-1.5'>見積番号</div>
-            <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="estimation_id" value={orderSlip.estimation_id} onChange={handleChange} />
-          </div>
-          <div className='py-3'>
-            <hr className='' />
-          </div>
-          <div className='py-2.5 font-bold text-xl'>明細</div>
-          {
-            orderSlipDetails.map((orderSlipDetail, index) => (
-              <div>
-                <div className='flex items-center'>
-                  <div>
-                    <div className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex' onClick={addOrderSlipDetail}>＋</div>
-                  </div>
-                  <div className=''>
-                    <div className='flex items-center'>
-                      <div className='relative'>
-                        <div className='text-sm pb-1.5'>商品コード <span className='text-sm font-bold text-red-600'>必須</span></div>
-                        <input type='number'
-                          className='border rounded px-4 py-2.5 bg-white'
-                          placeholder=''
-                          name="product_id"
-                          value={orderSlipDetail.product_id}
-                          onChange={(e) => handleInputChange(index, e)}
-                          style={{ width: "120px" }}
-                          onFocus={(e) => handleProductIdFocus(index)}
-                          onBlur={handleeProductIdBlur}
-                        />
-                        {
-                          isProductIdFocused === index &&
-                          <div className='absolute top-20 left-0 z-10' onMouseDown={(e) => e.preventDefault()}>
-                            <div className="relative inline-block">
-                              <div className="absolute left-5 -top-2 w-3 h-3 bg-white transform rotate-45 shadow-lg"></div>
-                              <div className="bg-white shadow-lg rounded-lg p-4 w-60">
-                                <div className="flex flex-col space-y-2">
-                                  {
-                                    products.map((product, idx) => (
-                                      <div key={idx}
-                                        className="p-2 hover:bg-gray-100 hover:cursor-pointer"
-                                        onClick={(e) => handleOnDetailClick("product_id", product.id, index)}
-                                      >
-                                        {product.name}
-                                      </div>
-                                    ))
-                                  }
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        }
-                      </div>
-                      <div className='ml-4 relative'>
-                        <div className='text-sm pb-1.5'>商品名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                        <input type='text'
-                          className='border rounded px-4 py-2.5 bg-white'
-                          placeholder=''
-                          name="product_name"
-                          value={orderSlipDetail.product_name}
-                          onChange={(e) => handleInputChange(index, e)}
-                          style={{ width: "440px" }}
-                          onFocus={(e) => handleProductNameFocus(index)}
-                          onBlur={handleeProductNameBlur}
-                        />
-                        {
-                          isProductNameFocused === index &&
-                          <div className='absolute top-20 left-0 z-10' onMouseDown={(e) => e.preventDefault()}>
-                            <div className="relative inline-block">
-                              <div className="absolute left-5 -top-2 w-3 h-3 bg-white transform rotate-45 shadow-lg"></div>
-                              <div className="bg-white shadow-lg rounded-lg p-4 w-60">
-                                <div className="flex flex-col space-y-2">
-                                  {
-                                    products.map((product, idx) => (
-                                      <div key={idx}
-                                        className="p-2 hover:bg-gray-100 hover:cursor-pointer"
-                                        onClick={(e) => handleOnDetailClick("product_name", product.name, index)}
-                                      >
-                                        {product.name}
-                                      </div>
-                                    ))
-                                  }
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        }
-                      </div>
-                      <div className='ml-4'>
-                        <div className='text-sm pb-1.5'>数量 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                        <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="number" value={orderSlipDetail.number} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
-                      </div>
-                      <div className='ml-4'>
-                        <div className='text-sm pb-1.5'>単位</div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="unit" value={orderSlipDetail.unit} onChange={(e) => handleInputChange(index, e)} style={{ width: "120px" }} />
-                      </div>
-                      <div className='ml-4'>
-                        <div className='text-sm pb-1.5'>単価 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                        <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="unit_price" value={orderSlipDetail.unit_price} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
-                      </div>
+                    <div className='py-3'>
+                        <hr className='' />
                     </div>
-                    {errors["product_id" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["product_id" + index]}</div>}
-                    {errors["product_name" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["product_name" + index]}</div>}
-                    {errors["number" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["number" + index]}</div>}
-                    {errors["unit_price" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["unit_price" + index]}</div>}
-                    <div className='flex items-center mt-4'>
-                      <div className=''>
-                        <div className='text-sm pb-1.5 w-40'>税率 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                        <div className="relative" ref={dropdownRef}>
-                          <div
-                            className="bg-white border rounded px-4 py-2.5 cursor-pointer flex justify-between items-center"
-                            onClick={() => toggleDropdown("tax_rate" + index)}
-                          >
-                            <span>{orderSlipDetail.tax_rate ? orderSlipDetail.tax_rate + "%" : "税率"}</span>
-                            <svg
-                              className={`w-4 h-4 transform transition-transform ${isOpen === "tax_rate" + index ? 'rotate-180' : ''}`}
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                          </div>
+                    <div className='py-2.5 font-bold text-xl'>見積伝票</div>
+                    <div className='pb-2'>
+                        <div className='text-sm pb-1.5'>見積伝票番号</div>
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="estimation_slip_id" value={orderSlip.estimation_slip_id} onChange={handleChange}/>
+                    </div>
+                    <div className='pb-2'>
+                        <div className='text-sm pb-1.5'>見積番号</div>
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="estimation_id" value={orderSlip.estimation_id} onChange={handleChange}/>
+                    </div>
+                    <div className='py-3'>
+                        <hr className='' />
+                    </div>
+                    <div className='py-2.5 font-bold text-xl'>明細</div>
+                    {
+                        orderSlipDetails.map((orderSlipDetail, index) => (
+                            <div>
+                                <div className='flex items-center'>
+                                    <div>
+                                        <div className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex' onClick={addOrderSlipDetail}>＋</div>
+                                    </div>
+                                    <div className=''>
+                                        <div className='flex items-center'>
+                                            <div className='relative'>
+                                                <div className='text-sm pb-1.5'>商品コード <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                                <input type='number'
+                                                    className='border rounded px-4 py-2.5 bg-white'
+                                                    placeholder=''
+                                                    name="product_id"
+                                                    value={orderSlipDetail.product_id}
+                                                    onChange={(e) => handleInputChange(index, e)}
+                                                    style={{ width: "120px" }}
+                                                    onFocus={(e) => handleProductIdFocus(index)}
+                                                    onBlur={handleeProductIdBlur}
+                                                />
+                                                {
+                                                    isProductIdFocused === index &&
+                                                    <div className='absolute top-20 left-0 z-10' onMouseDown={(e) => e.preventDefault()}>
+                                                        <div className="relative inline-block">
+                                                            <div className="absolute left-5 -top-2 w-3 h-3 bg-white transform rotate-45 shadow-lg"></div>
+                                                            <div className="bg-white shadow-lg rounded-lg p-4 w-60">
+                                                                <div className="flex flex-col space-y-2">
+                                                                    {
+                                                                        products.map((product, idx) => (
+                                                                            <div key={idx}
+                                                                                className="p-2 hover:bg-gray-100 hover:cursor-pointer"
+                                                                                onClick={(e) => handleProductClick(product, index)}
+                                                                            >
+                                                                                {product.name}
+                                                                            </div>
+                                                                        ))
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                            <div className='ml-4 relative'>
+                                                <div className='text-sm pb-1.5'>商品名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                                <input type='text'
+                                                    className='border rounded px-4 py-2.5 bg-white'
+                                                    placeholder=''
+                                                    name="product_name"
+                                                    value={orderSlipDetail.product_name}
+                                                    onChange={(e) => handleInputChange(index, e)}
+                                                    style={{ width: "440px" }}
+                                                    onFocus={(e) => handleProductNameFocus(index)}
+                                                    onBlur={handleeProductNameBlur}
+                                                />
+                                                {
+                                                    isProductNameFocused === index &&
+                                                    <div className='absolute top-20 left-0 z-10' onMouseDown={(e) => e.preventDefault()}>
+                                                        <div className="relative inline-block">
+                                                            <div className="absolute left-5 -top-2 w-3 h-3 bg-white transform rotate-45 shadow-lg"></div>
+                                                            <div className="bg-white shadow-lg rounded-lg p-4 w-60">
+                                                                <div className="flex flex-col space-y-2">
+                                                                    {
+                                                                        products.map((product, idx) => (
+                                                                            <div key={idx}
+                                                                                className="p-2 hover:bg-gray-100 hover:cursor-pointer"
+                                                                                onClick={(e) => handleProductClick(product, index)}
+                                                                            >
+                                                                                {product.name}
+                                                                            </div>
+                                                                        ))
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                            <div className='ml-4'>
+                                                <div className='text-sm pb-1.5'>数量 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                                <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="number" value={orderSlipDetail.number} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
+                                            </div>
+                                            <div className='ml-4'>
+                                                <div className='text-sm pb-1.5'>単位</div>
+                                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="unit" value={orderSlipDetail.unit} onChange={(e) => handleInputChange(index, e)} style={{ width: "120px" }} />
+                                            </div>
+                                            <div className='ml-4'>
+                                                <div className='text-sm pb-1.5'>単価 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                                <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="unit_price" value={orderSlipDetail.unit_price} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
+                                            </div>
+                                        </div>
+                                        {errors["product_id" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["product_id" + index]}</div>}
+                                        {errors["product_name" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["product_name" + index]}</div>}
+                                        {errors["number" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["number" + index]}</div>}
+                                        {errors["unit_price" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["unit_price" + index]}</div>}
+                                        <div className='flex items-center mt-4'>
+                                            <div className=''>
+                                                <div className='text-sm pb-1.5 w-40'>税率 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                                <div className="relative" ref={dropdownRef}>
+                                                    <div
+                                                        className="bg-white border rounded px-4 py-2.5 cursor-pointer flex justify-between items-center"
+                                                        onClick={() => toggleDropdown("tax_rate" + index)}
+                                                    >
+                                                        <span>{orderSlipDetail.tax_rate ? orderSlipDetail.tax_rate + "%" : "税率"}</span>
+                                                        <svg
+                                                            className={`w-4 h-4 transform transition-transform ${isOpen === "tax_rate" + index ? 'rotate-180' : ''}`}
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            stroke="currentColor"
+                                                        >
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                                                        </svg>
+                                                    </div>
 
                           {isOpen === "tax_rate" + index && (
                             <div className="absolute z-10 mt-1 w-full bg-white border  rounded-md shadow-lg max-h-60 overflow-auto">

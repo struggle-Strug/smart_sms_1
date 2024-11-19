@@ -10,14 +10,14 @@ const {
 } = require('../../database/salesmanagements/orderSlips');
 
 // 受注伝票のデータをロード
-ipcMain.on('load-deposit-slips', (event, page) => {
-  loadDepositSlips(page, (err, rows) => {
-    if (err) {
-      console.error(err.message);
-    } else {
-      event.sender.send('load-order-slips', rows);
-    }
-  });
+ipcMain.on('load-order-slips', (event, page) => {
+    loadOrderSlips(page, (err, rows) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            event.sender.send('load-order-slips', rows);
+        }
+    });
 });
 
 // 受注伝票の詳細を取得

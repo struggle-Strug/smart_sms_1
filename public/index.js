@@ -43,10 +43,13 @@ require('./ipc/procurements/paymentVoucherDetails');
 require('./ipc/procurements/statementSettings');
 require('./ipc/procurements/posPvsMappings');
 require('./ipc/procurements/inventories');
+require('./ipc/procurements/squareLogs');
+require('./ipc/procurements/inventoryLogs');
 
 //ツール
 require('./ipc/utilis/export');
 require('./ipc/utilis/exportInvoice');
+require('./ipc/utilis/square');
 
 //売上管理
 require('./ipc/salesmanagements/estimationSlips');
@@ -59,26 +62,31 @@ require('./ipc/salesmanagements/salesSlips');
 require('./ipc/salesmanagements/salesSlipDetails');
 require('./ipc/salesmanagements/invoices');
 
-function createWindow() {
-  const mainWindow = new BrowserWindow({
-    width: 1440,
-    height: 800,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-      nodeIntegration: true,
-      contextIsolation: false,
-      enableRemoteModule: true,
-    },
+function dropAllTables(callback) {
+  // SQLiteで既存のすべてのテーブルを削除
+  db.serialize(() => {
+      db.each(
+          `SELECT name FROM sqlite_master WHERE type='table'`,
+          (err, row) => {
+              if (err) {
+                  console.error('Error fetching table names:', err);
+              } else {
+                  const tableName = row.name;
+                  db.run(`DROP TABLE IF EXISTS ${tableName}`, (dropErr) => {
+                      if (dropErr) {
+                          console.error(`Error dropping table ${tableName}:`, dropErr);
+                      } else {
+                          console.log(`Table ${tableName} dropped successfully.`);
+                      }
+                  });
+              }
+          },
+          callback // すべてのテーブル削除後にコールバックを実行
+      );
   });
-  mainWindow.loadURL(
-    app.isPackaged
-    ? `file://${path.join(__dirname, '../build/index.html')}`
-    : 'http://localhost:3000'
-  );
+}
 
-  if (!app.isPackaged) {
-    mainWindow.webContents.openDevTools();
-  }
+function initializeAllDatabases() {
   //ダッシュボード
   const dataConversionsDB = require('./database/dashboard/dataConversions')
   dataConversionsDB.initializeDatabase();
@@ -147,6 +155,10 @@ function createWindow() {
   posPvsMappingsDB.initializeDatabase();
   const inventoriesDB = require('./database/procurements/inventories');
   inventoriesDB.initializeDatabase();
+  const inventoryLogsDB = require('./database/procurements/inventoryLogs');
+  inventoryLogsDB.initializeDatabase();
+  const squareLogsDB = require('./database/procurements/squareLogs');
+  squareLogsDB.initializeDatabase();
 
   //集計管理
 
@@ -169,6 +181,39 @@ function createWindow() {
   salesSlipDetailsDB.initializeDatabase();
   const invoicesDB = require('./database/salesmanagements/invoices');
   invoicesDB.initializeDatabase();
+}
+
+ipcMain.on('reset-database', (event) => {
+  console.log('Resetting database...');
+  dropAllTables(() => {
+      initializeAllDatabases();
+      event.sender.send('database-reset-complete', 'All tables dropped and reinitialized.');
+  });
+});
+
+function createWindow() {
+  const mainWindow = new BrowserWindow({
+    width: 1440,
+    height: 800,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true,
+    },
+  });
+  mainWindow.loadURL(
+    app.isPackaged
+    ? `file://${path.join(__dirname, '../build/index.html')}`
+    : 'http://localhost:3000'
+  );
+
+  if (!app.isPackaged) {
+    mainWindow.webContents.openDevTools();
+  }
+
+  initializeAllDatabases();
+  
 }
 
 const dbPath = path.join(app.getPath('userData'), 'database.db');

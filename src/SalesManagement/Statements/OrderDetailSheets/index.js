@@ -69,12 +69,12 @@ function Index() {
   const minutes = String(now.getMinutes()).padStart(2, '0');
   const seconds = String(now.getSeconds()).padStart(2, '0');
 
-  const fileName = `支払明細表_${year}${month}${day}_${hours}${minutes}${seconds}`;
-  const [dataForExport, setDataForExport] = useState({
-    header: header,
-    data: [],
-    fileName: fileName
-  })
+    const fileName = `受注明細表_${year}${month}${day}_${hours}${minutes}${seconds}`;
+    const [dataForExport, setDataForExport] = useState({
+        header: header,
+        data: [],
+        fileName: fileName
+    })
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
