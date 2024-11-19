@@ -1,3 +1,4 @@
+
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const { app } = require('electron');
@@ -5,9 +6,11 @@ const { app } = require('electron');
 const dbPath = path.join(app.getPath('userData'), 'database.db');
 const db = new sqlite3.Database(dbPath);
 
-function loadEstimationSlips(callback) {
-    const sql = `SELECT * FROM estimation_slips`;
-    db.all(sql, [], (err, rows) => {
+function loadEstimationSlips(page, callback) {
+  const pageSize = 10;
+  const offset = page;
+  const sql = `SELECT * FROM estimation_slips LIMIT ? OFFSET ?;`;
+  db.all(sql, [pageSize, offset], (err, rows) => {
         callback(err, rows);
     });
 }

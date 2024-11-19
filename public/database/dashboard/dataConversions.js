@@ -9,14 +9,10 @@ const fs = require('fs');
 const xlsx = require('xlsx');
 const csv = require('csv-parser');
 const { importAllCsvToDatabase } = require('../dashboard/backupsSettings');
-// const { convertExcelToCsv, importCsvToTable, saveImportLog } = require('./utils');
 //require('../../database/dashboard/backupsSettings');
 // データベースとExcelディレクトリのパスを設定
 const excelDirPath = '/public/excel/xlsx';  // Excelファイルが置かれているディレクトリ
 const csvDirPath = '/public/excel/csv';  // 一時的なCSVファイル保存ディレクトリ
-
-
-
 
 function initializeDatabase() {
   console.log("initialezeDatabase");
@@ -177,48 +173,6 @@ function saveImportLog(db, log, callback) {
   db.run(query, params, callback);
 }
 
-// function saveExcelToDataConversionsTable(db, excelFilePath, totalLineCount, callback) {
-//   const fileName = path.basename(excelFilePath); // ファイル名を取得
-//   const completeTime = new Date().toISOString(); // 完了日時を現在時刻として設定
-//   const updatedRecord = 0; // 上書きレコード数 (この例では0)
-//   const importedLineCount = totalLineCount; // インポートした行数
-//   const newRecord = totalLineCount; // 新規レコード数 (この例では全行を新規とする)
-
-//   const insertQuery = `
-//     INSERT INTO data_conversions (
-//       file_name,
-//       complete_time,
-//       total_line_count,
-//       updated_record,
-//       imported_line_count,
-//       new_record
-//     ) VALUES (?, ?, ?, ?, ?, ?)
-//   `;
-
-//   db.run(
-//     insertQuery,
-//     [fileName, completeTime, totalLineCount, updatedRecord, importedLineCount, newRecord],
-//     (err) => {
-//       if (err) {
-//         console.error("Error inserting into data_conversions:", err);
-//         callback(err);
-//       } else {
-//         console.log("データ変換情報が登録されました:", {
-//           fileName,
-//           completeTime,
-//           totalLineCount,
-//           updatedRecord,
-//           importedLineCount,
-//           newRecord,
-//         });
-//         callback(null);
-//       }
-//     }
-//   );
-// }
-
-
-
 module.exports = { 
   initializeDatabase,
   loadDataConversions,
@@ -226,106 +180,3 @@ module.exports = {
   convertExcelToCsv,
   // saveExcelToDataConversionsTable
 };
-
-
-
-
-
-
-//Excel取込み
-// function dataConversionsImport(db, csvDirPath, callback) {
-//   fs.readdir(csvDirPath, (err, files) => {
-//       if (err) return callback(err);
-
-//       const csvFiles = files.filter(file => file.endsWith('.csv'));
-//       let remaining = csvFiles.length;
-
-//       if (remaining === 0) return callback(null, "No CSV files to import.");
-
-//       csvFiles.forEach((file) => {
-//           const tableName = path.basename(file, '.csv'); // ファイル名からテーブル名を取得
-//           const filePath = path.join(csvDirPath, file);
-
-//           importCsvToTable(db, tableName, filePath, (err) => {
-//               if (err) return callback(err);
-
-//               remaining -= 1;
-//               if (remaining === 0) {
-//                   callback(null, "復元に成功しました。");
-//               }
-//           });
-//       });
-//   });
-// }
-
-// // 単一CSVファイルを対応するテーブルにインポートする関数
-// function importCsvToTable(db, tableName, filePath, callback) {
-//   const columns = []; // CSVのカラム名を格納する配列
-//   const rows = [];    // CSVデータの行を格納する配列
-
-//   fs.createReadStream(filePath)
-//       .pipe(csv())
-//       .on('headers', (headers) => {
-//           columns.push(...headers);
-//       })
-//       .on('data', (data) => {
-//           rows.push(data);
-//       })
-//       .on('end', () => {
-//           db.serialize(() => {
-//               db.run(`DELETE FROM ${tableName}`); // 既存データを削除
-//               const placeholders = columns.map(() => '?').join(',');
-//               const insertStmt = `INSERT INTO ${tableName} (${columns.join(',')}) VALUES (${placeholders})`;
-
-//               const stmt = db.prepare(insertStmt);
-//               rows.forEach(row => {
-//                   stmt.run(columns.map(col => row[col]));
-//               });
-//               stmt.finalize(callback);
-//           });
-//       })
-//       .on('error', callback);
-// }
-
-
-// 1. ExcelファイルをCSVに変換
-// function convertExcelToCsv(excelDirPath, csvDirPath, callback) {
-//   fs.readdir(excelDirPath, (err, files) => {
-//     if (err) return callback(err);
-
-//     // .xlsx ファイルのみを取得
-//     const excelFiles = files.filter(file => file.endsWith('.xlsx'));
-//     if (excelFiles.length === 0) return callback(null, "No Excel files to convert.");
-
-//     excelFiles.forEach((file) => {
-//       const filePath = path.join(excelDirPath, file);
-//       const workbook = xlsx.readFile(filePath);
-
-//       workbook.SheetNames.forEach(sheetName => {
-//         const csvFileName = `${path.basename(file, '.xlsx')}_${sheetName}.csv`;
-//         const csvFilePath = path.join(csvDirPath, csvFileName);
-        
-//         const worksheet = workbook.Sheets[sheetName];
-//         const csvData = xlsx.utils.sheet_to_csv(worksheet);
-
-//         fs.writeFileSync(csvFilePath, csvData, 'utf8');
-//       });
-//     });
-
-//     callback(null, "All Excel files converted to CSV.");
-//   });
-// }
-
-// // 2. CSVをデータベースにインポートして更新
-// function importExcelToDatabase(db, excelDirPath, csvDirPath, callback) {
-//   // ExcelをCSVに変換
-//   convertExcelToCsv(excelDirPath, csvDirPath, (err, message) => {
-//     if (err) return callback(err);
-
-//     console.log(message);  // 変換が完了したメッセージを表示
-
-//     // CSVデータベースへのインポート
-//     importAllCsvToDatabase(db, csvDirPath, callback);
-//   });
-// }
-

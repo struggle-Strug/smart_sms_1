@@ -38,29 +38,3 @@ ipcMain.handle('show-folder-dialog', async () => {
   });
 });
 
-// ipcMain.on('save-excel-to-db', (event, excelFilePath) => {
-//   console.log("Excelファイルパス:", excelFilePath);
-
-//   try {
-//     const workbook = xlsx.readFile(excelFilePath);
-//     const sheetName = workbook.SheetNames[0]; // 最初のシートを使用
-//     const sheet = workbook.Sheets[sheetName];
-//     const data = xlsx.utils.sheet_to_json(sheet); // JSON形式に変換
-
-//     const totalLineCount = data.length;
-
-//     // DBにデータを登録
-//     saveExcelToDataConversionsTable(db, excelFilePath, totalLineCount, (err) => {
-//       if (err) {
-//         console.error("Error saving data to DB:", err);
-//         event.reply('save-excel-to-db-reply', { error: err.message });
-//       } else {
-//         console.log("データベースに登録完了");
-//         event.reply('save-excel-to-db-reply', { message: "データベースに登録が完了しました。" });
-//       }
-//     });
-//   } catch (err) {
-//     console.error("Error processing Excel file:", err);
-//     event.reply('save-excel-to-db-reply', { error: err.message });
-//   }
-// });
