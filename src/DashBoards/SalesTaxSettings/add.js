@@ -35,7 +35,7 @@ function SalesTaxSettingsAdd() {
                 start_date: '',
                 end_date: '',
             });
-            alert('商品が正常に追加されました。');
+            alert('消費税設定が正常に追加されました。');
         }
     };
 

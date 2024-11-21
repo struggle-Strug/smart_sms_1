@@ -7,9 +7,9 @@ const { ipcRenderer } = window.require('electron');
 function Index() {
 
   const posCoordinationOptions = [
+    { value: '15 * 60 * 1000', label: '15分' },
     { value: '30min', label: '30分' },
     { value: '1hour', label: '1時間' },
-    { value: '6hours', label: '6時間' },
   ];
 
   const [posCoordination, setPosCoordination] = useState({
@@ -23,9 +23,9 @@ function Index() {
   useEffect(() => {
     ipcRenderer.send('load-pos-coodination-settings');
     ipcRenderer.on('pos-coodination-settings-data', (event, data) => {
-      console.log("受信したデータ:", data[0].created);
+      console.log("受信したデータ:", data[0]);
       if (data.length > 0) {
-        setLastSync(data[0].created); // 最終同期日時を更新
+        setLastSync(data[0].sync_interva); // 最終同期日時を更新
       }
     });
     return () => {
@@ -44,6 +44,8 @@ function Index() {
       return;
     }
     ipcRenderer.send('save-pos-coodination-setting',posCoordination);
+    ipcRenderer.send('update-sync-interval')
+    
     setPosCoordination({
       api_key: '',
     });

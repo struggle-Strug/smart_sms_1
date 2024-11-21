@@ -3,6 +3,7 @@ const path = require('path');
 const { app } = require('electron');
 const { ipcMain } = require('electron');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+// const { createObjectCsvWriter: createCsvWriter } = require('csv-writer');
 const fs = require('fs');
 const csv = require('csv-parser'); // CSVファイル読み込みに使用
 const dbPath = path.join(app.getPath('userData'), 'database.db');
@@ -53,43 +54,32 @@ function loadAllTablesData(db, callback) {
 // DBインスタンスの作成
 
 // 全テーブルのデータを取得してCSVファイルに出力する関数
-function loadAllTablesDataAndExportToCSV(db) {
-  // 全テーブル名を取得
-  db.all("SELECT name FROM sqlite_master WHERE type='table'", [], (err, tables) => {
-    if (err) {
-      console.error("Error retrieving tables:", err);
-      return;
-    }
-
-    tables.forEach((table) => {
-      const tableName = table.name;
-
-      // 各テーブルのデータを取得
-      db.all(`SELECT * FROM ${tableName}`, [], (err, rows) => {
-        if (err) {
-          console.error(`Error retrieving data from table ${tableName}:`, err);
-          return;
-        }
-
-        if (rows.length > 0) {
-          // CSV Writerのセットアップ
-          const csvWriter = createCsvWriter({
-            path: path.join('/Users/esakiryota/smart-sms/public/csv', `${tableName}.csv`),
-            header: Object.keys(rows[0]).map((column) => ({ id: column, title: column }))
-          });
-
-          // データをCSVに書き込み
-          csvWriter.writeRecords(rows)
-            .then(() => {
-              console.log(`Data from table ${tableName} has been written to ${tableName}.csv`);
-            })
-            .catch((err) => console.error(`Error writing CSV for table ${tableName}:`, err));
-        }
-      });
+// SQLiteから全テーブル名を取得する関数
+function getTablesFromDB(db) {
+  return new Promise((resolve, reject) => {
+    db.all("SELECT name FROM sqlite_master WHERE type='table'", [], (err, rows) => {
+      if (err) reject(err);
+      else resolve(rows.map(row => row.name));
     });
   });
 }
 
+// SQLiteから指定テーブルのデータを取得する関数
+function getTableData(db, tableName) {
+  return new Promise((resolve, reject) => {
+    db.all(`SELECT * FROM ${tableName}`, [], (err, rows) => {
+      if (err) reject(err);
+      else resolve(rows);
+    });
+  });
+}
+
+// データをCSV形式に変換する関数
+function convertToCSV(rows) {
+  const headers = Object.keys(rows[0]);
+  const csvRows = rows.map(row => headers.map(header => `"${row[header] || ''}"`).join(','));
+  return [headers.join(','), ...csvRows].join('\n');
+}
 // /**
 //  * CSVファイルを読み込んで指定テーブルにデータを上書きする
 //  * @param {string} tableName - テーブル名
@@ -190,7 +180,9 @@ function importCsvToTable(db, tableName, filePath, callback) {
 
 module.exports = {
   loadAllTablesData,
-  loadAllTablesDataAndExportToCSV,
   importCsvToTable,
-  importAllCsvToDatabase
+  importAllCsvToDatabase,
+  getTablesFromDB,
+  getTableData,
+  convertToCSV
 };
