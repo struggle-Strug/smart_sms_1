@@ -14,6 +14,12 @@ function Index() {
     const dropdownRef = useRef(null);
     const location = useLocation();
     const [searchQuery, setSearchQuery] = useState('');
+    const [pages, setPages] = useState(0);
+    const page = 10;
+  
+    useEffect(() => {
+      ipcRenderer.send('load-deposit-slips', pages);
+  }, [pages]);  
 
     useEffect(() => {
         ipcRenderer.send('load-deposit-slips');
@@ -35,6 +41,14 @@ function Index() {
         };
     }, []);
 
+    const nextPageSubmit = () => {
+        setPages(pages + page);
+      };
+    
+      const backPagesSubmit = () => {
+        setPages(pages - page);
+      }
+    
 const toggleDropdown = (id) => {
     
     if (!isOpen) setIsOpen(id);
@@ -141,6 +155,13 @@ const DropDown = (id) => {
                     </tbody>
                 </table>
             </div>
+            <div className='p-8 flex items-center justify-end'>
+        <div className='flex items-center'>
+          <div className='border rounded mr-3 px-4 py-3 font-bold' onClick={backPagesSubmit}>戻る</div>
+          <div className='border rounded ml-3 px-4 py-3 font-bold' onClick={nextPageSubmit}>次へ</div>
+        </div>
+      </div>
+
         </div>
     )
 }

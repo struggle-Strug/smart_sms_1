@@ -204,21 +204,21 @@ function SalesSlipsAdd() {
 
   const validator = new Validator();
 
-  const handleSubmit = () => {
-    setErrors(null);
-    validator.required(salesSlip.code, 'code', '伝票番号');
-    validator.required(salesSlip.sales_date, 'sales_date', '売上日付');
-    validator.required(salesSlip.vender_id, 'vender_id', '得意先コード');
-    validator.required(salesSlip.vender_name, 'vender_name', '得意先名');
-    for (let i = 0; i < salesSlipDetails.length; i++) {
-      validator.required(salesSlipDetails[i].product_id, 'product_id' + i, '商品コード');
-      validator.required(salesSlipDetails[i].product_name, 'product_name' + i, '商品名');
-      validator.required(salesSlipDetails[i].number, 'number' + i, '数量');
-      validator.required(salesSlipDetails[i].unit_price, 'unit_price' + i, '単価');
-      validator.required(salesSlipDetails[i].tax_rate, 'tax_rate' + i, '税率');
-      validator.required(salesSlipDetails[i].storage_facility, 'storage_facility' + i, '倉庫');
-    }
-    setErrors(validator.getErrors());
+    const handleSubmit = () => {
+        setErrors(null);
+        validator.required(salesSlip.code, 'code', '伝票番号');
+        validator.required(salesSlip.sales_date, 'sales_date', '売上日付');
+        validator.required(salesSlip.vender_id, 'vender_id', '得意先コード');
+        validator.required(salesSlip.vender_name, 'vender_name', '得意先名');
+        for (let i = 0; i < salesSlipDetails.length; i++) {
+            validator.required(salesSlipDetails[i].product_id, 'product_id' + i, '商品コード');
+            validator.required(salesSlipDetails[i].product_name, 'product_name' + i, '商品名');
+            validator.required(salesSlipDetails[i].number, 'number' + i, '数量');
+            validator.required(salesSlipDetails[i].unit_price, 'unit_price' + i, '単価');
+            validator.required(salesSlipDetails[i].tax_rate, 'tax_rate' + i, '税率');
+            validator.required(salesSlipDetails[i].storage_facility, 'storage_facility' + i, '倉庫');
+        }
+        setErrors(validator.getErrors());
 
     if (!validator.hasErrors()) {
 
@@ -251,15 +251,22 @@ function SalesSlipsAdd() {
     }
   };
 
-  const handleSumPrice = () => {
-    let SumPrice = 0
+    const handleSumPrice = () => {
+        let SumPrice = 0
+        let consumptionTaxEight = 0
+        let consumptionTaxTen = 0
 
-    for (let i = 0; i < salesSlipDetails.length; i++) {
-      SumPrice += salesSlipDetails[i].unit_price * salesSlipDetails[i].number;
+        for (let i = 0; i < salesSlipDetails.length; i++) {
+            SumPrice += salesSlipDetails[i].unit_price * salesSlipDetails[i].number;
+            if (salesSlipDetails[i].tax_rate === 8) {
+                consumptionTaxEight += salesSlipDetails[i].unit_price * salesSlipDetails[i].number * 0.08;
+            } else if (salesSlipDetails[i].tax_rate === 10) {
+                consumptionTaxTen += salesSlipDetails[i].unit_price * salesSlipDetails[i].number * 0.1;
+            }
+        }
+
+        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxEight + consumptionTaxTen, "Total": SumPrice + consumptionTaxEight + consumptionTaxTen }
     }
-
-    return { "subtotal": SumPrice, "consumptionTaxEight": SumPrice * 0.08, "consumptionTaxTen": 0, "totalConsumptionTax": SumPrice * 0.08, "Total": SumPrice * 1.08 }
-  }
 
   const [isOpen, setIsOpen] = useState(null);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -616,81 +623,81 @@ function SalesSlipsAdd() {
                             </svg>
                           </div>
 
-                          {isOpen === "storage_facility" + index && (
-                            <div className="absolute z-10 mt-1 w-full bg-white border  rounded-md shadow-lg max-h-60 overflow-auto">
-                              {storageFacilitiesList.map((option) => (
-                                <div
-                                  key={option.value}
-                                  className="cursor-pointer p-2 hover:bg-gray-100"
-                                  onClick={() => selectOption(option, "storage_facility", index)}
-                                >
-                                  {option.label}
+                                                    {isOpen === "storage_facility" + index && (
+                                                        <div className="absolute z-10 mt-1 w-full bg-white border  rounded-md shadow-lg max-h-60 overflow-auto">
+                                                            {storageFacilitiesList.map((option) => (
+                                                                <div
+                                                                    key={option.value}
+                                                                    className="cursor-pointer p-2 hover:bg-gray-100"
+                                                                    onClick={() => selectOption(option, "storage_facility", index)}
+                                                                >
+                                                                    {option.label}
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className='ml-4'>
+                                                <div className='text-sm pb-1.5'>在庫数</div>
+                                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="stock" value={salesSlipDetail.stock} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)} />
+                                            </div>
+                                            <div className='ml-4'>
+                                                <div className='text-sm pb-1.5'>粗利益</div>
+                                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="gross_profit" value={salesSlipDetail.gross_profit} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)} />
+                                            </div>
+                                            <div className='ml-4'>
+                                                <div className='text-sm pb-1.5'>粗利率</div>
+                                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="gross_margin_rate" value={salesSlipDetail.gross_margin_rate} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)} />
+                                            </div>
+                                        </div>
+                                        {errors["tax_rate" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["tax_rate" + index]}</div>}
+                                        {errors["storage_facility" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["storage_facility" + index]}</div>}
+                                    </div>
+                                    <div className='ml-4'>
+                                        <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={(e) => removeSalesSlipDetail(index)}>
+                                            <svg width="15" height="19" viewBox="0 0 15 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M11.3926 6.72949V16.7295H3.39258V6.72949H11.3926ZM9.89258 0.729492H4.89258L3.89258 1.72949H0.392578V3.72949H14.3926V1.72949H10.8926L9.89258 0.729492ZM13.3926 4.72949H1.39258V16.7295C1.39258 17.8295 2.29258 18.7295 3.39258 18.7295H11.3926C12.4926 18.7295 13.3926 17.8295 13.3926 16.7295V4.72949Z" fill="#1F2937" />
+                                            </svg>
+                                        </div>
+                                    </div>
                                 </div>
-                              ))}
+                                <div className='flex items-center justify-end'>
+                                    <div className='flex items-center'>
+                                        <div className='mr-4'>消費税額</div>
+                                        <div className='mr-4'>{(salesSlipDetails[index].unit_price * salesSlipDetails[index].number * salesSlipDetail.tax_rate * 0.01).toFixed(0)}円</div>
+                                        <div className='mr-4'>金額</div>
+                                        <div className='text-lg font-bold'>{(salesSlipDetails[index].unit_price * salesSlipDetails[index].number * (1 + salesSlipDetail.tax_rate * 0.01)).toFixed(0)}円</div>
+                                    </div>
+                                </div>
+                                <hr className='py-3' />
                             </div>
-                          )}
+                        ))
+                    }
+                    <div className='py-6 flex'>
+                        <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>税抜合計</div>
+                                <div>{handleSumPrice().subtotal.toFixed(0).toLocaleString()}円</div>
+                            </div>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>消費税(8%)</div>
+                                <div>{handleSumPrice().consumptionTaxEight.toFixed(0).toLocaleString()}円</div>
+                            </div>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>消費税(10%)</div>
+                                <div>{handleSumPrice().consumptionTaxTen.toFixed(0).toLocaleString()}円</div>
+                            </div>
+                            <div className='flex pb-2'>
+                                <div className='w-40'>消費税合計</div>
+                                <div>{handleSumPrice().totalConsumptionTax.toFixed(0).toLocaleString()}円</div>
+                            </div>
+                            <div className='flex'>
+                                <div className='w-40'>税込合計</div>
+                                <div>{handleSumPrice().Total.toFixed(0).toLocaleString()}円</div>
+                            </div>
                         </div>
-                      </div>
-                      <div className='ml-4'>
-                        <div className='text-sm pb-1.5'>在庫数</div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="stock" value={salesSlipDetail.stock} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)} />
-                      </div>
-                      <div className='ml-4'>
-                        <div className='text-sm pb-1.5'>粗利益</div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="gross_profit" value={salesSlipDetail.gross_profit} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)} />
-                      </div>
-                      <div className='ml-4'>
-                        <div className='text-sm pb-1.5'>粗利率</div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="gross_margin_rate" value={salesSlipDetail.gross_margin_rate} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)} />
-                      </div>
                     </div>
-                    {errors["tax_rate" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["tax_rate" + index]}</div>}
-                    {errors["storage_facility" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["storage_facility" + index]}</div>}
-                  </div>
-                  <div className='ml-4'>
-                    <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={(e) => removeSalesSlipDetail(index)}>
-                      <svg width="15" height="19" viewBox="0 0 15 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M11.3926 6.72949V16.7295H3.39258V6.72949H11.3926ZM9.89258 0.729492H4.89258L3.89258 1.72949H0.392578V3.72949H14.3926V1.72949H10.8926L9.89258 0.729492ZM13.3926 4.72949H1.39258V16.7295C1.39258 17.8295 2.29258 18.7295 3.39258 18.7295H11.3926C12.4926 18.7295 13.3926 17.8295 13.3926 16.7295V4.72949Z" fill="#1F2937" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-                <div className='flex items-center justify-end'>
-                  <div className='flex items-center'>
-                    <div className='mr-4'>消費税額</div>
-                    <div className='mr-4'>{(salesSlipDetails[index].unit_price * salesSlipDetails[index].number * 0.08).toFixed(0)}円</div>
-                    <div className='mr-4'>金額</div>
-                    <div className='text-lg font-bold'>{(salesSlipDetails[index].unit_price * salesSlipDetails[index].number * 1.08).toFixed(0)}円</div>
-                  </div>
-                </div>
-                <hr className='py-3' />
-              </div>
-            ))
-          }
-          <div className='py-6 flex'>
-            <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
-              <div className='flex pb-2'>
-                <div className='w-40'>税抜合計</div>
-                <div>{handleSumPrice().subtotal.toFixed(0).toLocaleString()}円</div>
-              </div>
-              <div className='flex pb-2'>
-                <div className='w-40'>消費税(8%)</div>
-                <div>{handleSumPrice().consumptionTaxEight.toFixed(0).toLocaleString()}円</div>
-              </div>
-              <div className='flex pb-2'>
-                <div className='w-40'>消費税(10%)</div>
-                <div>{handleSumPrice().consumptionTaxTen.toFixed(0).toLocaleString()}円</div>
-              </div>
-              <div className='flex pb-2'>
-                <div className='w-40'>消費税合計</div>
-                <div>{handleSumPrice().totalConsumptionTax.toFixed(0).toLocaleString()}円</div>
-              </div>
-              <div className='flex'>
-                <div className='w-40'>税込合計</div>
-                <div>{handleSumPrice().Total.toFixed(0).toLocaleString()}円</div>
-              </div>
-            </div>
-          </div>
 
           <div className='py-3'>
             <hr className='' />
@@ -733,8 +740,8 @@ function SalesSlipsAdd() {
       </div>
       <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
         <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>新規登録</div>
-        <Link to={`salesmanagements/sales-slips`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
-      </div>
+        <Link to={`/sales-management/voucher-entries/sales-slips`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
+        </div>
     </div>
   );
 }

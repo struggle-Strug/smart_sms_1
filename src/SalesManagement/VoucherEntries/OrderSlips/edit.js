@@ -245,8 +245,8 @@ function OrderSlipsEdit() {
             validator.required(orderSlipDetails[i].product_name, 'product_name' + i, '商品名');
             validator.required(orderSlipDetails[i].number, 'number' + i, '数量');
             validator.required(orderSlipDetails[i].unit_price, 'unit_price' + i, '単価');
-            // validator.required(orderSlipDetails[i].tax_rate, 'tax_rate' + i, '税率');
-            // validator.required(orderSlipDetails[i].storage_facility, 'storage_facility' + i, '倉庫');
+            validator.required(orderSlipDetails[i].tax_rate, 'tax_rate' + i, '税率');
+            validator.required(orderSlipDetails[i].storage_facility, 'storage_facility' + i, '倉庫');
         }
         setErrors(validator.getErrors());
 
@@ -262,16 +262,23 @@ function OrderSlipsEdit() {
             alert('保存が完了しました。');
         }
     };
+
     const handleSumPrice = () => {
         let SumPrice = 0
+        let consumptionTaxEight = 0
+        let consumptionTaxTen = 0
 
         for (let i = 0; i < orderSlipDetails.length; i++) {
             SumPrice += orderSlipDetails[i].unit_price * orderSlipDetails[i].number;
+            if (orderSlipDetails[i].tax_rate === 8) {
+                consumptionTaxEight += orderSlipDetails[i].unit_price * orderSlipDetails[i].number * 0.08;
+            } else if (orderSlipDetails[i].tax_rate === 10) {
+                consumptionTaxTen += orderSlipDetails[i].unit_price * orderSlipDetails[i].number * 0.1;
+            }
         }
 
-        return { "subtotal": SumPrice, "consumptionTaxEight": SumPrice * 0.08, "consumptionTaxTen": 0, "totalConsumptionTax": SumPrice * 0.08, "Total": SumPrice * 1.08 }
+        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxEight + consumptionTaxTen, "Total": SumPrice + consumptionTaxEight + consumptionTaxTen }
     }
-
     const [isOpen, setIsOpen] = useState(null);
     const [selectedOption, setSelectedOption] = useState(null);
     const dropdownRef = useRef(null);
@@ -680,9 +687,9 @@ function OrderSlipsEdit() {
                                 <div className='flex items-center justify-end'>
                                     <div className='flex items-center'>
                                         <div className='mr-4'>消費税額</div>
-                                        <div className='mr-4'>{(orderSlipDetails[index].unit_price * orderSlipDetails[index].number * 0.08).toFixed(0)}円</div>
+                                        <div className='mr-4'>{(orderSlipDetails[index].unit_price * orderSlipDetails[index].number * orderSlipDetail.tax_rate * 0.01).toFixed(0)}円</div>
                                         <div className='mr-4'>金額</div>
-                                        <div className='text-lg font-bold'>{(orderSlipDetails[index].unit_price * orderSlipDetails[index].number * 1.08).toFixed(0)}円</div>
+                                        <div className='text-lg font-bold'>{(orderSlipDetails[index].unit_price * orderSlipDetails[index].number * (1 + orderSlipDetail.tax_rate * 0.01)).toFixed(0)}円</div>
                                     </div>
                                 </div>
                                 <hr className='py-3' />
@@ -753,7 +760,7 @@ function OrderSlipsEdit() {
             </div>
             <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
                 <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>保存</div>
-                <Link to={`salesmanagements/order-slips`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
+                <Link to={`/sales-management/voucher-entries/order-slips`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
             </div>
         </div>
     );
