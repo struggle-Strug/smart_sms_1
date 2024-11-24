@@ -1,15 +1,29 @@
 import React, { useState } from 'react';
 import Validator from '../../utils/validator'; // バリデーション用のクラスをインポート
 import { Link, Route, Routes } from 'react-router-dom';
+import axios from 'axios'; // 追加
+
 
 const { ipcRenderer } = window.require('electron');
 
 function Index() {
-
+    const [error, setError] = useState('');
   const [bankApi, setBankApi] = useState({
     api_key: '',
     // sync_interval: ''
   });
+
+  const [depositSlip, setDepositSlip] = useState({
+    id: '',
+    code: '',
+    deposit_date: '',
+    status: '',
+    vender_name: '',
+    vender_id: '',
+    remarks: '',
+    updated: '',
+    created: '',
+});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -40,7 +54,59 @@ function Index() {
     setShowPassword(!showPassword);
   };
 
-  console.log(bankApi);
+  console.log(bankApi.api_key);
+
+  // handleGetBankData メソッドの定義
+  const handleGetBankData = async () => {
+    try {
+      const response = await axios({
+        method: 'GET',
+        url: 'https://developer.api.bk.mufg.jp/btmu/retail/trial/v2/me/accounts/001001110001/transactions?inquiryDateFrom=2021-12-20&inquiryDateTo=2021-12-27',
+        headers: {
+          'X-IBM-Client-Id': bankApi.api_key, // APIキー
+          'X-BTMU-Seq-No': '20200514-0000000123456789', // ランダムな値
+          Accept: 'application/json',
+        },
+      });
+      const data = response.data;
+      setDepositSlip(prevState => ({
+          ...prevState,
+          deposit_date: data.transactions[0].settlementDate,
+      }));
+      console.log("aa")
+
+      console.log('データ取得成功:', data);
+      alert('テスト接続に成功しました。');
+
+
+      // APIレスポンスからデータを格納
+      // const data = response.data;
+      // setDepositSlip(prevState => ({
+      //   ...prevState,
+      //   deposit_date: data.transactions[0].settlementDate,
+      // }));
+
+      // const newDetails = data.transactions.map(transaction => ({
+      //   id: '',
+      //   deposit_slip_id: '',
+      //   deposit_date: transaction.settlementDate,
+      //   vender_id: '', // 必要に応じて値を設定
+      //   vender_name: data.accountInfo.accountName, // 必要に応じて値を設定
+      //   claim_id: '',
+      //   deposit_method: transaction.transactionType, // 取引タイプをセット
+      //   deposits: transaction.amount, // 取引額をセット
+      //   commission_fee: '',
+      //   data_category: '',
+      // }));
+
+    } catch (error) {
+      // エラーメッセージを表示
+      setError('データの取得に失敗しました。再度お試しください。');
+      console.error('エラー:', error);
+      alert('テスト接続に失敗しました。')
+    }
+  };
+
 
   return (
     <div>
@@ -74,7 +140,16 @@ function Index() {
             {errors.api_key && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.api_key}</div>}
           </div>
         </div>
+        <div className='pt-6 pb-4 text-lg font-bold'>テスト接続</div>
+        <div className='flex'>
+          <div className='border rounded-lg py-3 px-7 mb-8 text-base font-bold bg-white text-black'>
+            <button onClick={handleGetBankData}>テスト</button>
+          </div>
+        </div>
+
+
       </div>
+
 
       {/* フッターのボタン */}
       <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>

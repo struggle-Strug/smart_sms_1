@@ -25,19 +25,19 @@ function SalesTaxSettingsAdd() {
     validator.required(contactPerson.start_date, 'start_date', '適用開始日');
     validator.required(contactPerson.tax_rate, 'tax_rate', '消費税率');
 
-    setErrors(validator.getErrors());
-
-    if (!validator.hasErrors()) {
-      ipcRenderer.send('save-sales-tax-setting', contactPerson);
-      // フォームのリセット
-      setContactPerson({
-        tax_rate: '',
-        start_date: '',
-        end_date: '',
-      });
-      alert('商品が正常に追加されました。');
-    }
-  };
+        setErrors(validator.getErrors());
+        
+        if (!validator.hasErrors()) {
+            ipcRenderer.send('save-sales-tax-setting', contactPerson);
+            // フォームのリセット
+            setContactPerson({
+                tax_rate: '',
+                start_date: '',
+                end_date: '',
+            });
+            alert('消費税設定が正常に追加されました。');
+        }
+    };
 
   return (
     <div className='mx-40'>

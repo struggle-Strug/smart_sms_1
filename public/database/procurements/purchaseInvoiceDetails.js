@@ -182,10 +182,10 @@ function searchPurchaseInvoiceDetails(conditions, callback) {
         for (const [column, value] of Object.entries(conditions)) {
             // pod.created_start と pod.created_end の特別な扱い
             if (column === 'pid.created_start') {
-                whereClauses.push(`pid.created >= ?`);
+                whereClauses.push(`pi.order_date >= ?`);
                 params.push(value); // created_startの日付をそのまま使用
             } else if (column === 'pid.created_end') {
-                whereClauses.push(`pid.created <= ?`);
+                whereClauses.push(`pi.order_date <= ?`);
                 params.push(value); // created_endの日付をそのまま使用
             } else {
                 whereClauses.push(`${column} LIKE ?`);

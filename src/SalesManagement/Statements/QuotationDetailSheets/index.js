@@ -67,12 +67,12 @@ function Index() {
   const minutes = String(now.getMinutes()).padStart(2, '0');
   const seconds = String(now.getSeconds()).padStart(2, '0');
 
-    const fileName = `見積明細表_${year}${month}${day}_${hours}${minutes}${seconds}`;
-    const [dataForExport, setDataForExport] = useState({
-        header: header,
-        data: [],
-        fileName: fileName
-    })
+  const fileName = `見積明細表_${year}${month}${day}_${hours}${minutes}${seconds}`;
+  const [dataForExport, setDataForExport] = useState({
+    header: header,
+    data: [],
+    fileName: fileName
+  })
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -86,6 +86,31 @@ function Index() {
     const formattedDate = date ? date.toISOString().split('T')[0] : '';
     setSearchQueryList({ ...searchQueryList, [name]: formattedDate });
   };
+
+  useEffect(() => {
+    // 現在の日付を取得
+    const now = new Date();
+
+    // 今月の1日を計算
+    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    // 日付を 'YYYY-MM-DD' フォーマットに変換する関数
+    const formatDate = (date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    // 検索条件の初期化
+    setSearchQueryList((prev) => ({
+      ...prev,
+      "esd.created_start": formatDate(firstDayOfMonth), // 今月の1日
+      "esd.created_end": formatDate(lastDayOfMonth),   // 今月の末日
+    }));
+  }, []);
+
 
   useEffect(() => {
     ipcRenderer.send('load-estimation-slip-details');

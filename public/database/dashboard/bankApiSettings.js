@@ -24,22 +24,48 @@ function getBankApiSettingById(id, callback) {
 }
 
 function saveBankApiSetting(bankApiSettingData, callback) {
-  const { id, api_key } = bankApiSettingData;
+  const { api_key } = bankApiSettingData;
 
-  if (id) {
-    db.run(
-      `UPDATE bank_apis SET api_key = ? WHERE id = ?`,
-      [api_key, id],
-      callback
-    );
-  } else {
-    db.run(
-      `INSERT INTO bank_apis (api_key) VALUES (?)`,
-      [api_key],
-      callback
-    );
-  }
+  // `bank_apis` テーブルにデータが存在するかを確認
+  db.get(`SELECT id FROM bank_apis LIMIT 1`, [], (err, row) => {
+    if (err) {
+      console.error("Error checking existing data:", err);
+      return callback(err);
+    }
+
+    if (row) {
+      // データが存在する場合は更新
+      const id = row.id; // 既存データのIDを取得
+      db.run(
+        `UPDATE bank_apis SET api_key = ? WHERE id = ?`,
+        [api_key, id],
+        (err) => {
+          if (err) {
+            console.error("Error updating data:", err);
+            return callback(err);
+          }
+          console.log("Data updated successfully.");
+          callback(null, "Data updated successfully.");
+        }
+      );
+    } else {
+      // データが存在しない場合は新規追加
+      db.run(
+        `INSERT INTO bank_apis (api_key) VALUES (?)`,
+        [api_key],
+        (err) => {
+          if (err) {
+            console.error("Error inserting data:", err);
+            return callback(err);
+          }
+          console.log("Data inserted successfully.");
+          callback(null, "Data inserted successfully.");
+        }
+      );
+    }
+  });
 }
+
 
 function deleteBankApiSettingById(id, callback) {
   db.run('DELETE FROM bank_api WHERE id = ?', [id], callback);

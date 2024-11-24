@@ -49,7 +49,7 @@ function Index() {
     };
 
     const handleDelete = (id) => {
-        if (window.confirm('本当にこの顧客を削除しますか？')) {
+        if (window.confirm('本当にこの消費税設定を削除しますか？')) {
             ipcRenderer.send('delete-sales-tax-setting', id);
         }
     };

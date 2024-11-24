@@ -12,32 +12,32 @@ function Index() {
     { value: '貴社', label: '貴社' },
   ];
 
-  const [orderSlipDetails, setOrderSlipDetails] = useState([]);
-  // const [paymentVoucherDetail, setPaymentVoucherDetail] = useState([]);
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
-  const location = useLocation();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [customerIdToDelete, setCustomerIdToDelete] = useState(null);
-  const [searchQueryList, setSearchQueryList] = useState({
-    "pvd.created_start": "",
-    "pvd.created_end": "",
-    "p.category": "",
-    "p.subcategory": "",
-    "osd.code": "",
-    "osd.created_start": "",
-    "osd.created_end": "",
-    "osd.code": "",
-    "osd.payment_method": "",
-    "osd.vender_name": "",
-    "osd.product_name": "",
-    "v.contact_person": "",
-    "osd.storage_facility": "",
-    "osd.lot_number": "",
-    "p.classification_primary": "",
-    "p.classification_secondary": ""
-  });
-
+    const [orderSlipDetails, setOrderSlipDetails] = useState([]);
+    // const [paymentVoucherDetail, setPaymentVoucherDetail] = useState([]);
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef(null);
+    const location = useLocation();
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [customerIdToDelete, setCustomerIdToDelete] = useState(null);
+    const [searchQueryList, setSearchQueryList] = useState({
+        "osd.created_start": "",
+        "osd.created_end": "",
+        "p.category": "",
+        "p.subcategory": "",
+        "osd.code": "",
+        "osd.created_start": "",
+        "osd.created_end": "",
+        "osd.code": "",
+        "osd.payment_method": "",
+        "osd.vender_name": "",
+        "osd.product_name": "",
+        "v.contact_person": "",
+        "osd.storage_facility": "",
+        "osd.lot_number": "",
+        "p.classification_primary": "",
+        "p.classification_secondary": ""
+    });
+    
 
   const header = [
     "見積日付",
@@ -84,10 +84,35 @@ function Index() {
     }));
   };
 
-  const handleDateChange = (date, name) => {
-    const formattedDate = date ? date.toISOString().split('T')[0] : '';
-    setSearchQueryList({ ...searchQueryList, [name]: formattedDate });
-  };
+    const handleDateChange = (date, name) => {
+        const formattedDate = date ? date.toISOString().split('T')[0] : '';
+        setSearchQueryList({ ...searchQueryList, [name]: formattedDate });
+    };
+
+    useEffect(() => {
+      // 現在の日付を取得
+      const now = new Date();
+      
+      // 今月の1日を計算
+      const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  
+      // 日付を 'YYYY-MM-DD' フォーマットに変換する関数
+      const formatDate = (date) => {
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          return `${year}-${month}-${day}`;
+      };
+  
+      // 検索条件の初期化
+      setSearchQueryList((prev) => ({
+          ...prev,
+          "osd.created_start": formatDate(firstDayOfMonth), // 今月の1日
+          "osd.created_end": formatDate(lastDayOfMonth),   // 今月の末日
+      }));
+  }, []);
+  
 
   useEffect(() => {
     ipcRenderer.send('load-order-slip-details');

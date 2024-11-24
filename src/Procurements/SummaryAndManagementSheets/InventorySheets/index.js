@@ -11,9 +11,9 @@ function Index() {
     const dropdownRef = useRef(null);
     const location = useLocation();
     const [searchQueryList, setSearchQueryList] = useState({
-        "倉庫": "",
-        "商品": "",
-        "アラート": "",
+        "storage_facility": "",
+        "product": "",
+        // "アラート": "",
     });
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -70,6 +70,7 @@ function Index() {
     };
 
     const handleSearch = () => {
+      console.log(searchQueryList);
         ipcRenderer.send('search-inventories', searchQueryList);
     };
 

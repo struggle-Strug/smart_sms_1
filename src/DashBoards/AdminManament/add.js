@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Validator from '../../utils/validator'; // バリデーション用のクラスをインポート
 import CustomSelect from '../../Components/CustomSelect';
+import { useNavigate } from 'react-router-dom';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -11,6 +12,8 @@ function AdminSettingsAdd() {
     { value: '0', label: 'マスタ管理者' },
     { value: '1', label: '管理者' },
   ];
+
+  const navigate = useNavigate();
 
   const [admin, setAdmin] = useState({
     user_name: '',
@@ -52,6 +55,12 @@ function AdminSettingsAdd() {
   // パスワードの表示・非表示
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  // パスワードの表示・非表示
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
   };
 
   console.log(admin);
@@ -119,16 +128,16 @@ function AdminSettingsAdd() {
         <div className="w-4/5 mb-4">
           <label className="block text-sm font-normal pb-1.5">パスワード（確認用） <span className="text-red-500">必須</span></label>
           <div className="relative w-2/3">
-            <input
-              type={showPassword ? 'text' : 'password'}
-              className='border rounded px-4 py-2.5 bg-white w-full'
-              placeholder=''
-              name="confirmPassword"
-              value={admin.confirmPassword}
-              onChange={handleChange}
+            <input 
+              type={showConfirmPassword ? 'text' : 'password'} 
+              className='border rounded px-4 py-2.5 bg-white w-full' 
+              placeholder='' 
+              name="confirmPassword" 
+              value={admin.confirmPassword} 
+              onChange={handleChange} 
             />
-            <button
-              onClick={togglePasswordVisibility}
+            <button 
+              onClick={toggleConfirmPasswordVisibility} 
               className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-900 hover:text-gray-700"
             >
               <svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">

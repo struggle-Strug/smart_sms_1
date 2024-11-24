@@ -86,11 +86,36 @@ function Index() {
 
   const fileName = `支払集計表_${year}${month}${day}_${hours}${minutes}${seconds}`;
 
-  const [dataForExport, setDataForExport] = useState({
-    header: header,
-    data: [],
-    fileName: fileName
-  });
+    const [dataForExport, setDataForExport] = useState({
+        header: header,
+        data: [],
+        fileName: fileName
+    });
+
+    useEffect(() => {
+      // 現在の日付を取得
+      const now = new Date();
+      
+      // 今月の1日を計算
+      const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  
+      // 日付を 'YYYY-MM-DD' フォーマットに変換する関数
+      const formatDate = (date) => {
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          return `${year}-${month}-${day}`;
+      };
+  
+      // 検索条件の初期化
+      setSearchQueryList((prev) => ({
+          ...prev,
+          "pvd.created_start": formatDate(firstDayOfMonth), // 今月の1日
+          "pvd.created_end": formatDate(lastDayOfMonth),   // 今月の末日
+      }));
+  }, []);
+
 
   useEffect(() => {
     ipcRenderer.send('load-payment-voucher-details');

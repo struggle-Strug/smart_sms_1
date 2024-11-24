@@ -20,22 +20,37 @@ function App() {
   const location = useLocation();
   const [companyName, setCompanyName] = useState("株式会社サンプル");
 
+  const [dashboardIsHover, setDashboardIsHover] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [SalesManagementIsHover, setSalesManagementIsHover] = useState(false);
+  const [masterIsHover, setMasterIsHover] = useState(false);
+
+  const handleDashboardMouseEnter = () => {
+    setDashboardIsHover(true);
+  };
+  const handleDashboardMouseLeave = () => {
+    setDashboardIsHover(false);
+  };
 
   const handleMouseEnter = () => {
     setIsHovered(true);
   };
-
   const handleMouseLeave = () => {
     setIsHovered(false);
   };
+
   const handlSalesManagementMouseEnter = () => {
     setSalesManagementIsHover(true);
   };
-
   const handlelSalesManagementMouseLeave = () => {
     setSalesManagementIsHover(false);
+  };
+
+  const handleMasterMouseEnter = () => {
+    setMasterIsHover(true);
+  };
+  const handleMasterMouseLeave = () => {
+    setMasterIsHover(false);
   };
 
   useEffect(() => {
@@ -59,14 +74,54 @@ function App() {
             Smart_SmS
           </div>
           <div className='absolute' style={{ top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
-            <Link to="/dashboards" className={`py-6 px-4 mx-2  ${location.pathname.includes ("/dashboards") && "font-bold border-b-4 border-blue-600"}`}>ダッシュボード</Link>
+            <Link to="/dashboards" className={`py-6 px-4 mx-2  ${location.pathname.includes("/dashboards") && "font-bold border-b-4 border-blue-600"} relative`}
+              activeClassName=''
+              onMouseEnter={handleDashboardMouseEnter}
+              onMouseLeave={handleDashboardMouseLeave}>
+              ダッシュボード
+              {dashboardIsHover && (
+                <div
+                  onMouseEnter={handleDashboardMouseEnter}
+                  onMouseLeave={handleDashboardMouseLeave}
+                  className={`absolute bg-white shadow-md mt-2 top-12 p-3 left-0 z-auto`}
+                >
+                  <div className='font-normal' style={{ width: "344px" }}>
+                    <div className='px-3 pb-4'>
+                      <div className='font-bold flex items-center'>
+                        <div className='w-28'>データ設定</div>
+                        <div className='border w-full'></div>
+                      </div>
+                      <div className='grid grid-cols-2 text-gray-600'>
+                        <Link to="/dashboards/backups-settings">バックアップ設定</Link>
+                        <Link to="/dashboard/data-conversion">データコンバート</Link>
+                      </div>
+                    </div>
+                    <div className='px-3 pb-4'>
+                      <div className='font-bold flex items-center'>
+                        <div className='w-28'>ファイル管理</div>
+                        <div className='border w-56'></div>
+                      </div>
+                      <div className='grid grid-cols-2 text-gray-600'>
+                        <Link to="/dashboards/admin-settings">管理者設定</Link>
+                        <Link to="/dashboards/pos-coordination-settings">POS連携設定</Link>
+                      </div>
+                      <div className='grid grid-cols-2 text-gray-600'>
+                        <Link to="/dashboards/sales-tax-settings">消費税設定</Link>
+                        <Link to="/dashboards/banks-api-settings">銀行API設定</Link>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+            </Link>
             <Link to="/contact" className={`py-6 px-4 mx-2  ${location.pathname === "/contact" && "font-bold border-b-4 border-blue-600"}`} activeClassName=''>検索</Link>
             <Link to="/sales-management" className={`py-6 px-4 mx-2  ${location.pathname.includes("/sales-management") && "font-bold border-b-4 border-blue-600"} relative z-20`}
               activeClassName=''
               onMouseEnter={handlSalesManagementMouseEnter}
               onMouseLeave={handlelSalesManagementMouseLeave}>
-                売上管理
-                {SalesManagementIsHover && (
+              売上管理
+              {SalesManagementIsHover && (
                 <div
                   onMouseEnter={handlSalesManagementMouseEnter}
                   onMouseLeave={handlelSalesManagementMouseLeave}
@@ -191,7 +246,55 @@ function App() {
                 </div>
               )}
             </Link>
-            <Link to="/master" className={`pt-6 pb-5 px-4 mx-2  ${location.pathname.includes("/master") && "font-bold border-b-4 border-blue-600"}`} activeClassName=''>マスタ管理</Link>
+            <Link to="/master" className={`pt-6 pb-5 px-4 mx-2  ${location.pathname.includes("/master") && "font-bold border-b-4 border-blue-600"} relative`}
+              activeClassName=''
+              onMouseEnter={handleMasterMouseEnter}
+              onMouseLeave={handleMasterMouseLeave}>
+              マスタ管理
+              {masterIsHover && (
+                <div
+                  onMouseEnter={handleMasterMouseEnter}
+                  onMouseLeave={handleMasterMouseLeave}
+                  className={`absolute bg-white shadow-md mt-2 top-12 p-3 left-0 z-auto`}
+                >
+                  <div className='font-normal' style={{ width: "344px" }}>
+                    <div className='px-3 pb-4'>
+                      <div className='grid grid-cols-2 text-gray-600'>
+                        <Link to="/master/customers">得意先</Link>
+                        <Link to="/master/delivery-customers">納品先</Link>
+                      </div>
+                      <div className='grid grid-cols-2 text-gray-600'>
+                        <Link to="/master/products">商品</Link>
+                        <Link to="/master/set-products">セット商品</Link>
+                      </div>
+                      <div className='grid grid-cols-2 text-gray-600'>
+                        <Link to="/master/vendors">仕入先</Link>
+                        <Link to="/master/storage-facilities">倉庫</Link>
+                      </div>
+                      <div className='grid grid-cols-2 text-gray-600'>
+                        <Link to="/master/payment-methods">支払方法</Link>
+                        <Link to="/master/contact-persons">担当者</Link>
+                      </div>
+                      <div className='grid grid-cols-2 text-gray-600'>
+                        <Link to="/master/shipping-methods">配送方法</Link>
+                        <Link to="/master/shops">店舗</Link>
+                      </div>
+                      <div className='grid grid-cols-2 text-gray-600'>
+                        <Link to="/master/primary-sections">区分1</Link>
+                        <Link to="/master/secondary-sections">区分2</Link>
+                      </div>
+                      <div className='grid grid-cols-2 text-gray-600'>
+                        <Link to="/master/companies">自社マスタ</Link>
+                        <Link to="/master/categories">カテゴリー</Link>
+                      </div>
+                      <div className='grid grid-cols-2 text-gray-600'>
+                        <Link to="/master/subcategories">サブカテゴリー</Link>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </Link>
           </div>
           <div className='ml-auto text-xl py-3 pr-10'>{companyName}</div>
         </div>

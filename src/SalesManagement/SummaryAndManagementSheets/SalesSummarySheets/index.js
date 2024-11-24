@@ -176,6 +176,31 @@ function Index() {
     return { graphData: graphData, companyNames: companyNames, values: values }
   };
 
+    useEffect(() => {
+      // 現在の日付を取得
+      const now = new Date();
+      
+      // 今月の1日を計算
+      const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  
+      // 日付を 'YYYY-MM-DD' フォーマットに変換する関数
+      const formatDate = (date) => {
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          return `${year}-${month}-${day}`;
+      };
+  
+      // 検索条件の初期化
+      setSearchQueryList((prev) => ({
+          ...prev,
+          "ssd.created_start": formatDate(firstDayOfMonth), // 今月の1日
+          "ssd.created_end": formatDate(lastDayOfMonth),   // 今月の末日
+      }));
+  }, []);
+  
+
 
   useEffect(() => {
     ipcRenderer.send('load-sales-slip-details');

@@ -3,6 +3,7 @@ const path = require('path');
 const { app } = require('electron');
 const { ipcMain } = require('electron');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+// const { createObjectCsvWriter: createCsvWriter } = require('csv-writer');
 const fs = require('fs');
 const csv = require('csv-parser'); // CSVファイル読み込みに使用
 const dbPath = path.join(app.getPath('userData'), 'database.db');
@@ -107,6 +108,12 @@ function loadAllTablesDataAndExportToCSV(db, callback) {
 }
 
 
+// データをCSV形式に変換する関数
+function convertToCSV(rows) {
+  const headers = Object.keys(rows[0]);
+  const csvRows = rows.map(row => headers.map(header => `"${row[header] || ''}"`).join(','));
+  return [headers.join(','), ...csvRows].join('\n');
+}
 // /**
 //  * CSVファイルを読み込んで指定テーブルにデータを上書きする
 //  * @param {string} tableName - テーブル名
@@ -207,7 +214,9 @@ function importCsvToTable(db, tableName, filePath, callback) {
 
 module.exports = {
   loadAllTablesData,
-  loadAllTablesDataAndExportToCSV,
   importCsvToTable,
-  importAllCsvToDatabase
+  importAllCsvToDatabase,
+  getTablesFromDB,
+  getTableData,
+  convertToCSV
 };

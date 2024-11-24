@@ -21,8 +21,8 @@ function Index() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [customerIdToDelete, setCustomerIdToDelete] = useState(null);
   const [searchQueryList, setSearchQueryList] = useState({
-    "pvd.created_start": "",
-    "pvd.created_end": "",
+    "osd.created_start": "",
+    "osd.created_end": "",
     "p.category": "",
     "p.subcategory": "",
     "osd.code": "",
@@ -30,7 +30,7 @@ function Index() {
     "osd.created_end": "",
     "osd.code": "",
     "osd.payment_method": "",
-    "osd.vender_name": "",
+    "os.vender_name": "",
     "osd.product_name": "",
     "v.contact_person": "",
     "osd.storage_facility": "",
@@ -122,6 +122,31 @@ function Index() {
     const formattedDate = date ? date.toISOString().split('T')[0] : '';
     setSearchQueryList({ ...searchQueryList, [name]: formattedDate });
   };
+
+  useEffect(() => {
+    // 現在の日付を取得
+    const now = new Date();
+
+    // 今月の1日を計算
+    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    // 日付を 'YYYY-MM-DD' フォーマットに変換する関数
+    const formatDate = (date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    // 検索条件の初期化
+    setSearchQueryList((prev) => ({
+      ...prev,
+      "osd.created_start": formatDate(firstDayOfMonth), // 今月の1日
+      "osd.created_end": formatDate(lastDayOfMonth),   // 今月の末日
+    }));
+  }, []);
+
 
   useEffect(() => {
     ipcRenderer.send('load-order-slip-details');
@@ -333,7 +358,7 @@ function Index() {
         <div className='pb-6 flex items-center'>
           <div className='text-3xl font-bold'>受注集計表</div>
           <div className='flex ml-auto'>
-          <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={(e) => setIsDialogOpen(true)}>
+            <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={(e) => setIsDialogOpen(true)}>
               エクスポート
             </div>
           </div>
@@ -412,9 +437,9 @@ function Index() {
               <input
                 type='text'
                 className='border rounded px-4 py-2.5 bg-white w-full'
-                placeholder='得意先'
-                name="osd.vender_name"
-                value={searchQueryList["osd.vender_name"]}
+                placeholder=''
+                name="os.vender_name"
+                value={searchQueryList["os.vender_name"]}
                 onChange={handleInputChange}
               />
             </div>
@@ -434,7 +459,7 @@ function Index() {
               <input
                 type='text'
                 className='border rounded px-4 py-2.5 bg-white w-full'
-                placeholder='担当者'
+                placeholder=''
                 name="v.contact_person"
                 value={searchQueryList["v.contact_person"]}
                 onChange={handleInputChange}
@@ -445,7 +470,7 @@ function Index() {
               <input
                 type='text'
                 className='border rounded px-4 py-2.5 bg-white w-full'
-                placeholder='倉庫'
+                placeholder=''
                 name="osd.storage_facility"
                 value={searchQueryList["osd.storage_facility"]}
                 onChange={handleInputChange}
@@ -460,7 +485,7 @@ function Index() {
               <input
                 type='text'
                 className='border rounded px-4 py-2.5 bg-white w-full'
-                placeholder='ロット番号'
+                placeholder=''
                 name="osd.lot_number"
                 value={searchQueryList["osd.lot_number"]}
                 onChange={handleInputChange}
@@ -471,7 +496,7 @@ function Index() {
               <input
                 type='text'
                 className='border rounded px-4 py-2.5 bg-white w-full'
-                placeholder='区分１'
+                placeholder=''
                 name="p.classification_primary"
                 value={searchQueryList["p.classification_primary"]}
                 onChange={handleInputChange}
@@ -482,7 +507,7 @@ function Index() {
               <input
                 type='text'
                 className='border rounded px-4 py-2.5 bg-white w-full'
-                placeholder='区分2'
+                placeholder=''
                 name="p.classification_secondary"
                 value={searchQueryList["p.classification_secondary"]}
                 onChange={handleInputChange}
@@ -493,8 +518,8 @@ function Index() {
             <div className='border rounded-lg py-3 px-7 text-base font-bold bg-blue-600 text-white' onClick={(e) => handleSearch()}>適用して表示</div>
           </div>
         </div>
-        <div className='pb-8'>
-          <table className="w-full mt-8 table-auto">
+        <div className='py-8'>
+          <table className="w-full table-auto">
             <thead className="border-b">
               <tr>
                 {/* <th className="text-left pb-2.5">順位</th> */}
