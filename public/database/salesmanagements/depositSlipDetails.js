@@ -37,6 +37,7 @@ function saveDepositSlipDetail(detailData, callback) {
         deposit_method,
         deposits,
         commission_fee,
+        remarks,
         data_category,
     } = detailData;
 
@@ -51,6 +52,7 @@ function saveDepositSlipDetail(detailData, callback) {
                 deposit_method = ?, 
                 deposits = ?, 
                 commission_fee = ?, 
+                remarks = ?, 
                 data_category = ?, 
                 updated = datetime('now') 
             WHERE id = ?`,
@@ -63,6 +65,7 @@ function saveDepositSlipDetail(detailData, callback) {
                 deposit_method,
                 deposits,
                 commission_fee,
+                remarks,
                 data_category,
                 id
             ],
@@ -71,8 +74,8 @@ function saveDepositSlipDetail(detailData, callback) {
     } else {
         db.run(
             `INSERT INTO deposit_slip_details 
-            (deposit_slip_id, deposit_date, vender_id, vender_name, claim_id, deposit_method, deposits, commission_fee, data_category, created, updated) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+            (deposit_slip_id, deposit_date, vender_id, vender_name, claim_id, deposit_method, deposits, commission_fee, remarks, data_category, created, updated) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
             [
                 deposit_slip_id,
                 deposit_date,
@@ -82,6 +85,7 @@ function saveDepositSlipDetail(detailData, callback) {
                 deposit_method,
                 deposits,
                 commission_fee,
+                remarks,
                 data_category
             ],
             callback
@@ -190,6 +194,7 @@ function initializeDatabase() {
         deposit_method VARCHAR(255),
         deposits INTEGER,
         commission_fee INTEGER,
+        remarks VARCHAR(255),
         data_category VARCHAR(255),
         created DATE DEFAULT CURRENT_DATE,
         updated DATE DEFAULT CURRENT_DATE
