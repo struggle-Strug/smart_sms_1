@@ -215,8 +215,8 @@ function SalesSlipsAdd() {
             validator.required(salesSlipDetails[i].product_name, 'product_name' + i, '商品名');
             validator.required(salesSlipDetails[i].number, 'number' + i, '数量');
             validator.required(salesSlipDetails[i].unit_price, 'unit_price' + i, '単価');
-            // validator.required(salesSlipDetails[i].tax_rate, 'tax_rate' + i, '税率');
-            // validator.required(salesSlipDetails[i].storage_facility, 'storage_facility' + i, '倉庫');
+            validator.required(salesSlipDetails[i].tax_rate, 'tax_rate' + i, '税率');
+            validator.required(salesSlipDetails[i].storage_facility, 'storage_facility' + i, '倉庫');
         }
         setErrors(validator.getErrors());
 
@@ -253,12 +253,19 @@ function SalesSlipsAdd() {
 
     const handleSumPrice = () => {
         let SumPrice = 0
+        let consumptionTaxEight = 0
+        let consumptionTaxTen = 0
 
         for (let i = 0; i < salesSlipDetails.length; i++) {
             SumPrice += salesSlipDetails[i].unit_price * salesSlipDetails[i].number;
+            if (salesSlipDetails[i].tax_rate === 8) {
+                consumptionTaxEight += salesSlipDetails[i].unit_price * salesSlipDetails[i].number * 0.08;
+            } else if (salesSlipDetails[i].tax_rate === 10) {
+                consumptionTaxTen += salesSlipDetails[i].unit_price * salesSlipDetails[i].number * 0.1;
+            }
         }
 
-        return { "subtotal": SumPrice, "consumptionTaxEight": SumPrice * 0.08, "consumptionTaxTen": 0, "totalConsumptionTax": SumPrice * 0.08, "Total": SumPrice * 1.08 }
+        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxEight + consumptionTaxTen, "Total": SumPrice + consumptionTaxEight + consumptionTaxTen }
     }
 
     const [isOpen, setIsOpen] = useState(null);
@@ -655,9 +662,9 @@ function SalesSlipsAdd() {
                                 <div className='flex items-center justify-end'>
                                     <div className='flex items-center'>
                                         <div className='mr-4'>消費税額</div>
-                                        <div className='mr-4'>{(salesSlipDetails[index].unit_price * salesSlipDetails[index].number * 0.08).toFixed(0)}円</div>
+                                        <div className='mr-4'>{(salesSlipDetails[index].unit_price * salesSlipDetails[index].number * salesSlipDetail.tax_rate * 0.01).toFixed(0)}円</div>
                                         <div className='mr-4'>金額</div>
-                                        <div className='text-lg font-bold'>{(salesSlipDetails[index].unit_price * salesSlipDetails[index].number * 1.08).toFixed(0)}円</div>
+                                        <div className='text-lg font-bold'>{(salesSlipDetails[index].unit_price * salesSlipDetails[index].number * (1 + salesSlipDetail.tax_rate * 0.01)).toFixed(0)}円</div>
                                     </div>
                                 </div>
                                 <hr className='py-3' />
@@ -727,7 +734,7 @@ function SalesSlipsAdd() {
             </div>
             <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
                 <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>新規登録</div>
-                <Link to={`salesmanagements/sales-slips`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
+                <Link to={`/sales-management/voucher-entries/sales-slips`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
             </div>
         </div>
     );

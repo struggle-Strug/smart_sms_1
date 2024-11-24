@@ -79,6 +79,14 @@ function AddForm() {
     const [products, setProducts] = useState([])
 
     useEffect(() => {
+        ipcRenderer.on('search-id-vendors-result', (event, data) => {
+            setVendors(data);
+        });
+
+        ipcRenderer.on('search-name-vendors-result', (event, data) => {
+            setVendors(data);
+        });
+
         ipcRenderer.on('search-customers-result', (event, data) => {
             setVendors(data);
         });
@@ -122,6 +130,8 @@ function AddForm() {
             ipcRenderer.removeAllListeners('search-customers-result');
             ipcRenderer.removeAllListeners('search-id-products-result');
             ipcRenderer.removeAllListeners('search-name-products-result');
+            ipcRenderer.removeAllListeners('search-id-vendors-result');
+            ipcRenderer.removeAllListeners('search-name-vendors-result');
         };
     }, []);
 
@@ -137,6 +147,7 @@ function AddForm() {
             deposits: '',
             commission_fee: '',
             data_category: '',
+            remarks: '',
         }
     ]);
 
@@ -152,6 +163,7 @@ function AddForm() {
             deposits: '',
             commission_fee: '',
             data_category: '',
+            remarks: '',
         }]);
     }
 
@@ -162,13 +174,16 @@ function AddForm() {
 
     const handleInputChange = (index, e) => {
         const { name, value } = e.target;
-        if (name === "product_id") {
-            ipcRenderer.send('search-id-products', value);
+        if (name === "vender_id") {
+            // ipcRenderer.send('search-id-vendors', { id: value });
+            ipcRenderer.send('search-id-vendors', value.trim());
         }
 
-        if (name === "product_name") {
-            ipcRenderer.send('search-name-products', value);
+        if (name === "vender_name") {
+            // ipcRenderer.send('search-name-vendors', { name_primary: value });
+            ipcRenderer.send('search-name-vendors', value.trim());
         }
+
         const updatedDetails = depositSlipDetails.map((detail, i) =>
             i === index ? { ...detail, [name]: value } : detail
         );
@@ -177,13 +192,6 @@ function AddForm() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        if (name === "vender_id") {
-            ipcRenderer.send('search-customers', { id: value });
-        }
-
-        if (name === "vender_name") {
-            ipcRenderer.send('search-customers', { name_primary: value });
-        }
         setDepositSlip({ ...depositSlip, [name]: value });
     };
 
@@ -203,11 +211,12 @@ function AddForm() {
     const handleSubmit = () => {
         setErrors(null);
         validator.required(depositSlip.code, 'code', '伝票番号');
+        validator.required(depositSlip.deposit_date, 'deposit_date', '入金日付');
         for (let i = 0; i < depositSlipDetails.length; i++) {
             validator.required(depositSlipDetails[i].deposit_slip_id, 'deposit_slip_id' + i, '入金伝票番号');
             // validator.required(depositSlipDetails[i].deposit_date, 'deposit_date' + i, '入金日付');
-            // // validator.required(depositSlipDetails[i].vender_id, 'vender_id' + i, '得意先コード');
-            // // validator.required(depositSlipDetails[i].vender_name, 'vender_name' + i, '得意先名');
+            validator.required(depositSlipDetails[i].vender_id, 'vender_id' + i, '得意先コード');
+            validator.required(depositSlipDetails[i].vender_name, 'vender_name' + i, '得意先名');
             validator.required(depositSlipDetails[i].deposit_method, 'deposit_method' + i, '入金方法');
             validator.required(depositSlipDetails[i].deposits, 'deposits' + i, '入金額');
         }
@@ -329,11 +338,11 @@ function AddForm() {
                 commission_fee: '',
                 data_category: '',
             }));
-   
-          setDepositSlipDetails(newDetails);
-    
+
+            setDepositSlipDetails(newDetails);
+
             console.log('データ取得成功:', data);
-            console.log('newDetails',newDetails)
+            console.log('newDetails', newDetails)
             console.log('depositSlip', depositSlip);
             console.log('depositSlipDetails', depositSlipDetails);
             navigate('/sales-management/voucher-entries/payment-slips/add/data-import', { state: { newDetails: newDetails } });
@@ -361,6 +370,28 @@ function AddForm() {
                         </Link>
                     </div>
                 </div>
+                <div className='pb-2'>
+                    <div className='px-8 py-6'>
+                        <div className='pb-2.5 font-bold text-xl'>伝票情報</div>
+                        <div className='pb-2'>
+                            <div className='w-40 text-sm pb-1.5'>伝票番号 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
+                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-[480px]' placeholder='' name="code" value={depositSlip.code} onChange={handleChange} />
+                            {errors.code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.code}</div>}
+                        </div>
+                        <div className='w-40 text-sm pb-1.5'>入金日付 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
+                        <DatePicker
+                            selected={depositSlip.deposit_date ? new Date(depositSlip.deposit_date) : null}
+                            onChange={(date) => handleDateChange(date, "deposit_date")}
+                            dateFormat="yyyy-MM-dd"
+                            className='border rounded px-4 py-2.5 bg-white  w-[480px]'
+                            placeholderText='入金日付を選択'
+                        />
+                        {errors.deposit_date && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.deposit_date}</div>}
+                    </div>
+                    <div className='py-3'>
+                        <hr className='' />
+                    </div>
+                </div>
                 <div className='px-8 py-6'>
                     {
                         depositSlipDetails.map((depositSlipDetail, index) => (
@@ -377,7 +408,7 @@ function AddForm() {
                                                 {errors.deposit_slip_id && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.deposit_slip_id}</div>}
 
                                             </div>
-                                            <div className='ml-4'>
+                                            {/* <div className='ml-4'>
                                                 <div className='w-30 text-sm pb-1.5'>入金日付 <span className='text-xs ml-2.5 font-bold text-red-600'>必須</span></div>
                                                 <DatePicker
                                                     selected={depositSlipDetail.deposit_date ? new Date(depositSlipDetail.deposit_date) : null}
@@ -387,10 +418,10 @@ function AddForm() {
                                                     placeholderText='入金日付を選択'
                                                 />
                                                 {errors.deposit_date && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.deposit_date}</div>}
-                                            </div>
+                                            </div> */}
                                             <div className='ml-4 relative'>
                                                 <div className='w-45 text-sm pb-1.5'>得意先コード <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="vender_id" value={depositSlipDetail.vender_id} onChange={handleChange} onFocus={handleFocus} onBlur={handleBlur} style={{ width: "180px" }} />
+                                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="vender_id" value={depositSlipDetail.vender_id} onChange={(e) => handleInputChange(index, e)} onFocus={handleFocus} onBlur={handleBlur} style={{ width: "180px" }} />
                                                 {
                                                     isVendorIdFocused &&
                                                     <div className='absolute top-20 left-0 z-10' onMouseDown={(e) => e.preventDefault()}>
@@ -411,7 +442,7 @@ function AddForm() {
                                             </div>
                                             <div className='ml-4 relative'>
                                                 <div className='w-45 text-sm pb-1.5'>得意先名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="vender_name" value={depositSlipDetail.vender_name} onChange={handleChange} onFocus={handleVendorNameFocus} onBlur={handleVendorNameBlur} style={{ width: "180px" }} />
+                                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="vender_name" value={depositSlipDetail.vender_name} onChange={(e) => handleInputChange(index, e)} onFocus={handleVendorNameFocus} onBlur={handleVendorNameBlur} style={{ width: "180px" }} />
                                                 {
                                                     isVendorNameFocused &&
                                                     <div className='absolute top-20 left-0 z-10' onMouseDown={(e) => e.preventDefault()}>
@@ -458,8 +489,8 @@ function AddForm() {
                                                 <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="data_category" value={depositSlipDetail.data_category} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)} />
                                             </div>
                                             <div className='ml-4'>
-                                                <div className='text-sm pb-1.5 w-30'>備考</div>
-                                                <input className='border rounded px-4 py-2.5 bg-white resize-none' placeholder='' rows={1} name="remarks" value={depositSlip.remarks} onChange={handleChange} style={{ width: "640px" }} />
+                                                <div className='text-sm pb-1.5'>備考</div>
+                                                <input className='border rounded px-4 py-2.5 bg-white' placeholder='' rows={1} name="remarks" value={depositSlipDetail.remarks} onChange={(e) => handleInputChange(index, e)} style={{ width: "640px" }} />
                                             </div>
                                         </div>
                                     </div>
@@ -472,12 +503,12 @@ function AddForm() {
                                     </div>
                                 </div>
                                 <div className='pb-6 flex flex-col mr-14'>
-                                    <div className='flex items-center mr-10 pt-3'>
+                                    {/* <div className='flex items-center mr-10 pt-3'>
                                         <div className='ml-auto flex'>消費税額</div>
                                         <div className='ml-4'>0円</div>
                                         <div className='ml-10 flex'>金額</div>
                                         <div className='ml-4 text-lg font-semibold'>0円</div>
-                                    </div>
+                                    </div> */}
                                     <div className='py-3'>
                                         <hr className='' />
                                     </div>
@@ -486,17 +517,17 @@ function AddForm() {
 
                         ))
                     }
-                    <div className='pb-6 flex flex-col mr-14'>
+                    {/* <div className='pb-6 flex flex-col mr-14'>
                         <div className='flex items-center mr-10 pt-3'>
                             <div className='ml-auto flex'>消費税額</div>
                             <div className='ml-4'>0円</div>
                             <div className='ml-10 flex'>金額</div>
                             <div className='ml-4 text-lg font-semibold'>0円</div>
                         </div>
-                    </div>
-                    <div 
-                      className='w-36 bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' 
-                      onClick={handleGetBankData}>
+                    </div> */}
+                    <div
+                        className='w-36 bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer'
+                        onClick={handleGetBankData}>
                         銀行データ取込
                     </div>
                     <div className='py-3'>
@@ -510,19 +541,19 @@ function AddForm() {
             </div>
             <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
                 <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>新規登録</div>
-                <Link to={`salesmanagements/deposit-slips`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
+                <Link to={`/sales-management/voucher-entries/payment-slips`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
             </div>
         </div>
     );
 }
 
 function PaymentSlipsAdd() {
-  return (
-    <Routes>
-      <Route path="" element={<AddForm />} />
-      <Route path="data-import/*" element={<PaymentDataImport />} />
-    </Routes>
-  )
+    return (
+        <Routes>
+            <Route path="" element={<AddForm />} />
+            <Route path="data-import/*" element={<PaymentDataImport />} />
+        </Routes>
+    )
 }
 
 export default PaymentSlipsAdd;
