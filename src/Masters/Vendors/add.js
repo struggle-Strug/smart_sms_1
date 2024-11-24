@@ -52,6 +52,7 @@ function VendorAdd() {
 
     const handleSubmit = () => {
         validator.required(vendor.name_primary, 'name_primary', '仕入先名1');
+        validator.required(vendor.code, 'code', '仕入先名コード');
         validator.required(vendor.phone_number, 'phone_number', '電話番号');
         validator.required(vendor.address, 'address', '住所');
 
@@ -209,6 +210,7 @@ function VendorAdd() {
                         />
                     </div>
                 </div>
+                {errors.code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.code}</div>}
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
                         <div className='p-4'>電話番号 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>

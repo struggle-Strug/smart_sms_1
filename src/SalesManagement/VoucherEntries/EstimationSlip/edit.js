@@ -269,9 +269,9 @@ function EstimationSlipEdit() {
             validator.required(estimationSlipDetails[i].number, 'number' + i, '数量');
             validator.required(estimationSlipDetails[i].unit_price, 'unit_price' + i, '単価');
             validator.required(estimationSlipDetails[i].price, 'price' + i, '金額');
-            // validator.required(estimationSlipDetails[i].tax_rate, 'tax_rate' + i, '税率');
+            validator.required(estimationSlipDetails[i].tax_rate, 'tax_rate' + i, '税率');
             validator.required(estimationSlipDetails[i].lot_number, 'lot_number' + i, 'ロット番号');
-            // validator.required(estimationSlipDetails[i].storage_facility, 'storage_facility' + i, '倉庫');
+            validator.required(estimationSlipDetails[i].storage_facility, 'storage_facility' + i, '倉庫');
             // console.log(estimationSlipDetails[i]);
 
         }
@@ -292,12 +292,19 @@ function EstimationSlipEdit() {
 
     const handleSumPrice = () => {
         let SumPrice = 0
+        let consumptionTaxEight = 0
+        let consumptionTaxTen = 0
 
         for (let i = 0; i < estimationSlipDetails.length; i++) {
-            SumPrice += estimationSlipDetails[i].price * estimationSlipDetails[i].number;
+            SumPrice += estimationSlipDetails[i].unit_price * estimationSlipDetails[i].number;
+            if (estimationSlipDetails[i].tax_rate === 8) {
+                consumptionTaxEight += estimationSlipDetails[i].unit_price * estimationSlipDetails[i].number * 0.08;
+            } else if (estimationSlipDetails[i].tax_rate === 10) {
+                consumptionTaxTen += estimationSlipDetails[i].unit_price * estimationSlipDetails[i].number * 0.1;
+            }
         }
 
-        return { "subtotal": SumPrice, "consumptionTaxEight": SumPrice * 0.08, "consumptionTaxTen": 0, "totalConsumptionTax": SumPrice * 0.08, "Total": SumPrice * 1.08 }
+        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxEight + consumptionTaxTen, "Total": SumPrice + consumptionTaxEight + consumptionTaxTen }
     }
 
     const [isOpen, setIsOpen] = useState(null);
@@ -672,10 +679,11 @@ function EstimationSlipEdit() {
                                 </div>
                                 <div className='flex items-center justify-end'>
                                     <div className='flex items-center'>
-                                        <div className='mr-4'>消費税額</div>
-                                        <div className='mr-4'>{(estimationSlipDetails[index].price * estimationSlipDetails[index].number * 0.08).toFixed(0)}円</div>
+                                    <div className='mr-4'>消費税額</div>
+                                        {/* <div className='mr-4'>{(estimationSlipDetails[index].unit_price * estimationSlipDetails[index].number * 0.08).toFixed(0)}円</div> */}
+                                        <div className='mr-4'>{(estimationSlipDetails[index].unit_price * estimationSlipDetails[index].number * estimationSlipDetail.tax_rate / 100).toFixed(0)}円</div>
                                         <div className='mr-4'>金額</div>
-                                        <div className='text-lg font-bold'>{(estimationSlipDetails[index].price * estimationSlipDetails[index].number * 1.08).toFixed(0)}円</div>
+                                        <div className='text-lg font-bold'>{(estimationSlipDetails[index].unit_price * estimationSlipDetails[index].number * (1 + estimationSlipDetail.tax_rate / 100)).toFixed(0)}円</div>
                                     </div>
                                 </div>
                                 <hr className='py-3' />
@@ -684,12 +692,6 @@ function EstimationSlipEdit() {
                     }
 
                     <div className='pb-6 flex flex-col mr-14'>
-                        <div className='flex items-center mr-10 pt-3'>
-                            <div className='ml-auto flex'>消費税額</div>
-                            <div className='ml-4'>0円</div>
-                            <div className='ml-10 flex'>金額</div>
-                            <div className='ml-4 text-lg font-semibold'>0円</div>
-                        </div>
                         <div className='py-6 flex'>
                         <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
                             <div className='flex pb-2'>
@@ -783,7 +785,7 @@ function EstimationSlipEdit() {
             </div>
             <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
                 <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>保存</div>
-                <Link to={`sales-managements/estimation-slip`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
+                <Link to={`/sales-management/voucher-entries/estimation-slip`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
             </div>
         </div>
     );

@@ -1,5 +1,5 @@
-const { ipcMain} = require('electron');
-const { loadDataConversions, importExcelToDatabase } = require('../../database/dashboard/dataConversions');
+const { ipcMain, dialog } = require('electron');
+const { loadDataConversions, importExcelToDatabase,  } = require('../../database/dashboard/dataConversions');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const { app } = require('electron');
@@ -19,13 +19,22 @@ ipcMain.on('load-data-conversions', (event) => {
 });
 
 ipcMain.on('import-excel-to-database', (event, { excelDirPath, csvDirPath }) => {
-  importExcelToDatabase(db, excelDirPath, csvDirPath, (err, message) => {
+  importExcelToDatabase(db, excelDirPath, csvDirPath, (err, logs) => {
     if (err) {
       console.error("Error importing Excel data:", err);
       event.reply('import-excel-to-database-reply', { error: err.message });
     } else {
-      console.log(message);
-      event.reply('import-excel-to-database-reply', { message });
+      console.log("Import completed successfully.");
+      event.reply('import-excel-to-database-reply', { logs });
     }
   });
 });
+
+
+ipcMain.handle('show-folder-dialog', async () => {
+  const { dialog } = require('electron');
+  return await dialog.showOpenDialog({
+      properties: ['openDirectory'],
+  });
+});
+

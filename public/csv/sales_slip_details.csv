@@ -1,0 +1,4 @@
+id,sales_slip_id,product_id,product_name,number,unit,unit_price,tax_rate,lot_number,storage_facility,stock,gross_profit,gross_margin_rate,created,updated
+1,test,1,test,3,test,321,test,test,test,test,123,0.3,2024-11-17 11:49:38,2024-11-17 11:49:38
+2,test,3,test,2,test,456,test,test,test,test,343,1,2024-11-17 11:49:40,2024-11-17 11:49:40
+3,test,2,test,13,test,111,test,test,test,test,713,10,2024-11-17 11:49:41,2024-11-17 11:49:41

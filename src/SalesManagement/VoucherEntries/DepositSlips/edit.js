@@ -469,7 +469,7 @@ function DepositSlipsEdit() {
             </div>
             <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
                 <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>保存</div>
-                <Link to={`salesmanagements/deposit-slips`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
+                <Link to={`/sales-management/voucher-entries/deposit-slips`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
             </div>
         </div>
     );

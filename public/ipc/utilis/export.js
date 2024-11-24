@@ -52,69 +52,80 @@ ipcMain.on('export-to-excel', (event, dataForSet) => {
 )
 
 ipcMain.on('export-to-pdf', (event, dataForSet) => {
-    try {
-        const { header, data, fileName } = dataForSet;
+  try {
+      const { header, data, fileName } = dataForSet;
 
-        // PDFドキュメントを作成
-        const doc = new PDFDocument();
-        const filePath = path.join(app.getPath('desktop'), `${fileName}.pdf`);
+      const doc = new PDFDocument({
+          margins: {
+              top: 50,
+              bottom: 50,
+              left: 50,
+              right: 50,
+          },
+      });
+      const filePath = path.join(app.getPath('desktop'), `${fileName}.pdf`);
 
-        // フォントファイルのパスを指定（日本語フォントを使用）
-        const fontPath = path.join(__dirname, 'assets', 'fonts', 'NotoSansJP-VariableFont_wght.ttf');
-        doc.font(fontPath);
+      const fontPath = path.join(__dirname, 'assets', 'fonts', 'NotoSansJP-VariableFont_wght.ttf');
+      doc.font(fontPath);
 
-        // PDFファイルの書き込みストリームを作成
-        const writeStream = fs.createWriteStream(filePath);
-        doc.pipe(writeStream);
+      const writeStream = fs.createWriteStream(filePath);
+      doc.pipe(writeStream);
 
-        // タイトル
-        doc.fontSize(16).text('支払明細表', { align: 'center' });
-        doc.moveDown(1);
+      const pageWidth = doc.page.width - doc.options.margins.left - doc.options.margins.right;
+      const tableTop = 100;
+      const cellHeight = 20;
 
-        // テーブルのヘッダー
-        const tableTop = 100;
-        const cellHeight = 30;
+      const columnWidths = header.map(() => pageWidth / header.length);
 
-        let columnWidths = [];
-        for (let i = 0; i < header.length; i++) {
-            columnWidths.push(60)
-        }
+      // タイトル
+      doc.fontSize(16).text('支払明細表', { align: 'center' });
+      doc.moveDown(1);
 
-        // ヘッダーの描画
-        drawRow(doc, tableTop, header, columnWidths);
-        drawLine(doc, tableTop + cellHeight);
+      // ヘッダー描画
+      drawRow(doc, tableTop, header, columnWidths);
+      drawLine(doc, tableTop + cellHeight);
 
-        // データの描画
-        let position = tableTop + cellHeight;
-        data.forEach((row) => {
-            drawRow(doc, position, row, columnWidths);
-            position += cellHeight;
-            drawLine(doc, position);
-        });
+      // データ描画
+      let position = tableTop + cellHeight;
+      data.forEach((row) => {
+          if (position + cellHeight > doc.page.height - doc.options.margins.bottom) {
+              doc.addPage(); // 改ページ
+              position = tableTop;
+              drawRow(doc, position, header, columnWidths); // ヘッダーを再描画
+              drawLine(doc, position + cellHeight);
+              position += cellHeight;
+          }
+          drawRow(doc, position, row, columnWidths);
+          position += cellHeight;
+          drawLine(doc, position);
+      });
 
-        // PDFを閉じる
-        doc.end();
+      doc.end();
 
-        // ファイル保存完了時にイベントを返す
-        writeStream.on('finish', () => {
-            event.reply('export-success', 'デスクトップフォルダにPDFをダウンロードしました。');
-        });
-    } catch (error) {
-        console.error('Failed to export to PDF:', error);
-        event.reply('export-failure', 'Failed to export to PDF');
-    }
+      writeStream.on('finish', () => {
+          event.reply('export-success', 'デスクトップフォルダにPDFをダウンロードしました。');
+      });
+  } catch (error) {
+      console.error('Failed to export to PDF:', error);
+      event.reply('export-failure', 'Failed to export to PDF');
+  }
 });
 
-// テーブルの行を描画
 function drawRow(doc, y, row, columnWidths) {
-    let x = 50; // テーブルの左端の位置
-    row.forEach((text, i) => {
-        doc.fontSize(10).text(text, x + 5, y + 5, { width: columnWidths[i], align: 'left' });
-        x += columnWidths[i];
-    });
+  let x = doc.options.margins.left; // 左の余白から開始
+  row.forEach((text, i) => {
+      doc.fontSize(8).text(String(text), x + 5, y + 5, {
+          width: columnWidths[i] - 10, // 列幅に収める
+          align: 'left',
+          lineBreak: false, // 改行を無効化
+          ellipsis: true,   // 切り捨てる場合に省略記号を付ける
+      });
+      x += columnWidths[i];
+  });
 }
 
-// 横線を描画
 function drawLine(doc, y) {
-    doc.moveTo(50, y).lineTo(50 + 900, y).stroke();
+  const startX = doc.options.margins.left;
+  const endX = doc.page.width - doc.options.margins.right;
+  doc.moveTo(startX, y).lineTo(endX, y).stroke();
 }

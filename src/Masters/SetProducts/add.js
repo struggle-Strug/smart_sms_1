@@ -44,6 +44,7 @@ function SetProductAdd() {
 
     const handleSubmit = () => {
         validator.required(product.set_product_name, 'set_product_name', 'セット商品名');
+        validator.required(product.code, 'code', 'セット商品コード');
         validator.required(product.category, 'category', 'カテゴリー');
         validator.required(product.sub_category, 'sub_category', 'サブカテゴリー');
         validator.required(product.jan_code, 'jan_code', 'JANコード');
@@ -91,6 +92,7 @@ function SetProductAdd() {
                         />
                     </div>
                 </div>
+                {errors.set_product_name && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.set_product_name}</div>}
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
                         <div className='p-4'>セット商品コード <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>

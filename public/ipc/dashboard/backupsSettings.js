@@ -1,8 +1,10 @@
-const { ipcMain } = require('electron');
-const { loadAllTablesData, loadAllTablesDataAndExportToCSV, importCSVToTable, importAllCsvToDatabase } = require('../../database/dashboard/backupsSettings');
+const { ipcMain, dialog } = require('electron');
+const { loadAllTablesData, importCSVToTable, importAllCsvToDatabase, getTablesFromDB, getTableData, convertToCSV } = require('../../database/dashboard/backupsSettings');
 const sqlite3 = require('sqlite3').verbose();
+const fs = require('fs');
 const path = require('path');
 const { app } = require('electron');
+const archiver = require('archiver');
 
 // DBインスタンスの作成
 const dbPath = path.join(app.getPath('userData'), 'database.db');
@@ -21,16 +23,53 @@ ipcMain.on('get-all-tables-data', (event) => {
   });
 });
 
-ipcMain.on('export-all-tables-to-csv', (event) => {
-  loadAllTablesDataAndExportToCSV(db, (err, message) => {
-    if (err) {
-      console.error("Error exporting data:", err);
-      event.reply('export-all-tables-to-csv-reply', { error: err.message });
-    } else {
-      console.log(message);
-      event.reply('export-all-tables-to-csv-reply', { message });
+ipcMain.handle('export-all-tables-to-zip', async (event, db) => {
+  try {
+    // ユーザーにフォルダを選択させる
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      properties: ['openDirectory'],
+    });
+
+    if (canceled || filePaths.length === 0) {
+      return { error: 'Export canceled by user.' };
     }
-  });
+
+    const outputFolder = filePaths[0];
+    const zipPath = path.join(outputFolder, 'backup.zip');
+
+    // ZIP ファイル作成準備
+    const output = fs.createWriteStream(zipPath);
+    const archive = archiver('zip', { zlib: { level: 9 } });
+
+    output.on('close', () => {
+      console.log(`ZIP file created: ${zipPath}`);
+    });
+
+    archive.on('error', (err) => {
+      throw err;
+    });
+
+    archive.pipe(output);
+
+    // 全テーブルのデータを取得し CSV を ZIP に追加
+    const tables = await getTablesFromDB(db); // 全テーブル名を取得する関数
+    for (const tableName of tables) {
+      const rows = await getTableData(db, tableName); // 各テーブルのデータを取得する関数
+
+      if (rows.length > 0) {
+        const csvContent = convertToCSV(rows); // データをCSV形式に変換する関数
+        archive.append(csvContent, { name: `${tableName}.csv` });
+      }
+    }
+
+    // ZIP ファイルの書き込み完了
+    await archive.finalize();
+
+    return { success: true, zipPath };
+  } catch (error) {
+    console.error('Error exporting data to ZIP:', error);
+    return { error: error.message };
+  }
 });
 
 ipcMain.on('import-csv-to-table', (event, tableName, filePath) => {
