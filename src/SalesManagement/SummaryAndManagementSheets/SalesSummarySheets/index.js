@@ -141,6 +141,31 @@ function Index() {
         return { graphData: graphData, companyNames: companyNames, values: values }
     };
 
+    useEffect(() => {
+      // 現在の日付を取得
+      const now = new Date();
+      
+      // 今月の1日を計算
+      const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  
+      // 日付を 'YYYY-MM-DD' フォーマットに変換する関数
+      const formatDate = (date) => {
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          return `${year}-${month}-${day}`;
+      };
+  
+      // 検索条件の初期化
+      setSearchQueryList((prev) => ({
+          ...prev,
+          "ssd.created_start": formatDate(firstDayOfMonth), // 今月の1日
+          "ssd.created_end": formatDate(lastDayOfMonth),   // 今月の末日
+      }));
+  }, []);
+  
+
 
     useEffect(() => {
         ipcRenderer.send('load-sales-slip-details');
@@ -350,11 +375,9 @@ function Index() {
                 <div className='pb-6 flex items-center'>
                     <div className='text-3xl font-bold'>売上集計表</div>
                     <div className='flex ml-auto'>
-                        <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold flex'>
-                            <div className='flex items-center'>
-                            </div>
-                            集計表設定
-                        </Link>
+                    <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={(e) => setIsDialogOpen(true)}>
+                          エクスポート
+                        </div>
                     </div>
                 </div>
                 <div className='bg-gray-100 rounded p-6'>
@@ -410,6 +433,7 @@ function Index() {
                                 placeholder=''
                                 name="ssd.product_name"
                                 value={searchQueryList["ssd.product_name"]}
+                                onChange={handleInputChange}
                             />
                         </div>
                     </div>
@@ -509,15 +533,6 @@ function Index() {
                     )}
                     <div className='flex mt-6'>
                         <div className='border rounded-lg py-3 px-7 text-base font-bold bg-blue-600 text-white' onClick={(e) => handleSearch()}>適用して表示</div>
-                    </div>
-                </div>
-                <div className='flex justify-end'>
-                    <div className='flex ml-auto pt-6'>
-                      <div className='flex ml-auto'>
-                          <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={() => setIsDialogOpen(true)}>
-                              エクスポート
-                          </div>
-                      </div>
                     </div>
                 </div>
                 <table className="w-full mt-8 table-auto">

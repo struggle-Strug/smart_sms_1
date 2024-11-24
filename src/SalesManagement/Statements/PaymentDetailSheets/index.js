@@ -80,6 +80,31 @@ function Index() {
     };
 
     useEffect(() => {
+      // 現在の日付を取得
+      const now = new Date();
+      
+      // 今月の1日を計算
+      const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  
+      // 日付を 'YYYY-MM-DD' フォーマットに変換する関数
+      const formatDate = (date) => {
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          return `${year}-${month}-${day}`;
+      };
+  
+      // 検索条件の初期化
+      setSearchQueryList((prev) => ({
+          ...prev,
+          "dsd.created_start": formatDate(firstDayOfMonth), // 今月の1日
+          "dsd.created_end": formatDate(lastDayOfMonth),   // 今月の末日
+      }));
+  }, []);
+  
+
+    useEffect(() => {
         ipcRenderer.send('load-deposit-slip-details');
 
         const handleLoadDetails = (event, data) => {
@@ -256,11 +281,9 @@ function Index() {
                 <div className='pb-6 flex items-center'>
                     <div className='text-2xl font-bold'>入金明細表</div>
                     <div className='flex ml-auto'>
-                        <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold flex'>
-                            <div className='flex items-center'>
-                            </div>
-                            明細表設定
-                        </Link>
+                    <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={(e) => setIsDialogOpen(true)}>
+                          エクスポート
+                        </div>
                     </div>
                 </div>
                 <div className='bg-gray-100 rounded p-6'>
@@ -416,14 +439,7 @@ function Index() {
                         <div className='border rounded-lg py-3 px-7 text-base font-bold bg-blue-600 text-white' onClick={(e) => handleSearch()}>適用して表示</div>
                     </div>
                 </div>
-                <div className='flex justify-end'>
-                    <div className='flex ml-auto pt-6'>
-                      <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={(e) => setIsDialogOpen(true)}>
-                        エクスポート
-                      </div>
-                    </div>
-                </div>
-                <div className='pb-8 overflow-x-scroll'>
+                <div className='py-8 overflow-x-scroll'>
                     <table className="w-full mt-8 table-auto">
                         <thead className="border-b">
                             <tr>
