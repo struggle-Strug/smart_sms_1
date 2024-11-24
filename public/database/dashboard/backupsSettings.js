@@ -53,42 +53,59 @@ function loadAllTablesData(db, callback) {
 // DBインスタンスの作成
 
 // 全テーブルのデータを取得してCSVファイルに出力する関数
-function loadAllTablesDataAndExportToCSV(db) {
-  // 全テーブル名を取得
+function loadAllTablesDataAndExportToCSV(db, callback) {
   db.all("SELECT name FROM sqlite_master WHERE type='table'", [], (err, tables) => {
     if (err) {
       console.error("Error retrieving tables:", err);
-      return;
+      return callback(err); // エラー時のコールバック呼び出し
+    }
+
+    let completedTables = 0;
+    const totalTables = tables.length;
+
+    if (totalTables === 0) {
+      return callback(null, "No tables found in the database.");
     }
 
     tables.forEach((table) => {
       const tableName = table.name;
 
-      // 各テーブルのデータを取得
       db.all(`SELECT * FROM ${tableName}`, [], (err, rows) => {
         if (err) {
           console.error(`Error retrieving data from table ${tableName}:`, err);
-          return;
+          return callback(err); // テーブル取得エラー時も callback を呼び出す
         }
 
         if (rows.length > 0) {
-          // CSV Writerのセットアップ
           const csvWriter = createCsvWriter({
             path: path.join('/Users/esakiryota/smart-sms/public/csv', `${tableName}.csv`),
             header: Object.keys(rows[0]).map((column) => ({ id: column, title: column }))
           });
 
-          // データをCSVに書き込み
           csvWriter.writeRecords(rows)
             .then(() => {
               console.log(`Data from table ${tableName} has been written to ${tableName}.csv`);
+              completedTables++;
+
+              if (completedTables === totalTables) {
+                callback(null, "バックアップを作成しました。");
+              }
             })
-            .catch((err) => console.error(`Error writing CSV for table ${tableName}:`, err));
+            .catch((err) => {
+              console.error(`Error writing CSV for table ${tableName}:`, err);
+              callback(err);
+            });
+        } else {
+          completedTables++;
+          if (completedTables === totalTables) {
+            callback(null, "バックアップを作成しました。");
+          }
         }
       });
     });
   });
 }
+
 
 // /**
 //  * CSVファイルを読み込んで指定テーブルにデータを上書きする

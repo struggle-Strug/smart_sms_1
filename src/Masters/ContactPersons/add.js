@@ -29,6 +29,7 @@ function ContactPersonAdd() {
     const handleSubmit = () => {
         // バリデーションを実行
         validator.required(contactPerson.name, 'name', '担当者名');
+        validator.required(contactPerson.code, 'code', '担当者コード');
         validator.required(contactPerson.phone_number, 'phone_number', '電話番号');
         validator.required(contactPerson.email, 'email', 'メールアドレス');
 
@@ -103,7 +104,7 @@ function ContactPersonAdd() {
                         />
                     </div>
                 </div>
-                {errors.id && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.id}</div>}
+                {errors.code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.code}</div>}
 
                 <div className="flex bg-white">
                     <div className="w-1/5">

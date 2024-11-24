@@ -43,6 +43,7 @@ function StorageFacilityAdd() {
 
     const handleSubmit = () => {
         validator.required(facility.name, 'name', '倉庫名');
+        validator.required(facility.code, 'code', '倉庫コード');
         validator.required(facility.address, 'address', '所在地');
 
         setErrors(validator.getErrors());
@@ -103,7 +104,7 @@ function StorageFacilityAdd() {
                         />
                     </div>
                 </div>
-                {errors.id && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.id}</div>}
+                {errors.code && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.code}</div>}
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
                         <div className='p-4'>倉庫所在地 <span className='text-red-600 bg-red-100 py-0.5 px-1.5'>必須</span></div>
