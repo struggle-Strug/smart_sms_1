@@ -8,16 +8,33 @@ function Index() {
 
   // IPCイベントのリスナーを登録
   useEffect(() => {
-    ipcRenderer.on('export-all-tables-to-zip-reply', (event, response) => {
-      if (response.error) {
-        console.error("エクスポート失敗:", response.error);
-        alert(`エクスポート失敗: ${response.error}`);
-      } else {
-        console.log("エクスポート成功:", response.zipPath);
-        alert(`バックアップZIPが作成されました: ${response.zipPath}`);
-      }
+    ipcRenderer.on('all-tables-data', (event, data) => {
+      console.log("受信したデータ", data);
+      setBackupData(data); // 受信したデータをstateに格納
     });
 
+    return () => {
+      ipcRenderer.removeAllListeners('all-tables-data');
+    };
+  }, []);
+
+  const [message, setMessage] = useState("");
+
+  // ボタン押下時に実行する処理
+  const hoge = () => {
+    ipcRenderer.send('export-all-tables-to-csv'); // ボタン押下でデータを要求
+  };
+  ipcRenderer.once('export-all-tables-to-csv-reply', (event, response) => {
+    if (response.error) {
+      setMessage(`Error: ${response.error}`);
+      alert(`Error: ${response.error}`);
+    } else {
+      setMessage(response.message);
+      alert(response.message); // 成功メッセージを表示
+    }
+  });
+
+  useEffect(() => {
     ipcRenderer.on('restore-all-tables-from-csv-reply', (event, data) => {
       console.log("復元結果", data);
       alert(data.message || data.error);

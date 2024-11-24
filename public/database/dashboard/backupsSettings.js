@@ -54,25 +54,59 @@ function loadAllTablesData(db, callback) {
 // DBインスタンスの作成
 
 // 全テーブルのデータを取得してCSVファイルに出力する関数
-// SQLiteから全テーブル名を取得する関数
-function getTablesFromDB(db) {
-  return new Promise((resolve, reject) => {
-    db.all("SELECT name FROM sqlite_master WHERE type='table'", [], (err, rows) => {
-      if (err) reject(err);
-      else resolve(rows.map(row => row.name));
+function loadAllTablesDataAndExportToCSV(db, callback) {
+  db.all("SELECT name FROM sqlite_master WHERE type='table'", [], (err, tables) => {
+    if (err) {
+      console.error("Error retrieving tables:", err);
+      return callback(err); // エラー時のコールバック呼び出し
+    }
+
+    let completedTables = 0;
+    const totalTables = tables.length;
+
+    if (totalTables === 0) {
+      return callback(null, "No tables found in the database.");
+    }
+
+    tables.forEach((table) => {
+      const tableName = table.name;
+
+      db.all(`SELECT * FROM ${tableName}`, [], (err, rows) => {
+        if (err) {
+          console.error(`Error retrieving data from table ${tableName}:`, err);
+          return callback(err); // テーブル取得エラー時も callback を呼び出す
+        }
+
+        if (rows.length > 0) {
+          const csvWriter = createCsvWriter({
+            path: path.join('/Users/esakiryota/smart-sms/public/csv', `${tableName}.csv`),
+            header: Object.keys(rows[0]).map((column) => ({ id: column, title: column }))
+          });
+
+          csvWriter.writeRecords(rows)
+            .then(() => {
+              console.log(`Data from table ${tableName} has been written to ${tableName}.csv`);
+              completedTables++;
+
+              if (completedTables === totalTables) {
+                callback(null, "バックアップを作成しました。");
+              }
+            })
+            .catch((err) => {
+              console.error(`Error writing CSV for table ${tableName}:`, err);
+              callback(err);
+            });
+        } else {
+          completedTables++;
+          if (completedTables === totalTables) {
+            callback(null, "バックアップを作成しました。");
+          }
+        }
+      });
     });
   });
 }
 
-// SQLiteから指定テーブルのデータを取得する関数
-function getTableData(db, tableName) {
-  return new Promise((resolve, reject) => {
-    db.all(`SELECT * FROM ${tableName}`, [], (err, rows) => {
-      if (err) reject(err);
-      else resolve(rows);
-    });
-  });
-}
 
 // データをCSV形式に変換する関数
 function convertToCSV(rows) {

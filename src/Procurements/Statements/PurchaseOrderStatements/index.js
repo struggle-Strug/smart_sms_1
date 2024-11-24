@@ -272,7 +272,6 @@ function Index() {
 
   const exportToCSV = () => {
     ipcRenderer.send('export-to-csv', dataForExport);
-    console.log(dataForExport);
   };
 
   const exportToExcel = () => {
@@ -330,32 +329,35 @@ function Index() {
           <div className='grid grid-cols-3 gap-6'>
             <div>
               <div className='flex items-center'>
-                <div>
-                  <div className='text-sm pb-1.5'>期間指定 </div>
+                <div style={{ width: "130px" }}>
+                  <div className='text-sm pb-1.5'>期間指定 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
                   {/* <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} /> */}
-                  <DatePicker
-                    selected={searchQueryList["pod.created_start"] ? new Date(searchQueryList["pod.created_start"]) : null}
-                    onChange={(date) => handleDateChange(date, "pod.created_start")}
-                    dateFormat="yyyy-MM-dd"
-                    className='border rounded px-4 py-2.5 bg-white  w-full'
-                    placeholderText='期間を選択'
+                  <input
+                    type='date'
+                    className='border rounded px-4 py-2.5 bg-white w-2/3 ml-[-10px]'
+                    placeholder='適用開始日を入力'
+                    name="pod.created_start"
+                    value={searchQueryList["pod.created_start"]}
+                    onChange={handleInputChange}
                   />
                 </div>
                 <div>
                   <div className='w-1'>&nbsp;</div>
-                  <div className='flex items-center px-2'>〜</div>
+                  <div className=' px-2'>〜</div>
                 </div>
 
-                <div>
-                  <div className='text-sm pb-1.5 text-gray-100'>期間指定</div>
-                  {/* <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} /> */}
-                  <DatePicker
-                    selected={searchQueryList["pod.created_end"] ? new Date(searchQueryList["pod.created_end"]) : null}
-                    onChange={(date) => handleDateChange(date, "pod.created_end")}
-                    dateFormat="yyyy-MM-dd"
-                    className='border rounded px-4 py-2.5 bg-white  w-full'
-                    placeholderText='期間を選択'
-                  />
+                <div className='flex items-center'>
+                  <div>
+                    <div className='text-sm pb-1.5 text-gray-100'>期間指定</div>
+                    <input
+                      type='date'
+                      className='border rounded px-4 py-2.5 bg-white w-2/3 ml-[-10px]'
+                      placeholder='適用開始日を入力'
+                      name="pod.created_end"
+                      value={searchQueryList["pod.created_end"]}
+                      onChange={handleInputChange}
+                    />
+                  </div>
                 </div>
               </div>
             </div>

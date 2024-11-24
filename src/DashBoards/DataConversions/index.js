@@ -7,6 +7,7 @@ const { ipcRenderer } = window.require('electron');
 
 function Index() {
   const [dataConversions, setDataConversions] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null); // 選択されたファイル
 
   useEffect(() => {
     ipcRenderer.send('load-data-conversions');
@@ -20,12 +21,47 @@ function Index() {
     };
   }, []);
 
+  const handleFolderSelection = async () => {
+    const result = await ipcRenderer.invoke('show-folder-dialog', {
+        properties: ['openDirectory'], // フォルダ選択
+    });
+    console.log(result.filePaths);
+    setSelectedFile(result.filePaths[0]);
+  };
+
+  // const handleFileSelection = async () => {
+  //   // Electronのダイアログを使ってファイルを選択
+  //   const result = await ipcRenderer.invoke('show-file-dialog', {
+  //     properties: ['openFile'], // ファイル選択のみ許可
+  //     filters: [
+  //       { name: 'Excel Files', extensions: ['xlsx', 'xls'] }, // Excelファイルのフィルター
+  //     ],
+  //   });
+
+  //   if (!result.canceled && result.filePaths.length > 0) {
+  //     setSelectedFile(result.filePaths[0]);
+  //     console.log("選択されたファイル:", result.filePaths[0]);
+  //   } else {
+  //     console.log("ファイル選択がキャンセルされました");
+  //   }
+  // };
+
   const handleImport = () => {
-    const excelDirPath = '/Users/esakiryota/smart-sms/public/excel/xlsx';  // Excelファイルが置かれているディレクトリ
-    const csvDirPath = '/Users/esakiryota/smart-sms/public/excel/csv';  // 一時的なCSVファイル保存ディレクトリ
-    
+    if (!selectedFile) {
+      alert("ファイルを選択してください");
+      return;
+    }
+
+    const csvDirPath = '/Users/esakiryota/smart-sms/public/excel/csv'; // 一時的なCSV保存ディレクトリ
+    const excelDirPath = selectedFile;
+    console.log(excelDirPath);
+
     // バックエンドにインポートリクエストを送信
-    ipcRenderer.send('import-excel-to-database', { excelDirPath, csvDirPath });
+    ipcRenderer.send('import-excel-to-database', {
+      excelDirPath,
+      csvDirPath,
+    });
+    ipcRenderer.send('save-excel-to-db', selectedFile);
   };
 
   // インポート完了やエラー通知をリッスン
@@ -37,6 +73,7 @@ function Index() {
       } else {
         console.log("インポート成功:", response.message);
         alert("インポート完了");
+        setSelectedFile(null); // ファイル選択をリセット
       }
     };
 
@@ -53,9 +90,16 @@ function Index() {
       <div className='p-8'>
         <div className='pb-6 text-2xl font-bold'>データコンバート</div>
         <div className='flex'>
-          <div className='border rounded-lg py-3 px-7 mb-8 text-base font-bold bg-blue-600 text-white'>
+          <div className='border rounded-lg py-3 px-7 mb-8 text-base font-bold bg-blue-600 text-white mr-4'>
+            <button onClick={handleFolderSelection}>ファイルを選択</button>
+          </div>
+          <div className='border rounded-lg py-3 px-7 mb-8 text-base font-bold bg-green-600 text-white'>
             <button onClick={handleImport}>インポート</button>
           </div>
+        </div>
+        <div className='pb-4'>
+          <span className='text-sm text-gray-600'>選択されたファイル:</span> 
+          <span className='text-sm font-bold'>{selectedFile || "ファイル未選択"}</span>
         </div>
         <table className="w-full table-auto">
           <thead className=''>

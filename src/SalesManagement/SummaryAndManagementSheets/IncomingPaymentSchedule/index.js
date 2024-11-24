@@ -318,12 +318,13 @@ function Index() {
               <div className='flex items-center'>
                 <div>
                   <div className='text-sm pb-1.5'>期間 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
-                  <DatePicker
-                    selected={searchQueryList["dsd.created_start"] ? new Date(searchQueryList["dsd.created_start"]) : null}
-                    onChange={(date) => handleDateChange(date, "dsd.created_start")}
-                    dateFormat="yyyy-MM-dd"
-                    className='border rounded px-4 py-2.5 bg-white  w-full'
-                    placeholderText='期間を選択'
+                  <input
+                    type='date'
+                    className='border rounded px-4 py-2.5 bg-white w-2/3'
+                    placeholder='適用開始日を入力'
+                    name="dsd.created_start"
+                    value={searchQueryList["dsd.created_start"]}
+                    onChange={handleInputChange}
                   />
                 </div>
                 <div>
@@ -333,24 +334,26 @@ function Index() {
 
                 <div>
                   <div className='text-sm pb-1.5 text-gray-100'>期間</div>
-                  <DatePicker
-                    selected={searchQueryList["dsd.created_end"] ? new Date(searchQueryList["dsd.created_end"]) : null}
-                    onChange={(date) => handleDateChange(date, "dsd.created_end")}
-                    dateFormat="yyyy-MM-dd"
-                    className='border rounded px-4 py-2.5 bg-white  w-full'
-                    placeholderText='期間を選択'
+                  <input
+                    type='date'
+                    className='border rounded px-4 py-2.5 bg-white w-2/3'
+                    placeholder='適用開始日を入力'
+                    name="dsd.created_end"
+                    value={searchQueryList["dsd.created_end"]}
+                    onChange={handleInputChange}
                   />
                 </div>
               </div>
             </div>
             <div>
               <div className='text-sm pb-1.5'>締日</div>
-              <DatePicker
-                selected={searchQueryList["dsd.closing_date"] ? new Date(searchQueryList["dsd.closing_date"]) : null}
-                onChange={(date) => handleDateChange(date, "dsd.closing_date")}
-                dateFormat="yyyy-MM-dd"
-                className='border rounded px-4 py-2.5 bg-white  w-full'
-                placeholderText='期間を選択'
+              <input
+                type='date'
+                className='border rounded px-4 py-2.5 bg-white w-2/3'
+                placeholder='適用開始日を入力'
+                name="dsd.closing_date"
+                value={searchQueryList["dsd.closing_date"]}
+                onChange={handleInputChange}
               />
             </div>
             <div>
@@ -393,11 +396,11 @@ function Index() {
         </div>
         <div className='flex justify-end'>
           <div className='flex ml-auto pt-6'>
-            <div className='flex ml-auto'>
-              <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={() => setIsDialogOpen(true)}>
-                エクスポート
+            <Link to={`/master/customers/edit/1`} className='py-3 px-4 border rounded-lg text-base font-bold flex'>
+              <div className='flex items-center'>
               </div>
-            </div>
+              エクスポート
+            </Link>
           </div>
         </div>
         <div className='pb-8 px-8 overflow-x-scroll'>
@@ -428,65 +431,6 @@ function Index() {
             </table>
           </div>
         </div>
-        {
-          isDialogOpen &&
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="container mx-auto sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl bg-white rounded-2xl shadow-md">
-              <p className='text-2xl font-bold px-6 py-4'>エクスポート設定</p>
-              <hr />
-              <div className='flex-col px-6 pt-4'>
-                <div className=''>出力形式選択</div>
-                <div className='mt-2.5 flex'>
-                  <label className='text-base'>
-                    <input
-                      type="radio"
-                      name="outputFormat"
-                      value="csv"
-                      checked={outputFormat === 'csv'}
-                      onChange={() => setOutputFormat('csv')}
-                      className='mr-2'
-                    />csv
-                  </label>
-                  <label className='text-base ml-10'>
-                    <input
-                      type="radio"
-                      name="outputFormat"
-                      value="Excel"
-                      checked={outputFormat === 'Excel'}
-                      onChange={() => setOutputFormat('Excel')}
-                      className='mr-2'
-                    />Excel
-                  </label>
-                  <label className='text-base ml-10'>
-                    <input
-                      type="radio"
-                      name="outputFormat"
-                      value="PDF"
-                      checked={outputFormat === 'PDF'}
-                      onChange={() => setOutputFormat('PDF')}
-                      className='mr-2'
-                    />PDF
-                  </label>
-                  <label className='text-base ml-10'>
-                    <input
-                      type="radio"
-                      name="outputFormat"
-                      value="print"
-                      checked={outputFormat === 'print'}
-                      onChange={() => setOutputFormat('print')}
-                      className='mr-2'
-                    />印刷
-                  </label>
-                </div>
-              </div>
-              <hr />
-              <div className="flex justify-end py-4 px-6">
-                <button onClick={handleCancelDelete} className="px-5 py-3 font-semibold text-base mr-6 bg-white border border-gray-300 rounded-xl">キャンセル</button>
-                <button onClick={handleSave} className="px-11 py-3 font-semibold text-base bg-blue-600 text-white border-0 rounded-xl">書き出し</button>
-              </div>
-            </div>
-          </div>
-        }
       </div>
     </div>
   )

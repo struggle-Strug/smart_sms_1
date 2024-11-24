@@ -26,6 +26,7 @@ function PaymentMethodAdd() {
 
     const handleSubmit = () => {
         validator.required(paymentMethod.name, 'name', '支払方法名');
+        validator.required(paymentMethod.code, 'code', '支払方法コード');
 
         setErrors(validator.getErrors());
 
@@ -69,7 +70,7 @@ function PaymentMethodAdd() {
                         <input 
                             type='text' 
                             className='border rounded px-4 py-2.5 bg-white w-2/3' 
-                            placeholder='支払方法コードを入力' 
+                            placeholder='支払方法コードを入力'  
                             name="code" 
                             value={paymentMethod.code} 
                             onChange={handleChange} 

@@ -316,9 +316,9 @@ function Index() {
         <div className='pb-6 flex items-center'>
           <div className='text-2xl font-bold'>見積明細表</div>
           <div className='flex ml-auto'>
-          <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={(e) => setIsDialogOpen(true)}>
-                          エクスポート
-                        </div>
+            <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={(e) => setIsDialogOpen(true)}>
+              エクスポート
+            </div>
           </div>
         </div>
         <div className='bg-gray-100 rounded p-6'>
@@ -330,12 +330,13 @@ function Index() {
               <div className='flex items-center'>
                 <div>
                   <div className='text-sm pb-1.5'>期間指定 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
-                  <DatePicker
-                    selected={searchQueryList["esd.created_start"] ? new Date(searchQueryList["esd.created_start"]) : null}
-                    onChange={(date) => handleDateChange(date, "esd.created_start")}
-                    dateFormat="yyyy-MM-dd"
-                    className='border rounded px-4 py-2.5 bg-white  w-full'
-                    placeholderText='期間を選択'
+                  <input
+                    type='date'
+                    className='border rounded px-4 py-2.5 bg-white w-2/3'
+                    placeholder='適用開始日を入力'
+                    name="esd.created_start"
+                    value={searchQueryList["esd.created_start"]}
+                    onChange={handleInputChange}
                   />
                 </div>
                 <div>
@@ -345,12 +346,13 @@ function Index() {
 
                 <div>
                   <div className='text-sm pb-1.5 text-gray-100'>期間指定</div>
-                  <DatePicker
-                    selected={searchQueryList["esd.created_end"] ? new Date(searchQueryList["esd.created_end"]) : null}
-                    onChange={(date) => handleDateChange(date, "esd.created_end")}
-                    dateFormat="yyyy-MM-dd"
-                    className='border rounded px-4 py-2.5 bg-white  w-full'
-                    placeholderText='期間を選択'
+                  <input
+                    type='date'
+                    className='border rounded px-4 py-2.5 bg-white w-2/3'
+                    placeholder='適用開始日を入力'
+                    name="esd.created_end"
+                    value={searchQueryList["esd.created_end"]}
+                    onChange={handleInputChange}
                   />
                 </div>
               </div>
@@ -597,7 +599,6 @@ function Index() {
           </div>
         </div>
       }
-
     </div>
   )
 }
