@@ -73,6 +73,7 @@ ipcMain.on('edit-purchase-order-detail', (event, id) => {
 
 // 購入注文明細の検索
 ipcMain.on('search-purchase-order-details', (event, query) => {
+  console.log(query);
     searchPurchaseOrderDetails(query, (err, results) => {
         if (err) {
             console.error(err.message);

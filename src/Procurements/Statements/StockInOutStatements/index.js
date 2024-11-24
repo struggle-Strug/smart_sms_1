@@ -69,6 +69,30 @@ function Index() {
         fileName: fileName
     });
 
+    useEffect(() => {
+      // 現在の日付を取得
+      const now = new Date();
+      
+      // 今月の1日を計算
+      const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  
+      // 日付を 'YYYY-MM-DD' フォーマットに変換する関数
+      const formatDate = (date) => {
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          return `${year}-${month}-${day}`;
+      };
+  
+      // 検索条件の初期化
+      setSearchQueryList((prev) => ({
+          ...prev,
+          "sio.created_start": formatDate(firstDayOfMonth), // 今月の1日
+          "sio.created_end": formatDate(lastDayOfMonth),   // 今月の末日
+      }));
+  }, []);
+
 
     useEffect(() => {
         ipcRenderer.send('load-stock-in-out-slip-details');
@@ -282,10 +306,10 @@ function Index() {
                     <div>
                             <div className='flex items-center'>
                                 <div>
-                                    <div className='text-sm pb-1.5'>期間指定 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'>期間指定</div>
                                     <DatePicker
-                                        selected={searchQueryList["siod.created_start"] ? new Date(searchQueryList["siod.created_start"]) : null}
-                                        onChange={(date) => handleDateChange(date, "siod.created_start")}
+                                        selected={searchQueryList["sio.created_start"] ? new Date(searchQueryList["sio.created_start"]) : null}
+                                        onChange={(date) => handleDateChange(date, "sio.created_start")}
                                         dateFormat="yyyy-MM-dd"
                                         className='border rounded px-4 py-2.5 bg-white  w-full'
                                         placeholderText='期間を選択'
@@ -299,8 +323,8 @@ function Index() {
                                 <div>
                                     <div className='text-sm pb-1.5 text-gray-100'>期間指定</div>
                                     <DatePicker
-                                        selected={searchQueryList["siod.created_end"] ? new Date(searchQueryList["siod.created_end"]) : null}
-                                        onChange={(date) => handleDateChange(date, "siod.created_end")}
+                                        selected={searchQueryList["sio.created_end"] ? new Date(searchQueryList["sio.created_end"]) : null}
+                                        onChange={(date) => handleDateChange(date, "sio.created_end")}
                                         dateFormat="yyyy-MM-dd"
                                         className='border rounded px-4 py-2.5 bg-white  w-full'
                                         placeholderText='期間を選択'
@@ -331,7 +355,7 @@ function Index() {
                             />
                         </div>
                         <div className='flex-col'>
-                            <div className='text-sm pb-1.5'>処理種別 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
+                            <div className='text-sm pb-1.5'>処理種別 </div>
                             <div className='my-2.5 flex'>
                                 <label className='text-base'>
                                     <input type="radio" name="sio.processType" value="type1" className='mr-2' onChange={handleInputChange}/>出庫

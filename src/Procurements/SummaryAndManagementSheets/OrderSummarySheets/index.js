@@ -23,7 +23,7 @@ function Index() {
         "p.classification_primary": "",
         "p.classification_secondary": "",
         "pod.product_name": "",
-        "pod.contact_person": "",
+        "v.contact_person": "",
         "pod.storage_facility": "",
         "pod.status": "",
         "pod.lot_number": "",
@@ -32,6 +32,7 @@ function Index() {
         "v.classification1": "",
         "v.classification2": "",
     });
+    console.log(searchQueryList);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -74,6 +75,30 @@ function Index() {
         data: [],
         fileName: fileName
     });
+
+    useEffect(() => {
+      // 現在の日付を取得
+      const now = new Date();
+      
+      // 今月の1日を計算
+      const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  
+      // 日付を 'YYYY-MM-DD' フォーマットに変換する関数
+      const formatDate = (date) => {
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          return `${year}-${month}-${day}`;
+      };
+  
+      // 検索条件の初期化
+      setSearchQueryList((prev) => ({
+          ...prev,
+          "pod.created_start": formatDate(firstDayOfMonth), // 今月の1日
+          "pod.created_end": formatDate(lastDayOfMonth),   // 今月の末日
+      }));
+  }, []);
 
 
     useEffect(() => {
@@ -201,6 +226,7 @@ function Index() {
                 searchColums[key] = searchQueryList[key]
             }
         }
+        console.log(searchColums);
         ipcRenderer.send('search-purchase-order-details', searchColums);
     };
 
@@ -302,7 +328,7 @@ function Index() {
         setIsDialogOpen(false);
     };
 
-
+console.log(purchaseOrderDetails);
 
     return (
         <div className='w-5/6'>
@@ -323,7 +349,7 @@ function Index() {
                         <div>
                             <div className='flex items-center'>
                                 <div>
-                                    <div className='text-sm pb-1.5'>期間指定 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'>期間指定 </div>
                                     {/* <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} /> */}
                                     <DatePicker
                                         selected={searchQueryList["pod.created_start"] ? new Date(searchQueryList["pod.created_start"]) : null}
@@ -401,8 +427,8 @@ function Index() {
                                 type='text'
                                 className='border rounded px-4 py-2.5 bg-white w-full'
                                 placeholder=''
-                                name="pod.contact_person"
-                                value={searchQueryList["pod.contact_person"]}
+                                name="v.contact_person"
+                                value={searchQueryList["v.contact_person"]}
                                 onChange={handleInputChange}
                             />
                         </div>
@@ -516,9 +542,9 @@ function Index() {
                         {purchaseOrderDetails.map((purchaseOrderDetail) => (
                             <tr className='border-b' key={purchaseOrderDetail.id}>
                                 <td className='py-4'>{purchaseOrderDetail.order_date || <div className='border w-4'></div>}</td>
-                                <td className='py-4'>{purchaseOrderDetail.vender_name || <div className='border w-4'></div>}</td>
+                                <td className='py-4'>{purchaseOrderDetail.name_primary || <div className='border w-4'></div>}</td>
                                 <td className='py-4'>{purchaseOrderDetail.product_name || <div className='border w-4'></div>}</td>
-                                <td className='py-4'>{purchaseOrderDetail.product_name || <div className='border w-4'></div>}</td>
+                                {/* <td className='py-4'>{purchaseOrderDetail.product_name || <div className='border w-4'></div>}</td> */}
                                 <td className='py-4'>{purchaseOrderDetail.classification_primary || <div className='border w-4'></div>}</td>
                                 <td className='py-4'>{purchaseOrderDetail.classification_secondary || <div className='border w-4'></div>}</td>
                                 <td className='py-4'>{purchaseOrderDetail.contact_person || <div className='border w-4'></div>}</td>

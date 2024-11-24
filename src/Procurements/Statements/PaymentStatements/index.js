@@ -71,6 +71,30 @@ function Index() {
     };
 
     useEffect(() => {
+      // 現在の日付を取得
+      const now = new Date();
+      
+      // 今月の1日を計算
+      const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  
+      // 日付を 'YYYY-MM-DD' フォーマットに変換する関数
+      const formatDate = (date) => {
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          return `${year}-${month}-${day}`;
+      };
+  
+      // 検索条件の初期化
+      setSearchQueryList((prev) => ({
+          ...prev,
+          "pvd.created_start": formatDate(firstDayOfMonth), // 今月の1日
+          "pvd.created_end": formatDate(lastDayOfMonth),   // 今月の末日
+      }));
+  }, []);
+
+    useEffect(() => {
         ipcRenderer.send('load-payment-voucher-details');
 
         const handleLoadDetails = (event, data) => {
@@ -270,7 +294,7 @@ function Index() {
                         <div className='pl-0'>
                             <div className='flex items-center'>
                                 <div>
-                                    <div className='text-sm pb-1.5'>期間指定 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'>期間指定</div>
                                     {/* <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} /> */}
                                     <DatePicker
                                         selected={searchQueryList["pvd.created_start"] ? new Date(searchQueryList["pvd.created_start"]) : null}

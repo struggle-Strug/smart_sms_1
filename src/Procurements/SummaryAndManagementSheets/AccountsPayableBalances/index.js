@@ -20,7 +20,9 @@ function Index() {
     const [aggregatedPiData, setAggregatedPiData] = useState([])
 
     const [searchQueryList, setSearchQueryList] = useState({
-
+      "pid.created_start": "",
+      "pid.created_end": "",
+      "pv.vender_name": "",
     });
 
     const handleDateChange = (date, name) => {
@@ -212,7 +214,8 @@ function Index() {
     };
 
     const handleSearch = () => {
-        ipcRenderer.send('search-customers', searchQuery);
+        ipcRenderer.send('search-customers', searchQueryList);
+        console.log(searchQueryList);
     };
 
     const handleKeyDown = (event) => {
@@ -250,10 +253,10 @@ function Index() {
                         <div>
                             <div className='flex items-center'>
                                 <div>
-                                    <div className='text-sm pb-1.5'>日付 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'>日付 </div>
                                     <DatePicker
-                                        selected={searchQueryList["pod.created_end"] ? new Date(searchQueryList["pod.created_end"]) : null}
-                                        onChange={(date) => handleDateChange(date, "pod.created_end")}
+                                        selected={searchQueryList["pid.created_start"] ? new Date(searchQueryList["pid.created_start"]) : null}
+                                        onChange={(date) => handleDateChange(date, "pid.created_start")}
                                         dateFormat="yyyy-MM-dd"
                                         className='border rounded px-4 py-2.5 bg-white  w-full'
                                         placeholderText='期間を選択'
@@ -266,8 +269,8 @@ function Index() {
                                 <div>
                                     <div className='text-sm pb-1.5'>&nbsp;</div>
                                     <DatePicker
-                                        selected={searchQueryList["pod.created_end"] ? new Date(searchQueryList["pod.created_end"]) : null}
-                                        onChange={(date) => handleDateChange(date, "pod.created_end")}
+                                        selected={searchQueryList["pid.created_end"] ? new Date(searchQueryList["pid.created_end"]) : null}
+                                        onChange={(date) => handleDateChange(date, "pid.created_end")}
                                         dateFormat="yyyy-MM-dd"
                                         className='border rounded px-4 py-2.5 bg-white  w-full'
                                         placeholderText='期間を選択'
@@ -278,8 +281,8 @@ function Index() {
                         <div>
                             <div className='text-sm pb-1.5'>支払予定日</div>
                             <DatePicker
-                                selected={searchQueryList["pod.created_end"] ? new Date(searchQueryList["pod.created_end"]) : null}
-                                onChange={(date) => handleDateChange(date, "pod.created_end")}
+                                selected={searchQueryList["pid.payment_due_date"] ? new Date(searchQueryList["pid.payment_due_date"]) : null}
+                                onChange={(date) => handleDateChange(date, "pid.payment_due_date")}
                                 dateFormat="yyyy-MM-dd"
                                 className='border rounded px-4 py-2.5 bg-white w-full'
                                 placeholderText='期間を選択'
@@ -287,11 +290,11 @@ function Index() {
                         </div>
                         <div>
                             <div className='text-sm pb-1.5'>仕入先</div>
-                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} />
+                            <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="vender_name" value={searchQueryList["pv.vender_name"]} />
                         </div>
                     </div>
                     <div className='flex mt-4'>
-                        <div className='border rounded-lg py-3 px-7 mb-8 text-base font-bold bg-blue-600 text-white'>集計する</div>
+                        <div className='border rounded-lg py-3 px-7 mb-8 text-base font-bold bg-blue-600 text-white' onClick={(e) => handleSearch()}>集計する</div>
                     </div>
                 </div>
             </div>

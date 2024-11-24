@@ -158,6 +158,7 @@ function initializeDatabase() {
 }
 
 function searchPurchaseOrderDetails(conditions, callback) {
+  console.log(conditions);
     let sql = `
         SELECT pod.*, po.*, p.*, v.*
         FROM purchase_order_details pod
@@ -174,10 +175,10 @@ function searchPurchaseOrderDetails(conditions, callback) {
         for (const [column, value] of Object.entries(conditions)) {
             // pod.created_start と pod.created_end の特別な扱い
             if (column === 'pod.created_start') {
-                whereClauses.push(`pod.created >= ?`);
+                whereClauses.push(`po.order_date >= ?`);
                 params.push(value); // created_startの日付をそのまま使用
             } else if (column === 'pod.created_end') {
-                whereClauses.push(`pod.created <= ?`);
+                whereClauses.push(`po.order_date <= ?`);
                 params.push(value); // created_endの日付をそのまま使用
             } else {
                 whereClauses.push(`${column} LIKE ?`);

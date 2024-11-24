@@ -40,6 +40,7 @@ ipcMain.on('edit-inventory', (event, id) => {
 });
 
 ipcMain.on('search-inventories', (event, query) => {
+  console.log(query);
     searchInventories(query, (err, results) => {
         if (err) {
             console.error(err.message);

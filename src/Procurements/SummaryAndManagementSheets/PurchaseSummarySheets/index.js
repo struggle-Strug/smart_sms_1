@@ -25,15 +25,17 @@ function Index() {
         "p.classification_primary": "",
         "p.classification_secondary": "",
         "pid.product_name": "",
-        "pid.contact_person": "",
+        "pi.contact_person": "",
         "pid.storage_facility": "",
-        "pid.status": "",
+        "pi.status": "",
         "pid.lot_number": "",
         "pid.created_start": "",
         "pid.created_end": "",
         "v.classification1": "",
         "v.classification2": "",
     });
+    console.log(searchQueryList);
+
 
     const handleDateChange = (date, name) => {
         const formattedDate = date ? date.toISOString().split('T')[0] : '';
@@ -82,6 +84,30 @@ function Index() {
         data: [],
         fileName: fileName
     });
+
+    useEffect(() => {
+      // 現在の日付を取得
+      const now = new Date();
+      
+      // 今月の1日を計算
+      const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  
+      // 日付を 'YYYY-MM-DD' フォーマットに変換する関数
+      const formatDate = (date) => {
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          return `${year}-${month}-${day}`;
+      };
+  
+      // 検索条件の初期化
+      setSearchQueryList((prev) => ({
+          ...prev,
+          "pid.created_start": formatDate(firstDayOfMonth), // 今月の1日
+          "pid.created_end": formatDate(lastDayOfMonth),   // 今月の末日
+      }));
+  }, []);
 
 
     useEffect(() => {
@@ -252,6 +278,7 @@ function Index() {
                 searchColums[key] = searchQueryList[key]
             }
         }
+        console.log(searchColums);
         ipcRenderer.send('search-purchase-invoice-details', searchColums);
     };
 
@@ -337,6 +364,9 @@ function Index() {
     };
 
 
+    console.log(purchaseInvoiceDetails);
+
+
 
 
     return (
@@ -358,7 +388,7 @@ function Index() {
                         <div>
                             <div className='flex items-center'>
                                 <div>
-                                    <div className='text-sm pb-1.5'>期間指定 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'>期間指定</div>
                                     {/* <input type='text' className='border rounded px-4 py-2.5 bg-white w-full' placeholder='' name="" value={""} /> */}
                                     <DatePicker
                                         selected={searchQueryList["pid.created_start"] ? new Date(searchQueryList["pid.created_start"]) : null}
@@ -436,8 +466,8 @@ function Index() {
                                 type='text'
                                 className='border rounded px-4 py-2.5 bg-white w-full'
                                 placeholder=''
-                                name="pid.contact_person"
-                                value={searchQueryList["pid.contact_person"]}
+                                name="pi.contact_person"
+                                value={searchQueryList["pi.contact_person"]}
                                 onChange={handleInputChange}
                             />
                         </div>
@@ -457,11 +487,11 @@ function Index() {
                             <div className="relative" ref={dropdownRef}>
                                 <div
                                     className="bg-white border rounded px-4 py-2.5 cursor-pointer flex justify-between items-center"
-                                    onClick={() => toggleDropdown("po.status")}
+                                    onClick={() => toggleDropdown("pi.status")}
                                 >
-                                    <span>{searchQueryList["po.status"] ? searchQueryList["po.status"] : "ステータス"}</span>
+                                    <span>{searchQueryList["pi.status"] ? searchQueryList["pi.status"] : "ステータス"}</span>
                                     <svg
-                                        className={`w-4 h-4 transform transition-transform ${isOpen === "po.status" ? 'rotate-180' : ''}`}
+                                        className={`w-4 h-4 transform transition-transform ${isOpen === "pi.status" ? 'rotate-180' : ''}`}
                                         xmlns="http://www.w3.org/2000/svg"
                                         fill="none"
                                         viewBox="0 0 24 24"
@@ -471,13 +501,13 @@ function Index() {
                                     </svg>
                                 </div>
 
-                                {isOpen === "po.status" && (
+                                {isOpen === "pi.status" && (
                                     <div className="absolute z-10 mt-1 w-full bg-white border  rounded-md shadow-lg max-h-60 overflow-auto">
                                         {[{ value: "未処理", label: "未処理" }, { value: "支払済", label: "支払済" }].map((option) => (
                                             <div
                                                 key={option.value}
                                                 className="cursor-pointer p-2 hover:bg-gray-100"
-                                                onClick={() => selectOption(option, "po.status")}
+                                                onClick={() => selectOption(option, "pi.status")}
                                             >
                                                 {option.label}
                                             </div>

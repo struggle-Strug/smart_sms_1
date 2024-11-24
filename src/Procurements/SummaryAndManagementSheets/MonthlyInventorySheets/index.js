@@ -23,6 +23,7 @@ function Index() {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const [monthlyInventory, setMonthlyInventory] = useState([]);
+    console.log(monthlyInventory);
 
     const handleDateChange = (date, name) => {
         const formattedDate = date ? date.toISOString().split('T')[0] : '';
@@ -60,6 +61,7 @@ function Index() {
     };
 
     const handleSearch = () => {
+      console.log(searchQueryList);
         ipcRenderer.send('get-inventory-log-filtered', searchQueryList);
     };
 
@@ -150,7 +152,7 @@ function Index() {
                         <div>
                             <div className='flex items-center'>
                                 <div>
-                                    <div className='text-sm pb-1.5'>年月指定 <span className='text-xs font-bold ml-1 text-red-600'>必須</span></div>
+                                    <div className='text-sm pb-1.5'>年月指定</div>
                                     <DatePicker
                                         selected={searchQueryList["created"] ? new Date(searchQueryList["created"]) : null}
                                         onChange={(date) => handleDateChange(date, "created")}
@@ -223,7 +225,7 @@ function Index() {
                             <input
                                 type='text'
                                 className='border rounded px-4 py-2.5 bg-white w-full'
-                                placeholder=''
+                                placeholder='これ必要ないかも'
                                 name="p.classification_primary"
                                 value={searchQueryList["p.classification_primary"]}
                                 onChange={handleInputChange}

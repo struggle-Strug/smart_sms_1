@@ -211,6 +211,7 @@ function initializeDatabase() {
 }
 
 function searchInventories(query, callback) {
+  console.log(query);
   let sql;
   let params = [];
 
