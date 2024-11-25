@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
-import { Tooltip } from 'react-tooltip'
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import ConfirmDialog from '../../../Components/ConfirmDialog';
 import { useNavigate } from 'react-router-dom';
+import InvoiceTotal from '../../../Components/InvoiceSettings/InvoiceTotal';
+
 const { ipcRenderer } = window.require('electron');
 
 function PurchaseInvoicesDetail() {
@@ -91,23 +91,6 @@ function PurchaseInvoicesDetail() {
             ipcRenderer.removeAllListeners('search-purchase-order-details-by-vender-id');
         };
     }, [id]);
-
-    const handleSumPrice = () => {
-        let SumPrice = 0
-        let consumptionTaxEight = 0
-        let consumptionTaxTen = 0
-
-        for (let i = 0; i < purchaseInvoiceDetails.length; i++) {
-            SumPrice += purchaseInvoiceDetails[i].price * purchaseInvoiceDetails[i].number;
-            if (purchaseInvoiceDetails[i].tax_rate === 8) {
-                consumptionTaxEight += purchaseInvoiceDetails[i].price * purchaseInvoiceDetails[i].number * 0.08;
-            } else if (purchaseInvoiceDetails[i].tax_rate === 10) {
-                consumptionTaxTen += purchaseInvoiceDetails[i].price * purchaseInvoiceDetails[i].number * 0.1;
-            }
-        }
-
-        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax":consumptionTaxEight + consumptionTaxTen, "Total": SumPrice + consumptionTaxEight + consumptionTaxTen }
-    }
 
     const handleDelete = (id, name) => {
         setCustomerIdToDelete(id);
@@ -250,28 +233,9 @@ function PurchaseInvoicesDetail() {
                         <hr />
                     </div>
                     <div className='py-6 flex'>
-                        <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>税抜合計</div>
-                                <div>{handleSumPrice().subtotal.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税(8%)</div>
-                                <div>{handleSumPrice().consumptionTaxEight.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税(10%)</div>
-                                <div>{handleSumPrice().consumptionTaxTen.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税合計</div>
-                                <div>{handleSumPrice().totalConsumptionTax.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex'>
-                                <div className='w-40'>税込合計</div>
-                                <div>{handleSumPrice().Total.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                        </div>
+                        <InvoiceTotal 
+                            details={purchaseInvoiceDetails}
+                        />
                     </div>
                     <div className='py-2.5 font-bold text-xl'>備考</div>
                     <div className='flex items-center pb-2'>
