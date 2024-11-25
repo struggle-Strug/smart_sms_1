@@ -6,7 +6,7 @@ const InvoiceTotal = ({ details }) => {
     let totalTax = 0;
 
     for (let i = 0; i < details.length; i++) {
-      const { price, number, tax_rate } = details[i];
+      const { price=0, number=0, tax_rate=0 } = details[i] || {};
       sumPrice += price * number;
       totalTax += (price * number * tax_rate) / 100;
     }
@@ -20,7 +20,7 @@ const InvoiceTotal = ({ details }) => {
 
   const groupedDetails = React.useMemo(() => {
     return details.reduce((acc, orderDetail) => {
-      const taxRate = orderDetail.tax_rate;
+      const taxRate = Number(orderDetail.tax_rate || 0);
       if (!acc[taxRate]) {
         acc[taxRate] = 0; // Initialize if not exists
       }
@@ -28,6 +28,8 @@ const InvoiceTotal = ({ details }) => {
       acc[taxRate] += Math.round(
         ((orderDetail.price * orderDetail.number * taxRate) / 100 + 0.05) * 10
       ) / 10;
+      console.log(acc);
+      
       return acc;
     }, {});
   }, [details]);
@@ -41,7 +43,7 @@ const InvoiceTotal = ({ details }) => {
       {Object.entries(groupedDetails).map(([taxRate, total], idx) => (
         <div className="flex pb-2" key={idx}>
           <div className="w-40">消費税({taxRate}%)</div>
-          <div>{total}円</div>
+          <div>{Number(total || 0)}円</div>
         </div>
       ))}
       <div className="flex pb-2">
