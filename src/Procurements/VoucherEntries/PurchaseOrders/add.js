@@ -1,13 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip'
-import CustomSelect from '../../../Components/CustomSelect';
-import ListTooltip from '../../../Components/ListTooltip';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Validator from '../../../utils/validator';
-import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import InvoiceTotal from '../../../Components/InvoiceSettings/InvoiceTotal';
+
 const { ipcRenderer } = window.require('electron');
 
 function PurchaseOrdersAdd() {
@@ -268,24 +265,6 @@ function PurchaseOrdersAdd() {
       alert('新規登録が完了しました。');
     }
   };
-
-
-  const handleSumPrice = () => {
-    let SumPrice = 0
-    let consumptionTaxEight = 0
-    let consumptionTaxTen = 0
-
-    for (let i = 0; i < purchaseOrderDetails.length; i++) {
-      SumPrice += purchaseOrderDetails[i].price * purchaseOrderDetails[i].number;
-      if (purchaseOrderDetails[i].tax_rate === 8) {
-        consumptionTaxEight += purchaseOrderDetails[i].price * purchaseOrderDetails[i].number * 0.08;
-      } else if (purchaseOrderDetails[i].tax_rate === 10) {
-        consumptionTaxTen += purchaseOrderDetails[i].price * purchaseOrderDetails[i].number * 0.1;
-      }
-    }
-
-    return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxEight + consumptionTaxTen, "Total": SumPrice + consumptionTaxEight + consumptionTaxTen }
-  }
 
   const [isOpen, setIsOpen] = useState(null);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -672,28 +651,9 @@ function PurchaseOrdersAdd() {
             <hr className='' />
           </div>
           <div className='py-6 flex'>
-            <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
-              <div className='flex pb-2'>
-                <div className='w-40'>税抜合計</div>
-                <div>{handleSumPrice().subtotal.toFixed(0).toLocaleString()}円</div>
-              </div>
-              <div className='flex pb-2'>
-                <div className='w-40'>消費税(8%)</div>
-                <div>{handleSumPrice().consumptionTaxEight.toFixed(0).toLocaleString()}円</div>
-              </div>
-              <div className='flex pb-2'>
-                <div className='w-40'>消費税(10%)</div>
-                <div>{handleSumPrice().consumptionTaxTen.toFixed(0).toLocaleString()}円</div>
-              </div>
-              <div className='flex pb-2'>
-                <div className='w-40'>消費税合計</div>
-                <div>{handleSumPrice().totalConsumptionTax.toFixed(0).toLocaleString()}円</div>
-              </div>
-              <div className='flex'>
-                <div className='w-40'>税込合計</div>
-                <div>{handleSumPrice().Total.toFixed(0).toLocaleString()}円</div>
-              </div>
-            </div>
+            <InvoiceTotal 
+              details={purchaseOrderDetails} 
+            />
           </div>
           <div className='py-3'>
             <hr className='' />
