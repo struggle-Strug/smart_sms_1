@@ -63,7 +63,7 @@ function StorageFacilityAdd() {
                 remarks: ''
             });
             alert('倉庫が正常に追加されました。');
-            navigate("/master/customers");
+            navigate("/master/storage-facilities");
         }
     };
 

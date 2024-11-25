@@ -82,7 +82,7 @@ function DeliveryCustomersAdd() {
                 monthly_sales_target: ''
             });
             alert('新規登録が完了しました。');
-            navigate("/master/customers");
+            navigate("/master/delivery-customers");
         }
     };
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 const { ipcRenderer } = window.require('electron');
 
 function VendorDetail() {
@@ -25,7 +26,11 @@ function VendorDetail() {
     return (
         <div className='w-full'>
             <div className='p-8'>
-                <div className='text-2xl font-bold mb-8'>{vendor.name_primary || '仕入先詳細'}</div>
+            <div className=' mb-8 flex'>
+            <div className='text-2xl font-bold'>{vendor.name_primary || '仕入先詳細'}</div>
+            <Link to={`/master/vendors/edit/${vendor.id}`} className='ml-auto py-3 px-4 border rounded-lg text-base font-bold'>編集する</Link>
+                </div>
+
                 <div className="flex bg-gray-100">
                     <div className="w-1/5">
                         <div className='p-4'>仕入先名1</div>

@@ -81,7 +81,7 @@ function VendorAdd() {
                 payment_date: '',        // 支払日
                 payment_method: '',      // 支払方法
             });
-            alert('仕入先が正常に追加されました。');
+            alert('新規登録が完了しました。');
             navigate("/master/vendors");
         }
     };
