@@ -1,13 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
-import { Tooltip } from 'react-tooltip'
-import CustomSelect from '../../../Components/CustomSelect';
-import ListTooltip from '../../../Components/ListTooltip';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Validator from '../../../utils/validator';
-import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import InvoiceTotal from '../../../Components/InvoiceSettings/InvoiceTotal';
+
 const { ipcRenderer } = window.require('electron');
 
 function PaymentVouchersAdd() {
@@ -191,37 +187,7 @@ function PaymentVouchersAdd() {
     setPaymentVoucherDetails(updatedDetails);
   };
 
-
-
   const validator = new Validator();
-
-
-  const handleSumPrice = () => {
-    let SumPrice = 0;
-    let consumptionTaxEight = 0;
-    let consumptionTaxTen = 0;
-
-    for (let i = 0; i < paymentVoucherDetails.length; i++) {
-      const price = Number(paymentVoucherDetails[i].price || 0);
-      const number = Number(paymentVoucherDetails[i].number || 0);
-      const taxRate = Number(paymentVoucherDetails[i].tax_rate || 0);
-
-      SumPrice += price * number;
-      if (taxRate === 8) {
-        consumptionTaxEight += price * number * 0.08;
-      } else if (taxRate === 10) {
-        consumptionTaxTen += price * number * 0.1;
-      }
-    }
-
-    return {
-      subtotal: SumPrice,
-      consumptionTaxEight,
-      consumptionTaxTen,
-      totalConsumptionTax: consumptionTaxEight + consumptionTaxTen,
-      Total: SumPrice + consumptionTaxEight + consumptionTaxTen
-    };
-  };
 
   const [isOpen, setIsOpen] = useState(null);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -650,28 +616,9 @@ function PaymentVouchersAdd() {
             <hr className='' />
           </div>
           <div className='py-6 flex'>
-            <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
-              <div className='flex pb-2'>
-                <div className='w-40'>税抜合計</div>
-                <div>{(handleSumPrice().subtotal || 0).toLocaleString()}円</div>
-              </div>
-              <div className='flex pb-2'>
-                <div className='w-40'>消費税(8%)</div>
-                <div>{(handleSumPrice().consumptionTaxEight || 0).toLocaleString()}円</div>
-              </div>
-              <div className='flex pb-2'>
-                <div className='w-40'>消費税(10%)</div>
-                <div>{(handleSumPrice().consumptionTaxTen || 0).toLocaleString()}円</div>
-              </div>
-              <div className='flex pb-2'>
-                <div className='w-40'>消費税合計</div>
-                <div>{(handleSumPrice().totalConsumptionTax || 0).toLocaleString()}円</div>
-              </div>
-              <div className='flex'>
-                <div className='w-40'>税込合計</div>
-                <div>{(handleSumPrice().Total || 0).toLocaleString()}円</div>
-              </div>
-            </div>
+            <InvoiceTotal
+              details={paymentVoucherDetails}
+            />
           </div>
           <div className='py-3'>
             <hr className='' />

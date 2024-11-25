@@ -216,7 +216,7 @@ module.exports = {
   loadAllTablesData,
   importCsvToTable,
   importAllCsvToDatabase,
-  getTablesFromDB,
-  getTableData,
+  // getTablesFromDB,
+  // getTableData,
   convertToCSV
 };
