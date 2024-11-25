@@ -50,7 +50,7 @@ function StorageFacilityAdd() {
                 storage_method: '',
                 remarks: ''
             });
-            alert('倉庫が正常に追加されました。');
+            alert('新規登録が完了しました。');
         }
     };
 

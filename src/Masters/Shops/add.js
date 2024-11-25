@@ -50,7 +50,7 @@ function ShopAdd() {
                 remarks: ''
             });
             alert('新規登録が完了しました。');
-            navigate("/master/customers");
+            navigate("/master/shops");
         }
     };
 

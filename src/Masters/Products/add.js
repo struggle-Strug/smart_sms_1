@@ -97,8 +97,8 @@ function ProductAdd() {
                 storage_method: '',
                 threshold: ''
             });
-            alert('商品が正常に追加されました。');
-            navigate("/master/customers");
+            alert('新規登録が完了しました。');
+            navigate("/master/products");
         }
     };
 
