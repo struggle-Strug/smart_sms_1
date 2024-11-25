@@ -1,5 +1,12 @@
 const { ipcMain, dialog } = require('electron');
-const { loadAllTablesData, importCSVToTable, importAllCsvToDatabase, getTablesFromDB, getTableData, convertToCSV } = require('../../database/dashboard/backupsSettings');
+const { 
+  loadAllTablesData, 
+  importCSVToTable, 
+  importAllCsvToDatabase, 
+  // getTablesFromDB,
+  // getTableData,
+  convertToCSV 
+} = require('../../database/dashboard/backupsSettings');
 const sqlite3 = require('sqlite3').verbose();
 const fs = require('fs');
 const path = require('path');
@@ -52,15 +59,15 @@ ipcMain.handle('export-all-tables-to-zip', async (event, db) => {
     archive.pipe(output);
 
     // 全テーブルのデータを取得し CSV を ZIP に追加
-    const tables = await getTablesFromDB(db); // 全テーブル名を取得する関数
-    for (const tableName of tables) {
-      const rows = await getTableData(db, tableName); // 各テーブルのデータを取得する関数
+    // const tables = await getTablesFromDB(db); // コメントアウト
+    // for (const tableName of tables) { // コメントアウト
+    //   const rows = await getTableData(db, tableName); // コメントアウト
 
       if (rows.length > 0) {
         const csvContent = convertToCSV(rows); // データをCSV形式に変換する関数
         archive.append(csvContent, { name: `${tableName}.csv` });
       }
-    }
+    // } // コメントアウト
 
     // ZIP ファイルの書き込み完了
     await archive.finalize();
