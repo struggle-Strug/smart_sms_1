@@ -104,7 +104,7 @@ function saveSalesSlipDetail(salesSlipDetailData, callback) {
 
 function deleteSalesSlipDetailsBySlipId(salesSlipId, callback) {
     const sql = `
-        DELETE FROM order_slip_details
+        DELETE FROM sales_slip_details
         WHERE sales_slip_id = ?
     `;
     db.run(sql, [salesSlipId], (err) => {

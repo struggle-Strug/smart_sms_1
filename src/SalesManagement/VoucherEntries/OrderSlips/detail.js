@@ -117,6 +117,7 @@ function OrderSlipsDetail() {
 
     const handleConfirmDelete = () => {
         ipcRenderer.send('delete-order-slip', customerIdToDelete);
+        ipcRenderer.send('order-slip-details-deleted-by-slip-id', customerIdToDelete);
 
         setIsDialogOpen(false);
         navigate("/sales-management/voucher-entries/order-slips");

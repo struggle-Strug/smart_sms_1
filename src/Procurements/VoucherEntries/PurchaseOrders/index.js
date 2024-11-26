@@ -82,6 +82,7 @@ function Index() {
 
   const handleConfirmDelete = () => {
     ipcRenderer.send('delete-purchase-order', customerIdToDelete);
+    ipcRenderer.send('delete-purchase-order-details-by-po-id', customerIdToDelete);
     setIsDialogOpen(false);
   };
 

@@ -64,6 +64,7 @@ function Index() {
   const handleDelete = (id) => {
     if (window.confirm('本当にこの入金伝票を削除しますか？')) {
       ipcRenderer.send('delete-deposit-slip', id);
+      ipcRenderer.send('delete-deposit-slip-details-by-slip-id', id);
     }
   };
 

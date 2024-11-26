@@ -61,6 +61,7 @@ function StockInOutSlipsDetail() {
 
     const handleConfirmDelete = () => {
         ipcRenderer.send('delete-stock-in-out-slip', customerIdToDelete);
+        ipcRenderer.send('delete-stock-in-out-slip-details-by-slip-id', customerIdToDelete);
 
         setIsDialogOpen(false);
         navigate("/procurement/voucher-entries/stock-in-out-slips");
