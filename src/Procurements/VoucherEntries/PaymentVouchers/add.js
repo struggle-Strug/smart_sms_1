@@ -7,6 +7,7 @@ import InvoiceTotal from '../../../Components/InvoiceSettings/InvoiceTotal';
 const { ipcRenderer } = window.require('electron');
 
 function PaymentVouchersAdd() {
+  const [vouchers, setVouchers] = useState([]);
   const [isVendorIdFocused, setIsVendorIdFocused] = useState(false);
   const [isVendorNameFocused, setIsVendorNameFocused] = useState(false);
   const [isProductIdFocused, setIsProductIdFocused] = useState(-1);
@@ -16,13 +17,41 @@ function PaymentVouchersAdd() {
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
 
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth() + 1; // getMonth() returns 0-11
+  const day = today.getDate();
+
   useEffect(() => {
     ipcRenderer.send('load-payment-methods');
     ipcRenderer.on('load-payment-methods', (event, data) => {
+    const numbersToday = data.filter(voucher => voucher.order_date == `${year}-${month}-${day}`).length;
+    const id = numbersToday < 10 ? (`${year}${month}${day}0${numbersToday+1}`) : (`${year}${month}${day}${numbersToday}`)
+    setPaymentVoucher(prev => {
+      return {
+        ...prev,
+        code: id
+      }
+    })
       setPaymentMethods(data);
     });
+    ipcRenderer.send('load-payment-vouchers');
+    ipcRenderer.on('load-payment-vouchers', (event, data) => {
+      setVouchers(data);
+    });
+
+    ipcRenderer.on('payment-voucher-deleted', (event, id) => {
+      setVouchers((prevVouchers) => prevVouchers.filter(voucher => voucher.id !== id));
+    });
+
+    ipcRenderer.on('search-payment-vouchers-result', (event, data) => {
+      setVouchers(data);
+    });
+
     return () => {
       ipcRenderer.removeAllListeners('load-payment-methods');
+      ipcRenderer.removeAllListeners('payment-vouchers-data');
+      ipcRenderer.removeAllListeners('search-payment-vouchers-result');
     };
   }, []);
   console.log(paymentMethods);
@@ -60,10 +89,16 @@ function PaymentVouchersAdd() {
     setIsProductNameFocused(-1);
   };
 
+  const defaultOrderId = () => {
+    
+  }
+  
+  const id = defaultOrderId();
+
   const [paymentVoucher, setPaymentVoucher] = useState(
     {
-      code: '',
-      order_date: '',
+      code: `${id}`,
+      order_date: `${year}-${month}-${day}`,
       vender_id: '',
       vender_name: '',
       honorific: '',
@@ -121,6 +156,8 @@ function PaymentVouchersAdd() {
   }, []);
 
 
+
+
   const [paymentVoucherDetails, setPaymentVoucherDetails] = useState([
     {
       payment_voucher_id: '',
@@ -172,7 +209,7 @@ function PaymentVouchersAdd() {
   };
 
   const handlePaymentMethodChange = (e) => {
-    setSelectedPaymentMethod(e.target.value); // 選択した支払方法のcodeを保存
+    setSelectedPaymentMethod(e.target.value);
   };
 
 

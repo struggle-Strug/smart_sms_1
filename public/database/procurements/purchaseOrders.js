@@ -8,10 +8,16 @@ const db = new sqlite3.Database(dbPath);
 function loadPurchaseOrders(page, callback) {
   const pageSize = 10;
   const offset = page;
-  const sql = `SELECT * FROM purchase_orders LIMIT ? OFFSET ?`;
+  const sql = (page === undefined) ? `SELECT * FROM purchase_orders` : `SELECT * FROM purchase_orders LIMIT ? OFFSET ?`;
+  (page === undefined) ? 
+  db.all(sql, (err, rows) => {
+    callback(err, rows);
+  })
+  : 
   db.all(sql, [pageSize, offset], (err, rows) => {
     callback(err, rows);
-  });
+  })
+  
 }
 
 function getPurchaseOrderById(id, callback) {

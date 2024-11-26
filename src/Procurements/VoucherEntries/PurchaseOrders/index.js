@@ -10,8 +10,8 @@ const { ipcRenderer } = window.require('electron');
 
 
 function Index() {
-  const [purchaseOrders, setPurchaseOrders] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [ purchaseOrders, setPurchaseOrders ] = useState([]);
   const dropdownRef = useRef(null);
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
@@ -27,11 +27,7 @@ function Index() {
 
 
   useEffect(() => {
-    ipcRenderer.send('load-purchase-orders');
     ipcRenderer.on('load-purchase-orders', (event, data) => {
-      console.log("@@@@@@@@@@@@@@@@@@@@@@仕入れ管理@@@@@@@@@@@@@@@@@@@@@@@@@");  // データの内容を確認
-      console.log(data);  // データの内容を確認
-
       setPurchaseOrders(data);
     });
 
@@ -86,6 +82,7 @@ function Index() {
 
   const handleConfirmDelete = () => {
     ipcRenderer.send('delete-purchase-order', customerIdToDelete);
+    ipcRenderer.send('delete-purchase-order-details-by-po-id', customerIdToDelete);
     setIsDialogOpen(false);
   };
 
@@ -193,7 +190,6 @@ function Index() {
     </div>
   )
 }
-
 function PurchaseOrdersIndex() {
   return (
     <Routes>

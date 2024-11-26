@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { Tooltip } from 'react-tooltip'
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Validator from '../../../utils/validator';
@@ -9,12 +9,18 @@ const { ipcRenderer } = window.require('electron');
 
 function PurchaseOrdersAdd() {
   const [isVendorIdFocused, setIsVendorIdFocused] = useState(false);
+  const [ purchaseOrders, setPurchaseOrders ] = useState([]);
   const [isVendorNameFocused, setIsVendorNameFocused] = useState(false);
   const [isProductIdFocused, setIsProductIdFocused] = useState(-1);
   const [isProductNameFocused, setIsProductNameFocused] = useState(-1);
   const [taxRateList, setTaxRateList] = useState([]);
   const [storageFacilitiesList, setStorageFacilitiesList] = useState([]);
   const [errors, setErrors] = useState({});
+
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth() + 1; // getMonth() returns 0-11
+  const day = today.getDate();
 
   const handleFocus = () => {
     setIsVendorIdFocused(true);
@@ -48,46 +54,31 @@ function PurchaseOrdersAdd() {
     setIsProductNameFocused(-1);
   };
 
-  const [purchaseOrder, setPurchaseOrder] = useState({
-    code: '',
-    order_date: '',
-    vender_id: '',
-    vender_name: '',
-    honorific: '',
-    vender_contact_person: '',
-    remarks: '',
-    closing_date: '',
-    payment_due_date: '',
-    payment_method: '',
-    estimated_delivery_date: '',
-  });
-
+  
   const [vendors, setVendors] = useState([])
   const [products, setProducts] = useState([])
-
+  
   useEffect(() => {
     ipcRenderer.on('search-id-vendors-result', (event, data) => {
       setVendors(data);
     });
-
+    
     ipcRenderer.on('search-name-vendors-result', (event, data) => {
       setVendors(data);
     });
-
+    
     ipcRenderer.on('search-id-products-result', (event, data) => {
       setProducts(data);
     });
-
+    
     ipcRenderer.on('purchase-order-inventory-result', (event, data) => {
     });
-
+    
     ipcRenderer.on('search-name-products-result', (event, data) => {
       setProducts(data);
     });
-
-    ipcRenderer.send('load-sales-tax-settings');
+    
     ipcRenderer.on('sales-tax-settings-data', (event, data) => {
-      console.log(data)
       let arr = [];
       for (let i = 0; i < data.length; i++) {
         const taxRateTemplate = {
@@ -98,7 +89,7 @@ function PurchaseOrdersAdd() {
       }
       setTaxRateList(arr);
     });
-
+    
     ipcRenderer.send('load-storage-facilities');
     ipcRenderer.on('load-storage-facilities', (event, data) => {
       let arr = [];
@@ -111,7 +102,28 @@ function PurchaseOrdersAdd() {
       }
       setStorageFacilitiesList(arr);
     });
+    
+    ipcRenderer.send('load-purchase-orders');
+    ipcRenderer.on('load-purchase-orders', (event, data) => {
+      const numbersToday = data.filter(order => order.order_date == `${year}-${month}-${day}`).length;
+      const id = numbersToday < 9 ? (`${year}${month}${day}0${numbersToday+1}`) : (`${year}${month}${day}${numbersToday+1}`)
 
+      setPurchaseOrder( prev => {
+        return {
+          ...prev,
+          code: id
+        }
+      });
+      setPurchaseOrders(data);
+    });
+
+    ipcRenderer.on('purchase-order-deleted', (event, id) => {
+      setPurchaseOrders((prevOrders) => prevOrders.filter(order => order.id !== id));
+    });
+
+    ipcRenderer.on('search-purchase-orders-result', (event, data) => {
+      setPurchaseOrders(data);
+    });
 
     return () => {
       ipcRenderer.removeAllListeners('search-id-vendors-result');
@@ -119,9 +131,24 @@ function PurchaseOrdersAdd() {
       ipcRenderer.removeAllListeners('search-id-products-result');
       ipcRenderer.removeAllListeners('search-name-products-result');
       ipcRenderer.removeAllListeners('purchase-order-inventory-result');
+      ipcRenderer.removeAllListeners('purchase-orders-data');
+      ipcRenderer.removeAllListeners('search-purchase-orders-result');
     };
   }, []);
-
+  
+  const [purchaseOrder, setPurchaseOrder] = useState({
+    code: '',
+    order_date: `${year}-${month}-${day}`,
+    vender_id: '',
+    vender_name: '',
+    honorific: '',
+    vender_contact_person: '',
+    remarks: '',
+    closing_date: '',
+    payment_due_date: '',
+    payment_method: '',
+    estimated_delivery_date: '',
+  });
 
   const [purchaseOrderDetails, setPurchaseOrderDetails] = useState([
     {
@@ -228,6 +255,7 @@ function PurchaseOrdersAdd() {
         for (let i = 0; i < purchaseOrderDetails.length; i++) {
           const purchaseOrderDetailData = purchaseOrderDetails[i];
           purchaseOrderDetailData.purchase_order_id = data.id;
+          console.log(purchaseOrderDetailData);
           ipcRenderer.send('save-purchase-order-detail', purchaseOrderDetailData);
           const inventoryData = {
             product_id: purchaseOrderDetailData.product_id,
@@ -617,11 +645,11 @@ function PurchaseOrdersAdd() {
                       </div>
                       <div className='ml-4'>
                         <div className='text-sm pb-1.5'>ロット番号</div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="stock" value={purchaseOrderDetail.lot_number} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="lot_number" value={purchaseOrderDetail.lot_number} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)} />
                       </div>
                       <div className='ml-4'>
                         <div className='text-sm pb-1.5'>警告値</div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="stock" value={purchaseOrderDetail.threshold} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="threshold" value={purchaseOrderDetail.threshold} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)} />
                       </div>
                     </div>
                     {errors["tax_rate" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["tax_rate" + index]}</div>}

@@ -23,8 +23,6 @@ function Index() {
   useEffect(() => {
     ipcRenderer.send('load-payment-vouchers', pages);
   }, [pages]);
-  console.log(pages);
-
 
   useEffect(() => {
     ipcRenderer.send('load-payment-vouchers');
@@ -72,6 +70,7 @@ function Index() {
 
   const handleConfirmDelete = () => {
     ipcRenderer.send('delete-payment-voucher', customerIdToDelete);
+    ipcRenderer.send('delete-payment-voucher-details-by-pv-id', customerIdToDelete);
     setIsDialogOpen(false);
   };
 

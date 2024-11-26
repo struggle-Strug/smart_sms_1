@@ -64,6 +64,7 @@ function Index() {
   const handleDelete = (id) => {
     if (window.confirm('本当にこの受注伝票を削除しますか？')) {
       ipcRenderer.send('delete-order-slip', id);
+      ipcRenderer.send('order-slip-details-deleted-by-slip-id', id);
     }
   };
 

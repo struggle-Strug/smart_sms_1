@@ -11,7 +11,7 @@ function PurchaseInvoicesAdd() {
     { value: '御中', label: '御中' },
     { value: '貴社', label: '貴社' },
   ];
-
+  const [purchaseInvoices, setPurchaseInvoices] = useState([]);
   const [isVendorIdFocused, setIsVendorIdFocused] = useState(false);
   const [isVendorNameFocused, setIsVendorNameFocused] = useState(false);
   const [isPurchaseOrderFocused, setIsPurchaseOrderFocused] = useState(false);
@@ -20,6 +20,11 @@ function PurchaseInvoicesAdd() {
   const [taxRateList, setTaxRateList] = useState([]);
   const [storageFacilitiesList, setStorageFacilitiesList] = useState([]);
   const [errors, setErrors] = useState({});
+
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth() + 1; // getMonth() returns 0-11
+  const day = today.getDate();
 
   const handleFocus = () => {
     setIsVendorIdFocused(true);
@@ -63,7 +68,7 @@ function PurchaseInvoicesAdd() {
 
   const [purchaseInvoice, setPurchaseInvoice] = useState({
     code: '',
-    order_date: '',
+    order_date: `${year}-${month}-${day}`,
     vender_id: '',
     vender_name: '',
     honorific: '',
@@ -171,6 +176,30 @@ function PurchaseInvoicesAdd() {
       setPurchaseOrderDetails(data);
     });
 
+    ipcRenderer.send('load-purchase-invoices');
+    ipcRenderer.on('load-purchase-invoices', (event, data) => {
+      const numbersToday = data.filter(purchaseInvoice => purchaseInvoice.order_date == `${year}-${month}-${day}`).length;
+    
+      const id = numbersToday < 9 ? (`${year}${month}${day}0${numbersToday+1}`) : (`${year}${month}${day}${numbersToday+1}`)
+      setPurchaseInvoice(prev => {
+        return {
+          ...prev,
+          code: id
+        }
+      })
+      setPurchaseInvoices(data);
+
+    });
+
+    ipcRenderer.on('purchase-invoice-deleted', (event, id) => {
+      setPurchaseInvoices((prevPurchaseInvoice) => prevPurchaseInvoice.filter(purchaseInvoice => purchaseInvoice.id !== id));
+    });
+
+    ipcRenderer.on('search-purchase-invoices-result', (event, data) => {
+      setPurchaseInvoices(data);
+    });
+
+
 
     return () => {
       ipcRenderer.removeAllListeners('search-id-vendors-result');
@@ -179,6 +208,8 @@ function PurchaseInvoicesAdd() {
       ipcRenderer.removeAllListeners('search-name-products-result');
       ipcRenderer.removeAllListeners('search-name-products-result');
       ipcRenderer.removeAllListeners('search-purchase-orders-on-pv-result');
+      ipcRenderer.removeAllListeners('purchase-invoices-data');
+      ipcRenderer.removeAllListeners('search-purchase-invoices-result');
     };
   }, []);
 

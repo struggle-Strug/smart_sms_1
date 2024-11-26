@@ -108,6 +108,7 @@ function PaymentVouchersDetail() {
 
     const handleConfirmDelete = () => {
         ipcRenderer.send('delete-payment-voucher', customerIdToDelete);
+        ipcRenderer.send('delete-payment-voucher-details-by-pv-id', customerIdToDelete);
 
         setIsDialogOpen(false);
         navigate("/procurement/voucher-entries/payment-vouchers");

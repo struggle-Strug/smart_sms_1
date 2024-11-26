@@ -76,6 +76,7 @@ function Index() {
 
   const handleConfirmDelete = () => {
     ipcRenderer.send('delete-purchase-invoice', customerIdToDelete);
+    ipcRenderer.send('delete-purchase-invoice-details-by-pi-id', customerIdToDelete);
     setIsDialogOpen(false);
   };
 
@@ -194,6 +195,7 @@ function Index() {
 }
 
 function PurchaseInvoicesIndex() {
+
   return (
     <Routes>
       <Route path="" element={<Index />} />

@@ -80,6 +80,7 @@ function Index() {
 
   const handleConfirmDelete = () => {
     ipcRenderer.send('delete-stock-in-out-slip', customerIdToDelete);
+    ipcRenderer.send('delete-stock-in-out-slip-details-by-slip-id', customerIdToDelete);
     setIsDialogOpen(false);
   };
 
@@ -193,7 +194,7 @@ function StockInOutSlipsIndex() {
   return (
     <Routes>
       <Route path="" element={<Index />} />
-      <Route path="add" element={<StockInOutSlipsAdd />} />
+      <Route path="add" element={<StockInOutSlipsAdd/>} />
       <Route path="edit/:id" element={<StockInOutSlipsEdit />} />
       <Route path="detail/:id" element={<StockInOutSlipsDetail />} />
     </Routes>

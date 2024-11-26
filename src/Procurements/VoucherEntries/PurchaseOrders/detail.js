@@ -38,6 +38,8 @@ function PurchaseOrdersDetail() {
       tax_rate: "",
       storage_facility: "",
       stock: "",
+      lot_number: "",
+      threshold: "",
     },
   ]);
 
@@ -134,6 +136,7 @@ function PurchaseOrdersDetail() {
 
   const handleConfirmDelete = () => {
     ipcRenderer.send("delete-purchase-order", customerIdToDelete);
+    ipcRenderer.send('delete-purchase-order-details-by-po-id', customerIdToDelete);
 
     setIsDialogOpen(false);
     navigate("/procurement/voucher-entries/purchase-orders");
@@ -284,6 +287,8 @@ function PurchaseOrdersDetail() {
                 <th className="text-left py-2">単価</th>
                 <th className="text-left py-2">税率</th>
                 <th className="text-left py-2">倉庫</th>
+                <th className="text-left py-2">ロット番号</th>
+                <th className="text-left py-2">警告値</th>
                 <th className="text-left py-2">金額</th>
                 <th className="text-left py-2">税額</th>
               </tr>
@@ -299,6 +304,12 @@ function PurchaseOrdersDetail() {
                   <td className="py-2">{purchaseOrderDetail.tax_rate}%</td>
                   <td className="py-2">
                     {purchaseOrderDetail.storage_facility}
+                  </td>
+                  <td className="py-2">
+                    {purchaseOrderDetail.lot_number}
+                  </td>
+                  <td className="py-2">
+                    {purchaseOrderDetail.threshold}
                   </td>
                   <td className="py-2">
                     {parseInt(purchaseOrderDetail.price) *

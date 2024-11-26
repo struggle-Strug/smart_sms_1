@@ -12,12 +12,18 @@ function StockInOutSlipsAdd() {
     { value: '倉庫A', label: '倉庫A' },
     { value: '倉庫B', label: '倉庫B' },
   ];
+  const [slips, setSlips] = useState([]);
   const [isVendorIdFocused, setIsVendorIdFocused] = useState(false);
   const [isVendorNameFocused, setIsVendorNameFocused] = useState(false);
   const [isProductIdFocused, setIsProductIdFocused] = useState(-1);
   const [isProductNameFocused, setIsProductNameFocused] = useState(-1);
   const [storageFacilitiesList, setStorageFacilitiesList] = useState([]);
   const [errors, setErrors] = useState({});
+
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth() + 1; // getMonth() returns 0-11
+  const day = today.getDate();
 
   const handleFocus = () => {
     setIsVendorIdFocused(true);
@@ -51,9 +57,15 @@ function StockInOutSlipsAdd() {
     setIsProductNameFocused(-1);
   };
 
+  const defaultOrderId = () => {
+
+  }
+  
+  const id = defaultOrderId();
+
   const [stockInOutSlip, setStockInOutSlip] = useState({
-    id: '',
-    stock_in_out_date: '',
+    code: '',
+    stock_in_out_date: `${year}-${month}-${day}`,
     processType: '',
     warehouse_from: '',
     warehouse_to: '',
@@ -94,19 +106,44 @@ function StockInOutSlipsAdd() {
       setStorageFacilitiesList(arr);
     });
 
+    ipcRenderer.send('load-stock-in-out-slips');
+    ipcRenderer.on('load-stock-in-out-slips', (event, data) => {
+      const numbersToday = data.filter(slip => slip.stock_in_out_date == `${year}-${month}-${day}`).length;
+    
+      const id = numbersToday < 9 ? (`${year}${month}${day}0${numbersToday+1}`) : (`${year}${month}${day}${numbersToday+1}`)
+      setStockInOutSlip(prev => {
+        return {
+          ...prev,
+          code: id
+        }
+      });
+      setSlips(data);
+    });
+
+    ipcRenderer.on('stock-in-out-slip-deleted', (event, id) => {
+      setSlips((prevSlips) => prevSlips.filter(slip => slip.id !== id));
+    });
+
+    ipcRenderer.on('search-stock-in-out-slips-result', (event, data) => {
+      setSlips(data);
+    });
+
+
 
     return () => {
       ipcRenderer.removeAllListeners('search-id-vendors-result');
       ipcRenderer.removeAllListeners('search-name-vendors-result');
       ipcRenderer.removeAllListeners('search-id-products-result');
       ipcRenderer.removeAllListeners('search-name-products-result');
+      ipcRenderer.removeAllListeners('load-stock-in-out-slips');
+      ipcRenderer.removeAllListeners('search-stock-in-out-slips-result');
     };
   }, []);
 
 
   const [stockInOutSlipDetails, setStockInOutSlipDetails] = useState([
     {
-      id: '',
+      code: '',
       stock_in_out_slip_id: '',
       product_id: '',
       product_name: '',
@@ -119,7 +156,7 @@ function StockInOutSlipsAdd() {
 
   const addStockInOutSlipDetail = () => {
     setStockInOutSlipDetails([...stockInOutSlipDetails, {
-      id: '',
+      code: '',
       stock_in_out_slip_id: '',
       product_id: '',
       product_name: '',
@@ -211,7 +248,7 @@ function StockInOutSlipsAdd() {
         }
       });
       setStockInOutSlip({
-        id: '',
+        code: '',
         stock_in_out_date: '',
         processType: '',
         warehouse_from: '',
@@ -221,7 +258,7 @@ function StockInOutSlipsAdd() {
       });
       setStockInOutSlipDetails([
         {
-          id: '',
+          code: '',
           stock_in_out_slip_id: '',
           product_id: '',
           product_name: '',

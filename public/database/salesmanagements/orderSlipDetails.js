@@ -107,6 +107,13 @@ function deleteOrderSlipDetailById(id, callback) {
     });
 }
 
+function deleteOrderSlipDetailByOrderSlipId(id, callback) {
+  const sql = `DELETE FROM order_slip_details WHERE order_slip_id = ?`;
+  db.run(sql, [id], (err) => {
+      callback(err);
+  });
+}
+
 function editOrderSlipDetail(id, callback) {
     const sql = `SELECT * FROM order_slip_details WHERE id = ?`;
     db.get(sql, [id], (err, row) => {
@@ -273,6 +280,7 @@ module.exports = {
     getOrderSlipDetailById,
     saveOrderSlipDetail,
     deleteOrderSlipDetailById,
+    deleteOrderSlipDetailByOrderSlipId,
     editOrderSlipDetail,
     initializeDatabase,
     deleteOrderSlipDetailsBySlipId,
