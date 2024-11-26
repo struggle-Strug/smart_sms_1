@@ -1,16 +1,17 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import PurchaseOrdersAdd from './add';
 import PurchaseOrdersEdit from './edit';
 import PurchaseOrdersDetail from './detail';
 import ConfirmDialog from '../../../Components/ConfirmDialog';
+import { PurchaseOrdersContext, PurchaseOrdersProvider } from '../../../Contexts/PurchaseOrdersContext';
 
 const { ipcRenderer } = window.require('electron');
 
 
 function Index() {
-  const [purchaseOrders, setPurchaseOrders] = useState([]);
+  const { purchaseOrders, setPurchaseOrders } = useContext(PurchaseOrdersContext);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const location = useLocation();
@@ -29,9 +30,6 @@ function Index() {
   useEffect(() => {
     ipcRenderer.send('load-purchase-orders');
     ipcRenderer.on('load-purchase-orders', (event, data) => {
-      console.log("@@@@@@@@@@@@@@@@@@@@@@仕入れ管理@@@@@@@@@@@@@@@@@@@@@@@@@");  // データの内容を確認
-      console.log(data);  // データの内容を確認
-
       setPurchaseOrders(data);
     });
 
@@ -196,12 +194,15 @@ function Index() {
 
 function PurchaseOrdersIndex() {
   return (
+      <PurchaseOrdersProvider>
     <Routes>
       <Route path="" element={<Index />} />
       <Route path="add" element={<PurchaseOrdersAdd />} />
       <Route path="edit/:id" element={<PurchaseOrdersEdit />} />
       <Route path="detail/:id" element={<PurchaseOrdersDetail />} />
+
     </Routes>
+      </PurchaseOrdersProvider>
   )
 }
 

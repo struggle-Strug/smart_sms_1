@@ -1,20 +1,28 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { Tooltip } from 'react-tooltip'
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Validator from '../../../utils/validator';
 import 'react-datepicker/dist/react-datepicker.css';
 import InvoiceTotal from '../../../Components/InvoiceSettings/InvoiceTotal';
+import { PurchaseOrdersContext } from '../../../Contexts/PurchaseOrdersContext';
 
 const { ipcRenderer } = window.require('electron');
 
 function PurchaseOrdersAdd() {
+  const { purchaseOrders, setPurchaseOrders } = useContext(PurchaseOrdersContext);
   const [isVendorIdFocused, setIsVendorIdFocused] = useState(false);
+
   const [isVendorNameFocused, setIsVendorNameFocused] = useState(false);
   const [isProductIdFocused, setIsProductIdFocused] = useState(-1);
   const [isProductNameFocused, setIsProductNameFocused] = useState(-1);
   const [taxRateList, setTaxRateList] = useState([]);
   const [storageFacilitiesList, setStorageFacilitiesList] = useState([]);
   const [errors, setErrors] = useState({});
+
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth() + 1; // getMonth() returns 0-11
+  const day = today.getDate();
 
   const handleFocus = () => {
     setIsVendorIdFocused(true);
@@ -48,46 +56,32 @@ function PurchaseOrdersAdd() {
     setIsProductNameFocused(-1);
   };
 
-  const [purchaseOrder, setPurchaseOrder] = useState({
-    code: '',
-    order_date: '',
-    vender_id: '',
-    vender_name: '',
-    honorific: '',
-    vender_contact_person: '',
-    remarks: '',
-    closing_date: '',
-    payment_due_date: '',
-    payment_method: '',
-    estimated_delivery_date: '',
-  });
-
+  
   const [vendors, setVendors] = useState([])
   const [products, setProducts] = useState([])
-
+  
   useEffect(() => {
     ipcRenderer.on('search-id-vendors-result', (event, data) => {
       setVendors(data);
     });
-
+    
     ipcRenderer.on('search-name-vendors-result', (event, data) => {
       setVendors(data);
     });
-
+    
     ipcRenderer.on('search-id-products-result', (event, data) => {
       setProducts(data);
     });
-
+    
     ipcRenderer.on('purchase-order-inventory-result', (event, data) => {
     });
-
+    
     ipcRenderer.on('search-name-products-result', (event, data) => {
       setProducts(data);
     });
-
+    
     ipcRenderer.send('load-sales-tax-settings');
     ipcRenderer.on('sales-tax-settings-data', (event, data) => {
-      console.log(data)
       let arr = [];
       for (let i = 0; i < data.length; i++) {
         const taxRateTemplate = {
@@ -98,7 +92,7 @@ function PurchaseOrdersAdd() {
       }
       setTaxRateList(arr);
     });
-
+    
     ipcRenderer.send('load-storage-facilities');
     ipcRenderer.on('load-storage-facilities', (event, data) => {
       let arr = [];
@@ -111,8 +105,8 @@ function PurchaseOrdersAdd() {
       }
       setStorageFacilitiesList(arr);
     });
-
-
+    
+    
     return () => {
       ipcRenderer.removeAllListeners('search-id-vendors-result');
       ipcRenderer.removeAllListeners('search-name-vendors-result');
@@ -121,7 +115,28 @@ function PurchaseOrdersAdd() {
       ipcRenderer.removeAllListeners('purchase-order-inventory-result');
     };
   }, []);
-
+  
+  const defaultOrderId = () => {
+    const numbersToday = purchaseOrders.filter(order => order.order_date == `${year}-${month}-${day}`).length;
+    
+    return numbersToday < 10 ? (`${year}${month}${day}0${numbersToday+1}`) : (`${year}${month}${day}${numbersToday}`)
+  }
+  
+  const id = defaultOrderId();
+  
+  const [purchaseOrder, setPurchaseOrder] = useState({
+    code: `${id}`,
+    order_date: `${year}-${month}-${day}`,
+    vender_id: '',
+    vender_name: '',
+    honorific: '',
+    vender_contact_person: '',
+    remarks: '',
+    closing_date: '',
+    payment_due_date: '',
+    payment_method: '',
+    estimated_delivery_date: '',
+  });
 
   const [purchaseOrderDetails, setPurchaseOrderDetails] = useState([
     {
@@ -346,6 +361,7 @@ function PurchaseOrdersAdd() {
               className='border rounded px-4 py-2.5 bg-white w-2/3'
               placeholder='適用終了日を入力'
               name="order_date"
+              defaultValue={`${month}/${day}/${year}`}
               value={purchaseOrder.order_date}
               onChange={handleChange}
             />
