@@ -1,18 +1,17 @@
-import React, { useState, useRef, useEffect, useContext } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import PurchaseOrdersAdd from './add';
 import PurchaseOrdersEdit from './edit';
 import PurchaseOrdersDetail from './detail';
 import ConfirmDialog from '../../../Components/ConfirmDialog';
-import { PurchaseOrdersContext, PurchaseOrdersProvider } from '../../../Contexts/PurchaseOrdersContext';
 
 const { ipcRenderer } = window.require('electron');
 
 
-function Index() {
-  const { purchaseOrders, setPurchaseOrders } = useContext(PurchaseOrdersContext);
+function Index({setPurchaseOrders, purchaseOrders}) {
   const [isOpen, setIsOpen] = useState(false);
+  
   const dropdownRef = useRef(null);
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
@@ -191,18 +190,15 @@ function Index() {
     </div>
   )
 }
-
 function PurchaseOrdersIndex() {
+  const [ purchaseOrders, setPurchaseOrders ] = useState([]);
   return (
-      <PurchaseOrdersProvider>
     <Routes>
-      <Route path="" element={<Index />} />
-      <Route path="add" element={<PurchaseOrdersAdd />} />
+      <Route path="" element={<Index setPurchaseOrders={setPurchaseOrders} purchaseOrders={purchaseOrders}/>} />
+      <Route path="add" element={<PurchaseOrdersAdd purchaseOrders={purchaseOrders} />} />
       <Route path="edit/:id" element={<PurchaseOrdersEdit />} />
       <Route path="detail/:id" element={<PurchaseOrdersDetail />} />
-
     </Routes>
-      </PurchaseOrdersProvider>
   )
 }
 

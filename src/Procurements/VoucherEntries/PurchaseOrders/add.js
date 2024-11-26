@@ -4,12 +4,10 @@ import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Validator from '../../../utils/validator';
 import 'react-datepicker/dist/react-datepicker.css';
 import InvoiceTotal from '../../../Components/InvoiceSettings/InvoiceTotal';
-import { PurchaseOrdersContext } from '../../../Contexts/PurchaseOrdersContext';
 
 const { ipcRenderer } = window.require('electron');
 
-function PurchaseOrdersAdd() {
-  const { purchaseOrders, setPurchaseOrders } = useContext(PurchaseOrdersContext);
+function PurchaseOrdersAdd({ purchaseOrders }) {
   const [isVendorIdFocused, setIsVendorIdFocused] = useState(false);
 
   const [isVendorNameFocused, setIsVendorNameFocused] = useState(false);
