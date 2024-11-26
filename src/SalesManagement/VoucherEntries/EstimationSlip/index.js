@@ -85,6 +85,7 @@ function Index() {
   const handleDelete = (id) => {
     if (window.confirm('本当にこの見積伝票を削除しますか？')) {
       ipcRenderer.send('delete-estimation-slip', id);
+      ipcRenderer.send('delete-estimation-slip-detail', id);
     }
   };
 

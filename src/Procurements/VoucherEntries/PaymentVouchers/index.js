@@ -72,6 +72,7 @@ function Index() {
 
   const handleConfirmDelete = () => {
     ipcRenderer.send('delete-payment-voucher', customerIdToDelete);
+    ipcRenderer.send('delete-payment-voucher-details-by-pv-id', customerIdToDelete);
     setIsDialogOpen(false);
   };
 

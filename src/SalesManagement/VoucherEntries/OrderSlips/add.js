@@ -144,26 +144,26 @@ function OrderSlipsAdd() {
     };
   }, []);
 
-    const [orderSlipDetails, setOrderSlipDetails] = useState([
-        {
-            id: '',
-            order_slip_id: '',
-            product_id: '',
-            product_name: '',
-            number: '',
-            unit: '',
-            unit_price: '',
-            tax_rate: '',
-            lot_number: '',
-            storage_facility: '',
-            stock: '',
-            gross_profit: '',
-            gross_margin_rate: '',
-            threshold: '',
-            created: '',
-            updated: '',
-        }
-    ]);
+  const [orderSlipDetails, setOrderSlipDetails] = useState([
+    {
+      id: '',
+      order_slip_id: '',
+      product_id: '',
+      product_name: '',
+      number: '',
+      unit: '',
+      unit_price: '',
+      tax_rate: '',
+      lot_number: '',
+      storage_facility: '',
+      stock: '',
+      gross_profit: '',
+      gross_margin_rate: '',
+      threshold: '',
+      created: '',
+      updated: '',
+    }
+  ]);
 
   const addOrderSlipDetail = () => {
     setOrderSlipDetails([...orderSlipDetails, {
@@ -230,21 +230,21 @@ function OrderSlipsAdd() {
 
   const validator = new Validator();
 
-    const handleSubmit = () => {
-        setErrors(null);
-        validator.required(orderSlip.code, 'code', '伝票番号');
-        validator.required(orderSlip.order_date, 'order_date', '受注日付');
-        validator.required(orderSlip.vender_id, 'vender_id', '得意先コード');
-        validator.required(orderSlip.vender_name, 'vender_name', '得意先名');
-        for (let i = 0; i < orderSlipDetails.length; i++) {
-            validator.required(orderSlipDetails[i].product_id, 'product_id' + i, '商品コード');
-            validator.required(orderSlipDetails[i].product_name, 'product_name' + i, '商品名');
-            validator.required(orderSlipDetails[i].number, 'number' + i, '数量');
-            validator.required(orderSlipDetails[i].unit_price, 'unit_price' + i, '単価');
-            validator.required(orderSlipDetails[i].tax_rate, 'tax_rate' + i, '税率');
-            validator.required(orderSlipDetails[i].storage_facility, 'storage_facility' + i, '倉庫');
-        }
-        setErrors(validator.getErrors());
+  const handleSubmit = () => {
+    setErrors(null);
+    validator.required(orderSlip.code, 'code', '伝票番号');
+    validator.required(orderSlip.order_date, 'order_date', '受注日付');
+    validator.required(orderSlip.vender_id, 'vender_id', '得意先コード');
+    validator.required(orderSlip.vender_name, 'vender_name', '得意先名');
+    for (let i = 0; i < orderSlipDetails.length; i++) {
+      validator.required(orderSlipDetails[i].product_id, 'product_id' + i, '商品コード');
+      validator.required(orderSlipDetails[i].product_name, 'product_name' + i, '商品名');
+      validator.required(orderSlipDetails[i].number, 'number' + i, '数量');
+      validator.required(orderSlipDetails[i].unit_price, 'unit_price' + i, '単価');
+      validator.required(orderSlipDetails[i].tax_rate, 'tax_rate' + i, '税率');
+      validator.required(orderSlipDetails[i].storage_facility, 'storage_facility' + i, '倉庫');
+    }
+    setErrors(validator.getErrors());
 
     if (!validator.hasErrors()) {
 
@@ -252,66 +252,67 @@ function OrderSlipsAdd() {
 
       ipcRenderer.on('save-order-slip-result', (event, data) => {
 
-                for (let i = 0; i < orderSlipDetails.length; i++) {
-                    const orderSlipDetailData = orderSlipDetails[i];
-                    orderSlipDetailData.order_slip_id = data.id;
-                    ipcRenderer.send('save-order-slip-detail', orderSlipDetailData);
-                    const inventoryData = {
-                        product_id: orderSlipDetailData.product_id,
-                        product_name: orderSlipDetailData.product_name,
-                        lot_number: orderSlipDetailData.lot_number,
-                        inventory: orderSlipDetailData.number,
-                        estimated_inventory: orderSlipDetailData.number,
-                        warning_value: orderSlipDetailData.threshold,
-                    }
-                    ipcRenderer.send('order-slips-inventory', inventoryData);
-                    const inventoryLogData = {
-                        product_id: orderSlipDetailData.product_id,
-                        product_name: orderSlipDetailData.product_name,
-                        lot_number: orderSlipDetailData.lot_number,
-                        number: orderSlipDetailData.number*(-1),
-                        action: "order slips",
-                        storage_facility_id: orderSlipDetailData.storage_facility,
-                    }
-                    ipcRenderer.send('save-inventory-log', inventoryLogData);
-                }
-            });
-            setOrderSlip({
-                code: '',
-                order_id: '',
-                order_date: '',
-                delivery_date: '',
-                vender_id: '',
-                vender_name: '',
-                honorific: '',
-                vender_contact_person: '',
-                estimation_slip_id: '',
-                estimation_id: '',
-                remarks: '',
-                closing_date: '',
-                deposit_due_date: '',
-                deposit_method: '',
-            });
-            alert('新規登録が完了しました。');
-        }
-    };
-
-    const handleSumPrice = () => {
-        let SumPrice = 0
-        let consumptionTaxEight = 0
-        let consumptionTaxTen = 0
-
         for (let i = 0; i < orderSlipDetails.length; i++) {
-            SumPrice += orderSlipDetails[i].unit_price * orderSlipDetails[i].number;
-            if (orderSlipDetails[i].tax_rate === 8) {
-                consumptionTaxEight += orderSlipDetails[i].unit_price * orderSlipDetails[i].number * 0.08;
-            } else if (orderSlipDetails[i].tax_rate === 10) {
-                consumptionTaxTen += orderSlipDetails[i].unit_price * orderSlipDetails[i].number * 0.1;
-            }
+          const orderSlipDetailData = orderSlipDetails[i];
+          orderSlipDetailData.order_slip_id = data.id;
+          console.log(orderSlipDetailData);
+          ipcRenderer.send('save-order-slip-detail', orderSlipDetailData);
+          const inventoryData = {
+            product_id: orderSlipDetailData.product_id,
+            product_name: orderSlipDetailData.product_name,
+            lot_number: orderSlipDetailData.lot_number,
+            inventory: orderSlipDetailData.number,
+            estimated_inventory: orderSlipDetailData.number,
+            warning_value: orderSlipDetailData.threshold,
+          }
+          ipcRenderer.send('order-slips-inventory', inventoryData);
+          const inventoryLogData = {
+            product_id: orderSlipDetailData.product_id,
+            product_name: orderSlipDetailData.product_name,
+            lot_number: orderSlipDetailData.lot_number,
+            number: orderSlipDetailData.number * (-1),
+            action: "order slips",
+            storage_facility_id: orderSlipDetailData.storage_facility,
+          }
+          ipcRenderer.send('save-inventory-log', inventoryLogData);
         }
-
-        return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxEight + consumptionTaxTen, "Total": SumPrice + consumptionTaxEight + consumptionTaxTen }
+      });
+      setOrderSlip({
+        code: '',
+        order_id: '',
+        order_date: '',
+        delivery_date: '',
+        vender_id: '',
+        vender_name: '',
+        honorific: '',
+        vender_contact_person: '',
+        estimation_slip_id: '',
+        estimation_id: '',
+        remarks: '',
+        closing_date: '',
+        deposit_due_date: '',
+        deposit_method: '',
+      });
+      alert('新規登録が完了しました。');
     }
+  };
+
+  const handleSumPrice = () => {
+    let SumPrice = 0
+    let consumptionTaxEight = 0
+    let consumptionTaxTen = 0
+
+    for (let i = 0; i < orderSlipDetails.length; i++) {
+      SumPrice += orderSlipDetails[i].unit_price * orderSlipDetails[i].number;
+      if (orderSlipDetails[i].tax_rate === 8) {
+        consumptionTaxEight += orderSlipDetails[i].unit_price * orderSlipDetails[i].number * 0.08;
+      } else if (orderSlipDetails[i].tax_rate === 10) {
+        consumptionTaxTen += orderSlipDetails[i].unit_price * orderSlipDetails[i].number * 0.1;
+      }
+    }
+
+    return { "subtotal": SumPrice, "consumptionTaxEight": consumptionTaxEight, "consumptionTaxTen": consumptionTaxTen, "totalConsumptionTax": consumptionTaxEight + consumptionTaxTen, "Total": SumPrice + consumptionTaxEight + consumptionTaxTen }
+  }
 
 
   const [isOpen, setIsOpen] = useState(null);
@@ -351,18 +352,18 @@ function OrderSlipsAdd() {
     };
   }, []);
 
-    const handleDateChange = (date, name) => {
-        // 日付をフォーマットしてorderSlipにセット
-        const formattedDate = date ? date.toISOString().split('T')[0] : '';
-        setOrderSlip({ ...orderSlip, [name]: formattedDate });
-    };
+  const handleDateChange = (date, name) => {
+    // 日付をフォーマットしてorderSlipにセット
+    const formattedDate = date ? date.toISOString().split('T')[0] : '';
+    setOrderSlip({ ...orderSlip, [name]: formattedDate });
+  };
 
-    const handleProductClick = (product, index) => {
-        const updatedDetails = orderSlipDetails.map((detail, i) =>
-            i === index ? { ...detail, ["product_name"]: product.name, ["product_id"]: product.id, ["tax_rate"]: product.tax_rate, ["unit"] : product.unit, ["price"] : product.procurement_cost, ["threshold"]: product.threshold  } : detail
-        );
-        setOrderSlipDetails(updatedDetails);
-    }
+  const handleProductClick = (product, index) => {
+    const updatedDetails = orderSlipDetails.map((detail, i) =>
+      i === index ? { ...detail, ["product_name"]: product.name, ["product_id"]: product.id, ["tax_rate"]: product.tax_rate, ["unit"]: product.unit, ["price"]: product.procurement_cost, ["threshold"]: product.threshold } : detail
+    );
+    setOrderSlipDetails(updatedDetails);
+  }
 
   return (
     <div className='w-full'>
@@ -498,159 +499,159 @@ function OrderSlipsAdd() {
                     </svg>
                   </div>
 
-                                    {isOpen === "honorific" && (
-                                        <div className="absolute z-10 mt-1 w-full bg-white border  rounded-md shadow-lg max-h-60 overflow-auto">
-                                            {[{ label: "御中", value: "御中" }, { label: "貴社", value: "貴社" }].map((option) => (
-                                                <div
-                                                    key={option.value}
-                                                    className="cursor-pointer p-2 hover:bg-gray-100"
-                                                    onClick={() => selectOrderSlipOption(option, "honorific")}
-                                                >
-                                                    {option.label}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
+                  {isOpen === "honorific" && (
+                    <div className="absolute z-10 mt-1 w-full bg-white border  rounded-md shadow-lg max-h-60 overflow-auto">
+                      {[{ label: "御中", value: "御中" }, { label: "貴社", value: "貴社" }].map((option) => (
+                        <div
+                          key={option.value}
+                          className="cursor-pointer p-2 hover:bg-gray-100"
+                          onClick={() => selectOrderSlipOption(option, "honorific")}
+                        >
+                          {option.label}
                         </div>
-                    </div>                    {errors.vender_id && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.vender_id}</div>}
-                    {errors.vender_name && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.vender_name}</div>}
-                    <div className='pb-2'>
-                        <div className='text-sm pb-1.5'>先方担当者</div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="vender_contact_person" value={orderSlip.vender_contact_person} onChange={handleChange}/>
+                      ))}
                     </div>
-                    <div className='py-3'>
-                        <hr className='' />
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>                    {errors.vender_id && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.vender_id}</div>}
+          {errors.vender_name && <div className="text-red-600 bg-red-100 py-1 px-4">{errors.vender_name}</div>}
+          <div className='pb-2'>
+            <div className='text-sm pb-1.5'>先方担当者</div>
+            <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="vender_contact_person" value={orderSlip.vender_contact_person} onChange={handleChange} />
+          </div>
+          <div className='py-3'>
+            <hr className='' />
+          </div>
+          <div className='py-2.5 font-bold text-xl'>見積伝票</div>
+          <div className='pb-2'>
+            <div className='text-sm pb-1.5'>見積伝票番号</div>
+            <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="estimation_slip_id" value={orderSlip.estimation_slip_id} onChange={handleChange} />
+          </div>
+          <div className='pb-2'>
+            <div className='text-sm pb-1.5'>見積番号</div>
+            <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="estimation_id" value={orderSlip.estimation_id} onChange={handleChange} />
+          </div>
+          <div className='py-3'>
+            <hr className='' />
+          </div>
+          <div className='py-2.5 font-bold text-xl'>明細</div>
+          {
+            orderSlipDetails.map((orderSlipDetail, index) => (
+              <div>
+                <div className='flex items-center'>
+                  <div>
+                    <div className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex' onClick={addOrderSlipDetail}>＋</div>
+                  </div>
+                  <div className=''>
+                    <div className='flex items-center'>
+                      <div className='relative'>
+                        <div className='text-sm pb-1.5'>商品コード <span className='text-sm font-bold text-red-600'>必須</span></div>
+                        <input type='number'
+                          className='border rounded px-4 py-2.5 bg-white'
+                          placeholder=''
+                          name="product_id"
+                          value={orderSlipDetail.product_id}
+                          onChange={(e) => handleInputChange(index, e)}
+                          style={{ width: "120px" }}
+                          onFocus={(e) => handleProductIdFocus(index)}
+                          onBlur={handleeProductIdBlur}
+                        />
+                        {
+                          isProductIdFocused === index &&
+                          <div className='absolute top-20 left-0 z-10' onMouseDown={(e) => e.preventDefault()}>
+                            <div className="relative inline-block">
+                              <div className="absolute left-5 -top-2 w-3 h-3 bg-white transform rotate-45 shadow-lg"></div>
+                              <div className="bg-white shadow-lg rounded-lg p-4 w-60">
+                                <div className="flex flex-col space-y-2">
+                                  {
+                                    products.map((product, idx) => (
+                                      <div key={idx}
+                                        className="p-2 hover:bg-gray-100 hover:cursor-pointer"
+                                        onClick={(e) => handleProductClick(product, index)}
+                                      >
+                                        {product.name}
+                                      </div>
+                                    ))
+                                  }
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        }
+                      </div>
+                      <div className='ml-4 relative'>
+                        <div className='text-sm pb-1.5'>商品名 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                        <input type='text'
+                          className='border rounded px-4 py-2.5 bg-white'
+                          placeholder=''
+                          name="product_name"
+                          value={orderSlipDetail.product_name}
+                          onChange={(e) => handleInputChange(index, e)}
+                          style={{ width: "440px" }}
+                          onFocus={(e) => handleProductNameFocus(index)}
+                          onBlur={handleeProductNameBlur}
+                        />
+                        {
+                          isProductNameFocused === index &&
+                          <div className='absolute top-20 left-0 z-10' onMouseDown={(e) => e.preventDefault()}>
+                            <div className="relative inline-block">
+                              <div className="absolute left-5 -top-2 w-3 h-3 bg-white transform rotate-45 shadow-lg"></div>
+                              <div className="bg-white shadow-lg rounded-lg p-4 w-60">
+                                <div className="flex flex-col space-y-2">
+                                  {
+                                    products.map((product, idx) => (
+                                      <div key={idx}
+                                        className="p-2 hover:bg-gray-100 hover:cursor-pointer"
+                                        onClick={(e) => handleProductClick(product, index)}
+                                      >
+                                        {product.name}
+                                      </div>
+                                    ))
+                                  }
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        }
+                      </div>
+                      <div className='ml-4'>
+                        <div className='text-sm pb-1.5'>数量 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                        <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="number" value={orderSlipDetail.number} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
+                      </div>
+                      <div className='ml-4'>
+                        <div className='text-sm pb-1.5'>単位</div>
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="unit" value={orderSlipDetail.unit} onChange={(e) => handleInputChange(index, e)} style={{ width: "120px" }} />
+                      </div>
+                      <div className='ml-4'>
+                        <div className='text-sm pb-1.5'>単価 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                        <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="unit_price" value={orderSlipDetail.unit_price} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
+                      </div>
                     </div>
-                    <div className='py-2.5 font-bold text-xl'>見積伝票</div>
-                    <div className='pb-2'>
-                        <div className='text-sm pb-1.5'>見積伝票番号</div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="estimation_slip_id" value={orderSlip.estimation_slip_id} onChange={handleChange}/>
-                    </div>
-                    <div className='pb-2'>
-                        <div className='text-sm pb-1.5'>見積番号</div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white w-1/3' placeholder='' name="estimation_id" value={orderSlip.estimation_id} onChange={handleChange}/>
-                    </div>
-                    <div className='py-3'>
-                        <hr className='' />
-                    </div>
-                    <div className='py-2.5 font-bold text-xl'>明細</div>
-                    {
-                        orderSlipDetails.map((orderSlipDetail, index) => (
-                            <div>
-                                <div className='flex items-center'>
-                                    <div>
-                                        <div className='py-3 px-4 border rounded-lg text-base font-bold mr-6 flex' onClick={addOrderSlipDetail}>＋</div>
-                                    </div>
-                                    <div className=''>
-                                        <div className='flex items-center'>
-                                            <div className='relative'>
-                                                <div className='text-sm pb-1.5'>商品コード <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                                <input type='number'
-                                                    className='border rounded px-4 py-2.5 bg-white'
-                                                    placeholder=''
-                                                    name="product_id"
-                                                    value={orderSlipDetail.product_id}
-                                                    onChange={(e) => handleInputChange(index, e)}
-                                                    style={{ width: "120px" }}
-                                                    onFocus={(e) => handleProductIdFocus(index)}
-                                                    onBlur={handleeProductIdBlur}
-                                                />
-                                                {
-                                                    isProductIdFocused === index &&
-                                                    <div className='absolute top-20 left-0 z-10' onMouseDown={(e) => e.preventDefault()}>
-                                                        <div className="relative inline-block">
-                                                            <div className="absolute left-5 -top-2 w-3 h-3 bg-white transform rotate-45 shadow-lg"></div>
-                                                            <div className="bg-white shadow-lg rounded-lg p-4 w-60">
-                                                                <div className="flex flex-col space-y-2">
-                                                                    {
-                                                                        products.map((product, idx) => (
-                                                                            <div key={idx}
-                                                                                className="p-2 hover:bg-gray-100 hover:cursor-pointer"
-                                                                                onClick={(e) => handleProductClick(product, index)}
-                                                                            >
-                                                                                {product.name}
-                                                                            </div>
-                                                                        ))
-                                                                    }
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                }
-                                            </div>
-                                            <div className='ml-4 relative'>
-                                                <div className='text-sm pb-1.5'>商品名 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                                <input type='text'
-                                                    className='border rounded px-4 py-2.5 bg-white'
-                                                    placeholder=''
-                                                    name="product_name"
-                                                    value={orderSlipDetail.product_name}
-                                                    onChange={(e) => handleInputChange(index, e)}
-                                                    style={{ width: "440px" }}
-                                                    onFocus={(e) => handleProductNameFocus(index)}
-                                                    onBlur={handleeProductNameBlur}
-                                                />
-                                                {
-                                                    isProductNameFocused === index &&
-                                                    <div className='absolute top-20 left-0 z-10' onMouseDown={(e) => e.preventDefault()}>
-                                                        <div className="relative inline-block">
-                                                            <div className="absolute left-5 -top-2 w-3 h-3 bg-white transform rotate-45 shadow-lg"></div>
-                                                            <div className="bg-white shadow-lg rounded-lg p-4 w-60">
-                                                                <div className="flex flex-col space-y-2">
-                                                                    {
-                                                                        products.map((product, idx) => (
-                                                                            <div key={idx}
-                                                                                className="p-2 hover:bg-gray-100 hover:cursor-pointer"
-                                                                                onClick={(e) => handleProductClick(product, index)}
-                                                                            >
-                                                                                {product.name}
-                                                                            </div>
-                                                                        ))
-                                                                    }
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                }
-                                            </div>
-                                            <div className='ml-4'>
-                                                <div className='text-sm pb-1.5'>数量 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                                <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="number" value={orderSlipDetail.number} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
-                                            </div>
-                                            <div className='ml-4'>
-                                                <div className='text-sm pb-1.5'>単位</div>
-                                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="unit" value={orderSlipDetail.unit} onChange={(e) => handleInputChange(index, e)} style={{ width: "120px" }} />
-                                            </div>
-                                            <div className='ml-4'>
-                                                <div className='text-sm pb-1.5'>単価 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                                <input type='number' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="unit_price" value={orderSlipDetail.unit_price} onChange={(e) => handleInputChange(index, e)} style={{ width: "180px" }} />
-                                            </div>
-                                        </div>
-                                        {errors["product_id" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["product_id" + index]}</div>}
-                                        {errors["product_name" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["product_name" + index]}</div>}
-                                        {errors["number" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["number" + index]}</div>}
-                                        {errors["unit_price" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["unit_price" + index]}</div>}
-                                        <div className='flex items-center mt-4'>
-                                            <div className=''>
-                                                <div className='text-sm pb-1.5 w-40'>税率 <span className='text-sm font-bold text-red-600'>必須</span></div>
-                                                <div className="relative" ref={dropdownRef}>
-                                                    <div
-                                                        className="bg-white border rounded px-4 py-2.5 cursor-pointer flex justify-between items-center"
-                                                        onClick={() => toggleDropdown("tax_rate" + index)}
-                                                    >
-                                                        <span>{orderSlipDetail.tax_rate ? orderSlipDetail.tax_rate + "%" : "税率"}</span>
-                                                        <svg
-                                                            className={`w-4 h-4 transform transition-transform ${isOpen === "tax_rate" + index ? 'rotate-180' : ''}`}
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            fill="none"
-                                                            viewBox="0 0 24 24"
-                                                            stroke="currentColor"
-                                                        >
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                                                        </svg>
-                                                    </div>
+                    {errors["product_id" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["product_id" + index]}</div>}
+                    {errors["product_name" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["product_name" + index]}</div>}
+                    {errors["number" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["number" + index]}</div>}
+                    {errors["unit_price" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["unit_price" + index]}</div>}
+                    <div className='flex items-center mt-4'>
+                      <div className=''>
+                        <div className='text-sm pb-1.5 w-40'>税率 <span className='text-sm font-bold text-red-600'>必須</span></div>
+                        <div className="relative" ref={dropdownRef}>
+                          <div
+                            className="bg-white border rounded px-4 py-2.5 cursor-pointer flex justify-between items-center"
+                            onClick={() => toggleDropdown("tax_rate" + index)}
+                          >
+                            <span>{orderSlipDetail.tax_rate ? orderSlipDetail.tax_rate + "%" : "税率"}</span>
+                            <svg
+                              className={`w-4 h-4 transform transition-transform ${isOpen === "tax_rate" + index ? 'rotate-180' : ''}`}
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </div>
 
                           {isOpen === "tax_rate" + index && (
                             <div className="absolute z-10 mt-1 w-full bg-white border  rounded-md shadow-lg max-h-60 overflow-auto">
@@ -690,81 +691,81 @@ function OrderSlipsAdd() {
                             </svg>
                           </div>
 
-                                                    {isOpen === "storage_facility" + index && (
-                                                        <div className="absolute z-10 mt-1 w-full bg-white border  rounded-md shadow-lg max-h-60 overflow-auto">
-                                                            {storageFacilitiesList.map((option) => (
-                                                                <div
-                                                                    key={option.value}
-                                                                    className="cursor-pointer p-2 hover:bg-gray-100"
-                                                                    onClick={() => selectOption(option, "storage_facility", index)}
-                                                                >
-                                                                    {option.label}
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <div className='ml-4'>
-                                                <div className='text-sm pb-1.5'>在庫数</div>
-                                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="stock" value={orderSlipDetail.stock} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)} />
-                                            </div>
-                                            <div className='ml-4'>
-                                                <div className='text-sm pb-1.5'>粗利益</div>
-                                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="gross_profit" value={orderSlipDetail.gross_profit} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)} />
-                                            </div>
-                                            <div className='ml-4'>
-                                                <div className='text-sm pb-1.5'>粗利率</div>
-                                                <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="gross_margin_rate" value={orderSlipDetail.gross_margin_rate} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)} />
-                                            </div>
-                                        </div>
-                                        {errors["tax_rate" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["tax_rate" + index]}</div>}
-                                        {errors["storage_facility" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["storage_facility" + index]}</div>}
-                                    </div>
-                                    <div className='ml-4'>
-                                        <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={(e) => removeOrderSlipDetail(index)}>
-                                            <svg width="15" height="19" viewBox="0 0 15 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M11.3926 6.72949V16.7295H3.39258V6.72949H11.3926ZM9.89258 0.729492H4.89258L3.89258 1.72949H0.392578V3.72949H14.3926V1.72949H10.8926L9.89258 0.729492ZM13.3926 4.72949H1.39258V16.7295C1.39258 17.8295 2.29258 18.7295 3.39258 18.7295H11.3926C12.4926 18.7295 13.3926 17.8295 13.3926 16.7295V4.72949Z" fill="#1F2937" />
-                                            </svg>
-                                        </div>
-                                    </div>
+                          {isOpen === "storage_facility" + index && (
+                            <div className="absolute z-10 mt-1 w-full bg-white border  rounded-md shadow-lg max-h-60 overflow-auto">
+                              {storageFacilitiesList.map((option) => (
+                                <div
+                                  key={option.value}
+                                  className="cursor-pointer p-2 hover:bg-gray-100"
+                                  onClick={() => selectOption(option, "storage_facility", index)}
+                                >
+                                  {option.label}
                                 </div>
-                                <div className='flex items-center justify-end'>
-                                    <div className='flex items-center'>
-                                        <div className='mr-4'>消費税額</div>
-                                        <div className='mr-4'>{(orderSlipDetails[index].unit_price * orderSlipDetails[index].number * orderSlipDetail.tax_rate * 0.01).toFixed(0)}円</div>
-                                        <div className='mr-4'>金額</div>
-                                        <div className='text-lg font-bold'>{(orderSlipDetails[index].unit_price * orderSlipDetails[index].number * (1 + orderSlipDetail.tax_rate * 0.01)).toFixed(0)}円</div>
-                                    </div>
-                                </div>
-                                <hr className='py-3' />
+                              ))}
                             </div>
-                        ))
-                    }
-                    <div className='py-6 flex'>
-                        <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>税抜合計</div>
-                                <div>{handleSumPrice().subtotal.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税(8%)</div>
-                                <div>{handleSumPrice().consumptionTaxEight.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税(10%)</div>
-                                <div>{handleSumPrice().consumptionTaxTen.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex pb-2'>
-                                <div className='w-40'>消費税合計</div>
-                                <div>{handleSumPrice().totalConsumptionTax.toFixed(0).toLocaleString()}円</div>
-                            </div>
-                            <div className='flex'>
-                                <div className='w-40'>税込合計</div>
-                                <div>{handleSumPrice().Total.toFixed(0).toLocaleString()}円</div>
-                            </div>
+                          )}
                         </div>
+                      </div>
+                      <div className='ml-4'>
+                        <div className='text-sm pb-1.5'>在庫数</div>
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="stock" value={orderSlipDetail.stock} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)} />
+                      </div>
+                      <div className='ml-4'>
+                        <div className='text-sm pb-1.5'>粗利益</div>
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="gross_profit" value={orderSlipDetail.gross_profit} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)} />
+                      </div>
+                      <div className='ml-4'>
+                        <div className='text-sm pb-1.5'>粗利率</div>
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="gross_margin_rate" value={orderSlipDetail.gross_margin_rate} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)} />
+                      </div>
                     </div>
+                    {errors["tax_rate" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["tax_rate" + index]}</div>}
+                    {errors["storage_facility" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["storage_facility" + index]}</div>}
+                  </div>
+                  <div className='ml-4'>
+                    <div className='py-3 px-4 border rounded-lg text-base font-bold flex' onClick={(e) => removeOrderSlipDetail(index)}>
+                      <svg width="15" height="19" viewBox="0 0 15 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11.3926 6.72949V16.7295H3.39258V6.72949H11.3926ZM9.89258 0.729492H4.89258L3.89258 1.72949H0.392578V3.72949H14.3926V1.72949H10.8926L9.89258 0.729492ZM13.3926 4.72949H1.39258V16.7295C1.39258 17.8295 2.29258 18.7295 3.39258 18.7295H11.3926C12.4926 18.7295 13.3926 17.8295 13.3926 16.7295V4.72949Z" fill="#1F2937" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                <div className='flex items-center justify-end'>
+                  <div className='flex items-center'>
+                    <div className='mr-4'>消費税額</div>
+                    <div className='mr-4'>{(orderSlipDetails[index].unit_price * orderSlipDetails[index].number * orderSlipDetail.tax_rate * 0.01).toFixed(0)}円</div>
+                    <div className='mr-4'>金額</div>
+                    <div className='text-lg font-bold'>{(orderSlipDetails[index].unit_price * orderSlipDetails[index].number * (1 + orderSlipDetail.tax_rate * 0.01)).toFixed(0)}円</div>
+                  </div>
+                </div>
+                <hr className='py-3' />
+              </div>
+            ))
+          }
+          <div className='py-6 flex'>
+            <div className='ml-auto rounded px-10 py-8 bg-gray-100'>
+              <div className='flex pb-2'>
+                <div className='w-40'>税抜合計</div>
+                <div>{handleSumPrice().subtotal.toFixed(0).toLocaleString()}円</div>
+              </div>
+              <div className='flex pb-2'>
+                <div className='w-40'>消費税(8%)</div>
+                <div>{handleSumPrice().consumptionTaxEight.toFixed(0).toLocaleString()}円</div>
+              </div>
+              <div className='flex pb-2'>
+                <div className='w-40'>消費税(10%)</div>
+                <div>{handleSumPrice().consumptionTaxTen.toFixed(0).toLocaleString()}円</div>
+              </div>
+              <div className='flex pb-2'>
+                <div className='w-40'>消費税合計</div>
+                <div>{handleSumPrice().totalConsumptionTax.toFixed(0).toLocaleString()}円</div>
+              </div>
+              <div className='flex'>
+                <div className='w-40'>税込合計</div>
+                <div>{handleSumPrice().Total.toFixed(0).toLocaleString()}円</div>
+              </div>
+            </div>
+          </div>
 
           <div className='py-3'>
             <hr className='' />
@@ -808,7 +809,7 @@ function OrderSlipsAdd() {
       <div className='flex mt-8 fixed bottom-0 border-t w-full py-4 px-8 bg-white'>
         <div className='bg-blue-600 text-white rounded px-4 py-3 font-bold mr-6 cursor-pointer' onClick={handleSubmit}>新規登録</div>
         <Link to={`/sales-management/voucher-entries/order-slips`} className='border rounded px-4 py-3 font-bold cursor-pointer'>キャンセル</Link>
-        </div>
+      </div>
     </div>
   );
 }

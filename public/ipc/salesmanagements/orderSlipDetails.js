@@ -9,6 +9,7 @@ const {
     searchOrderSlipsByOrderSlipId,
     deleteOrderSlipDetailsBySlipId,
     deleteOrderSlipDetailsBySoId,
+    deleteOrderSlipDetailByOrderSlipId,
     searchOrderSlipDepositDetails
 } = require('../../database/salesmanagements/orderSlipDetails');
 
@@ -64,7 +65,7 @@ ipcMain.on('delete-order-slip-detail', (event, id) => {
 
 // 購入注文明細を削除
 ipcMain.on('order-slip-details-deleted-by-slip-id', (event, id) => {
-    deleteOrderSlipDetailById(id, (err) => {
+  deleteOrderSlipDetailByOrderSlipId(id, (err) => {
         if (err) {
             console.error(err.message);
         } else {

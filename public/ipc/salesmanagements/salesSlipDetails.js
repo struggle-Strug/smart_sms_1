@@ -75,7 +75,7 @@ ipcMain.on('delete-sales-slip-detail', (event, id) => {
 
 // 売上伝票明細を削除 (編集画面用)
 ipcMain.on('sales-slip-details-deleted-by-slip-id', (event, id) => {
-    deleteSalesSlipDetailById(id, (err) => {
+  deleteSalesSlipDetailsBySlipId(id, (err) => {
         if (err) {
             console.error(err.message);
         } else {

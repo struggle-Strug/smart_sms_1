@@ -100,6 +100,7 @@ function PurchaseInvoicesDetail() {
 
     const handleConfirmDelete = () => {
         ipcRenderer.send('delete-purchase-invoice', customerIdToDelete);
+        ipcRenderer.send('delete-purchase-invoice-details-by-pi-id', customerIdToDelete);
 
         setIsDialogOpen(false);
         navigate("/procurement/voucher-entries/purchase-invoices");

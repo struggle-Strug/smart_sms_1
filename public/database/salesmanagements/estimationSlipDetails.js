@@ -103,7 +103,7 @@ function saveEstimationSlipDetail(detailData, callback) {
 }
 
 function deleteEstimationSlipDetailById(id, callback) {
-    const sql = `DELETE FROM estimation_slip_details WHERE id = ?`;
+    const sql = `DELETE FROM estimation_slip_details WHERE estimation_slip_id = ?`;
     db.run(sql, [id], (err) => {
         callback(err);
     });
