@@ -241,6 +241,7 @@ function PurchaseOrdersAdd({ purchaseOrders }) {
         for (let i = 0; i < purchaseOrderDetails.length; i++) {
           const purchaseOrderDetailData = purchaseOrderDetails[i];
           purchaseOrderDetailData.purchase_order_id = data.id;
+          console.log(purchaseOrderDetailData);
           ipcRenderer.send('save-purchase-order-detail', purchaseOrderDetailData);
           const inventoryData = {
             product_id: purchaseOrderDetailData.product_id,
@@ -630,11 +631,11 @@ function PurchaseOrdersAdd({ purchaseOrders }) {
                       </div>
                       <div className='ml-4'>
                         <div className='text-sm pb-1.5'>ロット番号</div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="stock" value={purchaseOrderDetail.lot_number} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="lot_number" value={purchaseOrderDetail.lot_number} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)} />
                       </div>
                       <div className='ml-4'>
                         <div className='text-sm pb-1.5'>警告値</div>
-                        <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="stock" value={purchaseOrderDetail.threshold} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)} />
+                        <input type='text' className='border rounded px-4 py-2.5 bg-white' placeholder='' name="threshold" value={purchaseOrderDetail.threshold} style={{ width: "180px" }} onChange={(e) => handleInputChange(index, e)} />
                       </div>
                     </div>
                     {errors["tax_rate" + index] && <div className="text-red-600 bg-red-100 py-1 px-4">{errors["tax_rate" + index]}</div>}
