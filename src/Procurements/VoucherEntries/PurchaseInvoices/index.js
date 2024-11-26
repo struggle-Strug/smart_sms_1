@@ -9,7 +9,8 @@ import ConfirmDialog from '../../../Components/ConfirmDialog';
 const { ipcRenderer } = window.require('electron');
 
 
-function Index({ purchaseInvoices, setPurchaseInvoices }) {
+function Index() {
+  const [purchaseInvoices, setPurchaseInvoices] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const location = useLocation();
@@ -193,12 +194,11 @@ function Index({ purchaseInvoices, setPurchaseInvoices }) {
 }
 
 function PurchaseInvoicesIndex() {
-  const [purchaseInvoices, setPurchaseInvoices] = useState([]);
 
   return (
     <Routes>
-      <Route path="" element={<Index purchaseInvoices={purchaseInvoices} setPurchaseInvoices={setPurchaseInvoices} />} />
-      <Route path="add" element={<PurchaseInvoicesAdd purchaseInvoices={purchaseInvoices} />} />
+      <Route path="" element={<Index />} />
+      <Route path="add" element={<PurchaseInvoicesAdd />} />
       <Route path="detail/:id" element={<PurchaseInvoicesDetail />} />
       <Route path="edit/:id" element={<PurchaseInvoicesEdit />} />
     </Routes>

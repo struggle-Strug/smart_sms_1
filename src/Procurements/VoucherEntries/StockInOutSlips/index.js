@@ -7,7 +7,8 @@ import ConfirmDialog from '../../../Components/ConfirmDialog';
 
 const { ipcRenderer } = window.require('electron');
 
-function Index({slips, setSlips}) {
+function Index() {
+  const [slips, setSlips] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const location = useLocation();
@@ -189,12 +190,10 @@ function Index({slips, setSlips}) {
 }
 
 function StockInOutSlipsIndex() {
-  const [slips, setSlips] = useState([]);
-
   return (
     <Routes>
-      <Route path="" element={<Index setSlips={setSlips} slips={slips} />} />
-      <Route path="add" element={<StockInOutSlipsAdd slips={slips}/>} />
+      <Route path="" element={<Index />} />
+      <Route path="add" element={<StockInOutSlipsAdd/>} />
       <Route path="edit/:id" element={<StockInOutSlipsEdit />} />
       <Route path="detail/:id" element={<StockInOutSlipsDetail />} />
     </Routes>

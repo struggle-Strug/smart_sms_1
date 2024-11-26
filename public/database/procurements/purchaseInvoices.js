@@ -8,7 +8,13 @@ const db = new sqlite3.Database(dbPath);
 function loadPurchaseInvoices(page, callback) {
   const pageSize = 10;
   const offset = page;
-  const sql = `SELECT * FROM purchase_invoices LIMIT ? OFFSET ?`;
+  
+  const sql = (page === undefined) ? `SELECT * FROM purchase_invoices` : `SELECT * FROM purchase_invoices LIMIT ? OFFSET ?`;
+  (page === undefined) ?
+  db.all(sql, (err, rows) => {
+    callback(err, rows);
+  })
+  :
   db.all(sql, [pageSize, offset], (err, rows) => {
     callback(err, rows);
   });

@@ -8,10 +8,15 @@ const db = new sqlite3.Database(dbPath);
 function loadStockInOutSlips(page, callback) {
   const pageSize = 10;
   const offset = page;
-  const sql = `SELECT * FROM stock_in_out_slips LIMIT ? OFFSET ?`;
+  const sql = (page === undefined) ? `SELECT * FROM stock_in_out_slips` : `SELECT * FROM stock_in_out_slips LIMIT ? OFFSET ?`;
+  (page === undefined) ? 
+  db.all(sql, (err, rows) => {
+    callback(err, rows);
+  })
+  : 
   db.all(sql, [pageSize, offset], (err, rows) => {
     callback(err, rows);
-  });
+  })
 }
 
 function getStockInOutSlipById(id, callback) {

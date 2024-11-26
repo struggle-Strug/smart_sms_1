@@ -8,7 +8,8 @@ import ConfirmDialog from '../../../Components/ConfirmDialog';
 
 const { ipcRenderer } = window.require('electron');
 
-function Index({ vouchers, setVouchers }) {
+function Index() {
+  const [vouchers, setVouchers] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const location = useLocation();
@@ -22,8 +23,6 @@ function Index({ vouchers, setVouchers }) {
   useEffect(() => {
     ipcRenderer.send('load-payment-vouchers', pages);
   }, [pages]);
-  console.log(pages);
-
 
   useEffect(() => {
     ipcRenderer.send('load-payment-vouchers');
@@ -187,12 +186,10 @@ function Index({ vouchers, setVouchers }) {
 }
 
 function PaymentVouchersIndex() {
-  const [vouchers, setVouchers] = useState([]);
-
   return (
     <Routes>
-      <Route path="" element={<Index vouchers={vouchers} setVouchers={setVouchers} />} />
-      <Route path="add" element={<PaymentVouchersAdd vouchers={vouchers} />} />
+      <Route path="" element={<Index />} />
+      <Route path="add" element={<PaymentVouchersAdd />} />
       <Route path="detail/:id" element={<PaymentVouchersDetail />} />
       <Route path="edit/:id" element={<PaymentVouchersEdit />} />
     </Routes>

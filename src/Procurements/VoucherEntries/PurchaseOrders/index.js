@@ -9,9 +9,9 @@ import ConfirmDialog from '../../../Components/ConfirmDialog';
 const { ipcRenderer } = window.require('electron');
 
 
-function Index({setPurchaseOrders, purchaseOrders}) {
+function Index() {
   const [isOpen, setIsOpen] = useState(false);
-  
+  const [ purchaseOrders, setPurchaseOrders ] = useState([]);
   const dropdownRef = useRef(null);
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
@@ -27,7 +27,6 @@ function Index({setPurchaseOrders, purchaseOrders}) {
 
 
   useEffect(() => {
-    ipcRenderer.send('load-purchase-orders');
     ipcRenderer.on('load-purchase-orders', (event, data) => {
       setPurchaseOrders(data);
     });
@@ -191,11 +190,10 @@ function Index({setPurchaseOrders, purchaseOrders}) {
   )
 }
 function PurchaseOrdersIndex() {
-  const [ purchaseOrders, setPurchaseOrders ] = useState([]);
   return (
     <Routes>
-      <Route path="" element={<Index setPurchaseOrders={setPurchaseOrders} purchaseOrders={purchaseOrders}/>} />
-      <Route path="add" element={<PurchaseOrdersAdd purchaseOrders={purchaseOrders} />} />
+      <Route path="" element={<Index />} />
+      <Route path="add" element={<PurchaseOrdersAdd />} />
       <Route path="edit/:id" element={<PurchaseOrdersEdit />} />
       <Route path="detail/:id" element={<PurchaseOrdersDetail />} />
     </Routes>

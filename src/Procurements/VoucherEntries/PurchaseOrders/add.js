@@ -7,9 +7,9 @@ import InvoiceTotal from '../../../Components/InvoiceSettings/InvoiceTotal';
 
 const { ipcRenderer } = window.require('electron');
 
-function PurchaseOrdersAdd({ purchaseOrders }) {
+function PurchaseOrdersAdd() {
   const [isVendorIdFocused, setIsVendorIdFocused] = useState(false);
-
+  const [ purchaseOrders, setPurchaseOrders ] = useState([]);
   const [isVendorNameFocused, setIsVendorNameFocused] = useState(false);
   const [isProductIdFocused, setIsProductIdFocused] = useState(-1);
   const [isProductNameFocused, setIsProductNameFocused] = useState(-1);
@@ -78,7 +78,6 @@ function PurchaseOrdersAdd({ purchaseOrders }) {
       setProducts(data);
     });
     
-    ipcRenderer.send('load-sales-tax-settings');
     ipcRenderer.on('sales-tax-settings-data', (event, data) => {
       let arr = [];
       for (let i = 0; i < data.length; i++) {
@@ -104,26 +103,41 @@ function PurchaseOrdersAdd({ purchaseOrders }) {
       setStorageFacilitiesList(arr);
     });
     
-    
+    ipcRenderer.send('load-purchase-orders');
+    ipcRenderer.on('load-purchase-orders', (event, data) => {
+      const numbersToday = data.filter(order => order.order_date == `${year}-${month}-${day}`).length;
+      const id = numbersToday < 9 ? (`${year}${month}${day}0${numbersToday+1}`) : (`${year}${month}${day}${numbersToday+1}`)
+
+      setPurchaseOrder( prev => {
+        return {
+          ...prev,
+          code: id
+        }
+      });
+      setPurchaseOrders(data);
+    });
+
+    ipcRenderer.on('purchase-order-deleted', (event, id) => {
+      setPurchaseOrders((prevOrders) => prevOrders.filter(order => order.id !== id));
+    });
+
+    ipcRenderer.on('search-purchase-orders-result', (event, data) => {
+      setPurchaseOrders(data);
+    });
+
     return () => {
       ipcRenderer.removeAllListeners('search-id-vendors-result');
       ipcRenderer.removeAllListeners('search-name-vendors-result');
       ipcRenderer.removeAllListeners('search-id-products-result');
       ipcRenderer.removeAllListeners('search-name-products-result');
       ipcRenderer.removeAllListeners('purchase-order-inventory-result');
+      ipcRenderer.removeAllListeners('purchase-orders-data');
+      ipcRenderer.removeAllListeners('search-purchase-orders-result');
     };
   }, []);
   
-  const defaultOrderId = () => {
-    const numbersToday = purchaseOrders.filter(order => order.order_date == `${year}-${month}-${day}`).length;
-    
-    return numbersToday < 10 ? (`${year}${month}${day}0${numbersToday+1}`) : (`${year}${month}${day}${numbersToday}`)
-  }
-  
-  const id = defaultOrderId();
-  
   const [purchaseOrder, setPurchaseOrder] = useState({
-    code: `${id}`,
+    code: '',
     order_date: `${year}-${month}-${day}`,
     vender_id: '',
     vender_name: '',

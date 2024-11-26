@@ -7,11 +7,12 @@ import InvoiceTotal from '../../../Components/InvoiceSettings/InvoiceTotal';
 
 const { ipcRenderer } = window.require('electron');
 
-function StockInOutSlipsAdd({slips}) {
+function StockInOutSlipsAdd() {
   const options = [
     { value: '倉庫A', label: '倉庫A' },
     { value: '倉庫B', label: '倉庫B' },
   ];
+  const [slips, setSlips] = useState([]);
   const [isVendorIdFocused, setIsVendorIdFocused] = useState(false);
   const [isVendorNameFocused, setIsVendorNameFocused] = useState(false);
   const [isProductIdFocused, setIsProductIdFocused] = useState(-1);
@@ -57,15 +58,13 @@ function StockInOutSlipsAdd({slips}) {
   };
 
   const defaultOrderId = () => {
-    const numbersToday = slips.filter(slip => slip.stock_in_out_date == `${year}-${month}-${day}`).length;
-    
-    return numbersToday < 10 ? (`${year}${month}${day}0${numbersToday+1}`) : (`${year}${month}${day}${numbersToday}`)
+
   }
   
   const id = defaultOrderId();
 
   const [stockInOutSlip, setStockInOutSlip] = useState({
-    code: `${id}`,
+    code: '',
     stock_in_out_date: `${year}-${month}-${day}`,
     processType: '',
     warehouse_from: '',
@@ -107,12 +106,37 @@ function StockInOutSlipsAdd({slips}) {
       setStorageFacilitiesList(arr);
     });
 
+    ipcRenderer.send('load-stock-in-out-slips');
+    ipcRenderer.on('load-stock-in-out-slips', (event, data) => {
+      const numbersToday = data.filter(slip => slip.stock_in_out_date == `${year}-${month}-${day}`).length;
+    
+      const id = numbersToday < 9 ? (`${year}${month}${day}0${numbersToday+1}`) : (`${year}${month}${day}${numbersToday+1}`)
+      setStockInOutSlip(prev => {
+        return {
+          ...prev,
+          code: id
+        }
+      });
+      setSlips(data);
+    });
+
+    ipcRenderer.on('stock-in-out-slip-deleted', (event, id) => {
+      setSlips((prevSlips) => prevSlips.filter(slip => slip.id !== id));
+    });
+
+    ipcRenderer.on('search-stock-in-out-slips-result', (event, data) => {
+      setSlips(data);
+    });
+
+
 
     return () => {
       ipcRenderer.removeAllListeners('search-id-vendors-result');
       ipcRenderer.removeAllListeners('search-name-vendors-result');
       ipcRenderer.removeAllListeners('search-id-products-result');
       ipcRenderer.removeAllListeners('search-name-products-result');
+      ipcRenderer.removeAllListeners('load-stock-in-out-slips');
+      ipcRenderer.removeAllListeners('search-stock-in-out-slips-result');
     };
   }, []);
 
