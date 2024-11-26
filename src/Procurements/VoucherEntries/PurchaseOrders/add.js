@@ -359,7 +359,6 @@ function PurchaseOrdersAdd({ purchaseOrders }) {
               className='border rounded px-4 py-2.5 bg-white w-2/3'
               placeholder='適用終了日を入力'
               name="order_date"
-              defaultValue={`${month}/${day}/${year}`}
               value={purchaseOrder.order_date}
               onChange={handleChange}
             />

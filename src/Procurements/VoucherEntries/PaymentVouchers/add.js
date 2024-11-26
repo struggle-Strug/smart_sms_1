@@ -6,7 +6,7 @@ import InvoiceTotal from '../../../Components/InvoiceSettings/InvoiceTotal';
 
 const { ipcRenderer } = window.require('electron');
 
-function PaymentVouchersAdd() {
+function PaymentVouchersAdd({ vouchers }) {
   const [isVendorIdFocused, setIsVendorIdFocused] = useState(false);
   const [isVendorNameFocused, setIsVendorNameFocused] = useState(false);
   const [isProductIdFocused, setIsProductIdFocused] = useState(-1);
@@ -15,6 +15,11 @@ function PaymentVouchersAdd() {
   const [errors, setErrors] = useState({});
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
+
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth() + 1; // getMonth() returns 0-11
+  const day = today.getDate();
 
   useEffect(() => {
     ipcRenderer.send('load-payment-methods');
@@ -60,10 +65,18 @@ function PaymentVouchersAdd() {
     setIsProductNameFocused(-1);
   };
 
+  const defaultOrderId = () => {
+    const numbersToday = vouchers.filter(voucher => voucher.order_date == `${year}-${month}-${day}`).length;
+    
+    return numbersToday < 10 ? (`${year}${month}${day}0${numbersToday+1}`) : (`${year}${month}${day}${numbersToday}`)
+  }
+  
+  const id = defaultOrderId();
+
   const [paymentVoucher, setPaymentVoucher] = useState(
     {
-      code: '',
-      order_date: '',
+      code: `${id}`,
+      order_date: `${year}-${month}-${day}`,
       vender_id: '',
       vender_name: '',
       honorific: '',
@@ -119,6 +132,8 @@ function PaymentVouchersAdd() {
       ipcRenderer.removeAllListeners('search-name-products-result');
     };
   }, []);
+
+
 
 
   const [paymentVoucherDetails, setPaymentVoucherDetails] = useState([

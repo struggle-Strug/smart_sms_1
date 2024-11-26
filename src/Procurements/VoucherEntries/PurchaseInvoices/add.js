@@ -6,7 +6,7 @@ import InvoiceTotal from '../../../Components/InvoiceSettings/InvoiceTotal';
 
 const { ipcRenderer } = window.require('electron');
 
-function PurchaseInvoicesAdd() {
+function PurchaseInvoicesAdd({ purchaseInvoices }) {
   const options = [
     { value: '御中', label: '御中' },
     { value: '貴社', label: '貴社' },
@@ -20,6 +20,11 @@ function PurchaseInvoicesAdd() {
   const [taxRateList, setTaxRateList] = useState([]);
   const [storageFacilitiesList, setStorageFacilitiesList] = useState([]);
   const [errors, setErrors] = useState({});
+
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth() + 1; // getMonth() returns 0-11
+  const day = today.getDate();
 
   const handleFocus = () => {
     setIsVendorIdFocused(true);
@@ -61,9 +66,17 @@ function PurchaseInvoicesAdd() {
     setIsProductNameFocused(-1);
   };
 
+  const defaultOrderId = () => {
+    const numbersToday = purchaseInvoices.filter(purchaseInvoice => purchaseInvoice.order_date == `${year}-${month}-${day}`).length;
+    
+    return numbersToday < 10 ? (`${year}${month}${day}0${numbersToday+1}`) : (`${year}${month}${day}${numbersToday}`)
+  }
+  
+  const id = defaultOrderId();
+
   const [purchaseInvoice, setPurchaseInvoice] = useState({
-    code: '',
-    order_date: '',
+    code: `${id}`,
+    order_date: `${year}-${month}-${day}`,
     vender_id: '',
     vender_name: '',
     honorific: '',

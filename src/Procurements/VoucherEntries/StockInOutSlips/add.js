@@ -7,7 +7,7 @@ import InvoiceTotal from '../../../Components/InvoiceSettings/InvoiceTotal';
 
 const { ipcRenderer } = window.require('electron');
 
-function StockInOutSlipsAdd() {
+function StockInOutSlipsAdd({slips}) {
   const options = [
     { value: '倉庫A', label: '倉庫A' },
     { value: '倉庫B', label: '倉庫B' },
@@ -18,6 +18,11 @@ function StockInOutSlipsAdd() {
   const [isProductNameFocused, setIsProductNameFocused] = useState(-1);
   const [storageFacilitiesList, setStorageFacilitiesList] = useState([]);
   const [errors, setErrors] = useState({});
+
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth() + 1; // getMonth() returns 0-11
+  const day = today.getDate();
 
   const handleFocus = () => {
     setIsVendorIdFocused(true);
@@ -51,9 +56,17 @@ function StockInOutSlipsAdd() {
     setIsProductNameFocused(-1);
   };
 
+  const defaultOrderId = () => {
+    const numbersToday = slips.filter(slip => slip.stock_in_out_date == `${year}-${month}-${day}`).length;
+    
+    return numbersToday < 10 ? (`${year}${month}${day}0${numbersToday+1}`) : (`${year}${month}${day}${numbersToday}`)
+  }
+  
+  const id = defaultOrderId();
+
   const [stockInOutSlip, setStockInOutSlip] = useState({
-    id: '',
-    stock_in_out_date: '',
+    code: `${id}`,
+    stock_in_out_date: `${year}-${month}-${day}`,
     processType: '',
     warehouse_from: '',
     warehouse_to: '',
@@ -106,7 +119,7 @@ function StockInOutSlipsAdd() {
 
   const [stockInOutSlipDetails, setStockInOutSlipDetails] = useState([
     {
-      id: '',
+      code: '',
       stock_in_out_slip_id: '',
       product_id: '',
       product_name: '',
@@ -119,7 +132,7 @@ function StockInOutSlipsAdd() {
 
   const addStockInOutSlipDetail = () => {
     setStockInOutSlipDetails([...stockInOutSlipDetails, {
-      id: '',
+      code: '',
       stock_in_out_slip_id: '',
       product_id: '',
       product_name: '',
@@ -211,7 +224,7 @@ function StockInOutSlipsAdd() {
         }
       });
       setStockInOutSlip({
-        id: '',
+        code: '',
         stock_in_out_date: '',
         processType: '',
         warehouse_from: '',
@@ -221,7 +234,7 @@ function StockInOutSlipsAdd() {
       });
       setStockInOutSlipDetails([
         {
-          id: '',
+          code: '',
           stock_in_out_slip_id: '',
           product_id: '',
           product_name: '',
