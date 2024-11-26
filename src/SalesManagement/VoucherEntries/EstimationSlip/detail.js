@@ -115,6 +115,7 @@ function EstimationSlipDetail() {
 
     const handleConfirmDelete = () => {
         ipcRenderer.send('delete-estimation-slip', customerIdToDelete);
+        ipcRenderer.send('delete-estimation-slip-detail', customerIdToDelete);
 
         setIsDialogOpen(false);
         navigate("/sales-management/voucher-entries/estimation-slip");

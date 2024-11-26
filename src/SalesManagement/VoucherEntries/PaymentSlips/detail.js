@@ -120,6 +120,7 @@ function PaymentSlipsDetail() {
 
     const handleConfirmDelete = () => {
         ipcRenderer.send('delete-deposit-slip', customerIdToDelete);
+        ipcRenderer.send('delete-deposit-slip-details-by-slip-id', customerIdToDelete);
 
         setIsDialogOpen(false);
         navigate("/sales-management/voucher-entries/payment-slips");

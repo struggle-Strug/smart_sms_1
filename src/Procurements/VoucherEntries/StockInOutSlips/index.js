@@ -80,6 +80,7 @@ function Index() {
 
   const handleConfirmDelete = () => {
     ipcRenderer.send('delete-stock-in-out-slip', customerIdToDelete);
+    ipcRenderer.send('delete-stock-in-out-slip-details-by-slip-id', customerIdToDelete);
     setIsDialogOpen(false);
   };
 
